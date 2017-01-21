@@ -32,7 +32,7 @@ const store = createStore(
 )
 
 // Socket
-const respCallback = ({ user }) => {
+const respCallback = ({ user, following }) => {
   store.dispatch(setUser(user))
   // Apply the current path
   pages.handleNavigation(store, history.location.pathname)

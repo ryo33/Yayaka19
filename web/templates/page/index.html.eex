@@ -35,4 +35,5 @@ window.token = "<%= @token %>"
 }
 </style>
 <div id="root">
+<script src="<%= static_path(@conn, "/js/app.js") %>"></script>
 </div>

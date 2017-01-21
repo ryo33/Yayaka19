@@ -19,7 +19,7 @@ export const home = p('/', 'home')
 export const publicTimeline = p('/p', 'public')
 export const timeline = p('/t', 'timeline')
 export const newPost = p('/new', 'new')
-export const userPage = p('/user/:id', 'user')
+export const userPage = p('/users/:name', 'user')
 export const loginPage = p('/login', 'login')
 export const errorPage = p('/*', 'error')
 
@@ -56,7 +56,7 @@ const timelineHook = createMiddleware(
 const userPageHook = createMiddleware(
   ({ action }) => userPage.check(action),
   ({ dispatch, nextDispatch, action }) => {
-    dispatch(requestUser(action.payload.params.id))
+    dispatch(requestUser(action.payload.params.name))
     nextDispatch(action)
   }
 )

@@ -11,9 +11,9 @@ export const channel = socket.channel("user")
 export const pushMessage = (event, params) => {
   return new Promise((resolve, reject) => {
     channel.push(event, params)
-    .receive('ok', result => resolve({ result }))
-    .receive('error', reasons => resolve({ error: reasons }))
-    .receive('timeout', () => resolve({ timeout: true }))
+    .receive('ok', result => resolve(result))
+    .receive('error', reasons => reject({ error: reasons }))
+    .receive('timeout', () => reject({ timeout: true }))
   })
 }
 
