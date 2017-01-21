@@ -1,0 +1,13 @@
+<h2>Show user</h2>
+
+<ul>
+  <li>
+    <strong>Name:</strong>
+    <%= @user.name %>
+  </li>
+
+  <li>
+    <strong>Display:</strong>
+    <%= @user.display %>
+  </li>
+</ul>

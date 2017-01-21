@@ -1,0 +1,15 @@
+# App artifacts
+/_build
+/db
+/deps
+/*.ez
+
+erl_crash.dump
+
+/priv/static/
+/node_modules
+
+/config/prod.secret.exs
+/config/dev.secret.exs
+
+.DS_Store

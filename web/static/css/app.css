@@ -1,0 +1,11 @@
+.alert {
+  padding: 10px;
+  color: white;
+}
+.alert:empty { display: none; }
+.alert-info {
+  background-color: grey;
+}
+.alert-danger {
+  background-color: red;
+}
