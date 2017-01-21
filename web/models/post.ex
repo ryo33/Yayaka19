@@ -9,8 +9,8 @@ defmodule Share.Post do
     timestamps()
   end
 
-  @required_fields ~w(text user_id)
-  @optional_fields ~w(post_id)
+  @required_fields ~w(text user_id)a
+  @optional_fields ~w(post_id)a
   @fields @required_fields ++ @optional_fields
 
   @doc """

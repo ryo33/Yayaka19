@@ -1,5 +1,8 @@
 defmodule Share.User do
   use Share.Web, :model
+  @derive {Poison.Encoder, only: [
+    :name, :display, :id,
+  ]}
 
   schema "users" do
     field :provider, :string

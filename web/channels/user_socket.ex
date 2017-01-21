@@ -13,7 +13,7 @@ defmodule Share.UserSocket do
         socket = socket
                  |> assign(:user, client.user)
         {:ok, socket}
-      :error -> :error
+      _ -> :error
     end
   end
 

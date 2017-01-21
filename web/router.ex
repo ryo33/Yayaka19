@@ -21,15 +21,14 @@ defmodule Share.Router do
   scope "/", Share do
     pipe_through [:browser, :browser_auth]
 
-    get "/", PageController, :index
-    get "/users/:id", UserController, :show
-
-    get "/login", AuthController, :login_page
+    get "/login", PageController, :index
     post "/auth/login", AuthController, :login
     get "/logout", AuthController, :delete
 
     get "/auth/:provider", AuthController, :request
     get "/auth/:provider/callback", AuthController, :callback
     post "/auth/create", AuthController, :create
+
+    get "/*page", PageController, :index
   end
 end

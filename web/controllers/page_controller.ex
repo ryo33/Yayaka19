@@ -6,7 +6,7 @@ defmodule Share.PageController do
     case user do
       nil ->
         client = %{
-          account: nil
+          user: nil
         }
         token = Phoenix.Token.sign(Share.Endpoint, "channel", client)
         render conn, "index.html", signed_in: false, token: token

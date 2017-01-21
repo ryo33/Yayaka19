@@ -7,10 +7,6 @@ defmodule Share.AuthController do
 
   @providers [:google, :github, :facebook]
 
-  def login_page(conn, _params) do
-    render(conn, "login.html")
-  end
-
   def request(conn, _params) do
     render(conn, "request.html", callback_url: Helpers.callback_url(conn))
   end

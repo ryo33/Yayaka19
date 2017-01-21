@@ -15,31 +15,8 @@
       url: "<%= Application.get_env(:share, :source)[:url] %>"
     }
   </script>
-  <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
   <body>
     <div class="container">
-      <header>
-        <nav class="navbar navbar-default navbar-static-top">
-          <div class="container">
-            <div>
-              <a href="/">Share</a>
-            </div>
-            <ul>
-              <%= if logged_in?(@conn) do %>
-                <li>
-                  <a href="<%= user_path(@conn, :show, current_user(@conn).name) %>">
-                    <%= current_user(@conn).display %> <span class="caret"></span>
-                  </a>
-                </li>
-                <li><a href="<%= auth_path(@conn, :delete) %>">Sign out</a></li>
-              <% else %>
-                <li><a href="<%= auth_path(@conn, :login_page) %>">Sign In</a></li>
-              <% end %>
-            </ul>
-          </div>
-        </nav>
-      </header>
-
       <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
       <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
 
@@ -49,4 +26,5 @@
 
     </div> <!-- /container -->
   </body>
+  <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
 </html>

@@ -9,3 +9,43 @@
 .alert-danger {
   background-color: red;
 }
+
+a {
+  font-size: 1em;
+}
+button.link {
+  border: none;
+  background: none;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: none;
+  font-size: 1em;
+}
+
+textarea {
+  font-size: 1.2em;
+  width: 100%;
+  margin: 0px 0px;
+}
+
+button.submit {
+  color: black;
+  background: none;
+  border: 2px solid black;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+button.submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+button.submit:hover {
+  background: grey;
+}
+button.submit:active {
+  background: black;
+  color: white;
+}
