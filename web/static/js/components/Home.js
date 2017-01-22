@@ -2,11 +2,12 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import { userPage } from '../pages.js'
-import { homePostSelector } from '../selectors.js'
+import { userSelector, homePostSelector } from '../selectors.js'
 import Post from './Post.js'
 
 const mapStateToProps = state => {
   return {
+    user: userSelector(state),
     post: homePostSelector(state)
   }
 }
@@ -28,11 +29,11 @@ class Home extends Component {
   }
 
   render() {
-    const { post } = this.props
-    const { user, text } = post
-    if (user != null) {
+    const { post, user } = this.props
+    if (post.user != null) {
       return (
         <Post
+          user={user}
           post={post}
           onClickUser={this.handleClickUser}
         />

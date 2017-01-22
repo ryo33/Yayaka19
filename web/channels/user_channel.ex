@@ -75,7 +75,8 @@ defmodule Share.UserChannel do
     query = from f in Follow,
       where: f.user_id == ^user.id,
       where: f.target_user_id == ^id
-    with 0 <- Repo.aggregate(query, :count, :id),
+    with true <- user.id != id,
+         0 <- Repo.aggregate(query, :count, :id),
          params <- %{user_id: user.id, target_user_id: id},
          changeset <- Follow.changeset(%Follow{}, params),
          {:ok, _changeset} <- Repo.insert(changeset) do

@@ -28,6 +28,10 @@ textarea {
   margin: 0px 0px;
 }
 
+button {
+  margin: 0px 3px;
+}
+
 button.submit {
   color: black;
   background: none;
@@ -48,4 +52,25 @@ button.submit:hover {
 button.submit:active {
   background: black;
   color: white;
+}
+
+button.follow {
+  background: white;
+  border: 2px solid black;
+}
+button.follow > span:after {
+  content: "Follow";
+}
+button.unfollow {
+  border: 2px solid black;
+  background: lightblue;
+}
+button.unfollow > span:after {
+  content: "Following";
+}
+button.unfollow:hover {
+  background: red;
+}
+button.unfollow:hover > span:after {
+  content: "Unfollow";
 }

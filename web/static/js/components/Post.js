@@ -1,10 +1,17 @@
 import React from 'react'
 
-const Post = ({ post: {user, text}, onClickUser }) => (
+import FollowButton from './FollowButton.js'
+
+const Post = ({ followButton = true, post: {user, text}, onClickUser }) => (
   <div>
     <button className="link" onClick={onClickUser}>
       {user.display}<small>@{user.name}</small>
     </button>
+    {
+      followButton
+        ? <FollowButton user={user} />
+        : null
+    }
     <pre>
       {text}
     </pre>
@@ -12,6 +19,7 @@ const Post = ({ post: {user, text}, onClickUser }) => (
 )
 
 Post.propTypes = {
+  followButton: React.PropTypes.bool,
   post: React.PropTypes.shape({
     user: React.PropTypes.shape({
       name: React.PropTypes.string.isRequired,

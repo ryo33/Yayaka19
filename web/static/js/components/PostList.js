@@ -1,5 +1,7 @@
 import React from 'react'
+import { connect } from 'react-redux'
 
+import { userSelector } from '../selectors.js'
 import Post from './Post.js'
 
 const PostList = ({ posts, onClickUser }) => (
@@ -10,6 +12,7 @@ const PostList = ({ posts, onClickUser }) => (
         [
           <Post
             key={post.id}
+            followButton={true}
             post={post}
             onClickUser={() => onClickUser(post.user.name)}
           />,
