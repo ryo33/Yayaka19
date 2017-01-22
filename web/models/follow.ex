@@ -8,12 +8,14 @@ defmodule Share.Follow do
     timestamps()
   end
 
+  @fields [:user_id, :target_user_id]
+
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [])
-    |> validate_required([])
+    |> cast(params, @fields)
+    |> validate_required(@fields)
   end
 end

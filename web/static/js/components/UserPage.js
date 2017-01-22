@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { follow, unfollow } from '../actions.js'
+import { requestFollow, requestUnfollow } from '../actions.js'
 import { userSelector, userPageSelector, followingSelector } from '../selectors.js'
 
 const mapDispatchToProps = state => {
@@ -15,7 +15,7 @@ const mapDispatchToProps = state => {
 }
 
 const actionCreators = {
-  follow, unfollow
+  requestFollow, requestUnfollow
 }
 
 class UserPage extends Component {
@@ -26,13 +26,13 @@ class UserPage extends Component {
   }
 
   follow() {
-    const { follow, userPage } = this.props
-    follow(userPage.user.id)
+    const { requestFollow, userPage } = this.props
+    requestFollow(userPage.user.id)
   }
 
   unfollow() {
-    const { unfollow, userPage } = this.props
-    unfollow(userPage.user.id)
+    const { requestUnfollow, userPage } = this.props
+    requestUnfollow(userPage.user.id)
   }
 
   renderFollowButton() {

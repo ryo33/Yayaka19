@@ -5,7 +5,8 @@ import { home } from './pages.js'
 import {
   submitPost, updatePostText,
   requestRandomPost, setHomePost,
-  requestUser, setUserInfo
+  requestUser, setUserInfo,
+  requestFollow, requestUnfollow, follow, unfollow
 } from './actions.js'
 
 const submitPostMiddleware = createMiddleware(
@@ -44,8 +45,36 @@ const requestUserMiddleware = createMiddleware(
   }
 )
 
+const requestFollowMiddleware = createMiddleware(
+  requestFollow.getType(),
+  ({ dispatch, nextDispatch, action }) => {
+    const id = action.payload
+    pushMessage('follow', id)
+      .then(resp => {
+        dispatch(follow(id))
+      }, ({ error, timeout }) => {
+      })
+    nextDispatch(action)
+  }
+)
+
+const requestUnfollowMiddleware = createMiddleware(
+  requestUnfollow.getType(),
+  ({ dispatch, nextDispatch, action }) => {
+    const id = action.payload
+    pushMessage('unfollow', id)
+      .then(resp => {
+        dispatch(unfollow(id))
+      }, ({ error, timeout }) => {
+      })
+    nextDispatch(action)
+  }
+)
+
 export default composeMiddleware(
   submitPostMiddleware,
   requestRandomPostMiddleware,
-  requestUserMiddleware
+  requestUserMiddleware,
+  requestFollowMiddleware,
+  requestUnfollowMiddleware
 )

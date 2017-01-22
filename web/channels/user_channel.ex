@@ -70,4 +70,33 @@ defmodule Share.UserChannel do
         {:reply, {:ok, res}, socket}
     end
   end
+
+  def handle_in("follow", id, socket) do
+    user = socket.assigns.user
+    query = from f in Follow,
+      where: f.user_id == ^user.id,
+      where: f.target_user_id == ^id
+    with 0 <- Repo.aggregate(query, :count, :id),
+         params <- %{user_id: user.id, target_user_id: id},
+         changeset <- Follow.changeset(%Follow{}, params),
+         {:ok, _changeset} <- Repo.insert(changeset) do
+      {:reply, :ok, socket}
+    else
+      _ -> {:reply, :error, socket}
+    end
+  end
+
+  def handle_in("unfollow", id, socket) do
+    user = socket.assigns.user
+    query = from f in Follow,
+      where: f.user_id == ^user.id,
+      where: f.target_user_id == ^id
+    case Repo.one(query) do
+      nil -> {:reply, :error, socket}
+      follow -> case Repo.delete(follow) do
+        {:ok, _} -> {:reply, :ok, socket}
+        _ -> {:reply, :error, socket}
+      end
+    end
+  end
 end

@@ -3,7 +3,7 @@ import { createReducer } from 'redux-act'
 import { createPagesReducer } from 'redux-pages'
 
 import { home } from '../pages.js'
-import { setUser, setFollowing } from '../actions.js'
+import { setUser, setFollowing, follow, unfollow } from '../actions.js'
 
 import homeReducer from './home.js'
 import newPostPage from './newPostPage.js'
@@ -16,7 +16,9 @@ const user = createReducer({
 }, null)
 
 const following = createReducer({
-  [setFollowing]: (state, payload) => payload
+  [setFollowing]: (state, payload) => payload,
+  [follow]: (state, id) => [id, ...state],
+  [unfollow]: (state, unfollowID) => state.filter(id => id !== unfollowID),
 }, [])
 
 export default combineReducers({
