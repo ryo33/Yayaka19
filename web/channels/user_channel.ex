@@ -101,10 +101,12 @@ defmodule Share.UserChannel do
   end
 
   def handle_in("public_timeline", _params, socket) do
-    query = from p in Post,
+    random_query = from p in Post,
       order_by: fragment("RANDOM()"),
-      preload: [:user],
       limit: 50
+    query = from p in subquery(random_query),
+      order_by: [desc: p.id],
+      preload: [:user]
     posts = Repo.all(query)
     {posts, socket} = Enum.map_reduce(posts, socket, &Post.encode(&1, &2))
     {:reply, {:ok, %{posts: posts}}, socket}
@@ -116,11 +118,13 @@ defmodule Share.UserChannel do
       select: f.target_user_id,
       where: f.user_id == ^user.id
     users = Repo.all(query)
-    query = from p in Post,
+    random_query = from p in Post,
       where: p.user_id in ^users,
       order_by: fragment("RANDOM()"),
-      preload: [:user],
       limit: 50
+    query = from p in subquery(random_query),
+      order_by: [desc: p.id],
+      preload: [:user]
     posts = Repo.all(query)
     {posts, socket} = Enum.map_reduce(posts, socket, &Post.encode(&1, &2))
     {:reply, {:ok, %{posts: posts}}, socket}
