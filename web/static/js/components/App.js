@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
+import { source } from '../global.js'
 import {
   home, publicTimeline, timeline, newPost, userPage, loginPage
 } from '../pages.js'
@@ -71,6 +72,7 @@ class App extends Component {
           <li><button className="link" onClick={timelineAction}>Timeline</button></li>
           <li><button className="link" onClick={publicTimelineAction}>Public Timeline</button></li>
           <li><button className="link" onClick={newPostAction}>New Post</button></li>
+          <li><a href={source.url}>GitHub</a></li>
           <li><a href="/logout">Sign out</a></li>
         </ul>
       )
@@ -80,6 +82,7 @@ class App extends Component {
           <li><button className="link" onClick={homeAction}>Home</button></li>
           <li><button className="link" onClick={publicTimelineAction}>Public Timeline</button></li>
           <li><button className="link" onClick={loginPageAction}>Sign in</button></li>
+          <li><a href={source.url}>GitHub</a></li>
         </ul>
       )
       // Not signed in
