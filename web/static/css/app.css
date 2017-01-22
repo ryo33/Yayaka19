@@ -10,6 +10,13 @@
   background-color: red;
 }
 
+pre {
+  overflow: auto;
+  word-wrap: normal;
+  white-space: pre-wrap;
+  font-size: 1.1em;
+}
+
 a {
   font-size: 1em;
 }
@@ -23,7 +30,7 @@ button.link {
 }
 
 textarea {
-  font-size: 1.2em;
+  font-size: 1.1em;
   width: 100%;
   margin: 0px 0px;
 }

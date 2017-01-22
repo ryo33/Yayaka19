@@ -38,7 +38,7 @@ class NewPost extends Component {
         <textarea
           value={text}
           onChange={this.handleChange}
-          rows={20}
+          rows={7}
           autoFocus
         >
         </textarea>
