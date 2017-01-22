@@ -6,7 +6,8 @@ import {
   requestRandomPost,
   requestTimeline,
   requestPublicTimeline,
-  requestUser
+  requestUser,
+  requestInfo
 } from './actions.js'
 import {
   signedInSelector
@@ -33,6 +34,7 @@ const homeHook = createMiddleware(
   ({ action }) => home.check(action),
   ({ dispatch, nextDispatch, action }) => {
     dispatch(requestRandomPost())
+    dispatch(requestInfo())
     nextDispatch(action)
   }
 )

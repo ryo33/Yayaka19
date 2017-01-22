@@ -8,7 +8,8 @@ import {
   requestUser, setUserInfo,
   requestFollow, requestUnfollow, follow, unfollow,
   requestPublicTimeline, updatePublicTimeline,
-  requestTimeline, updateTimeline
+  requestTimeline, updateTimeline,
+  requestInfo, updateInfo
 } from './actions.js'
 
 const submitPostMiddleware = createMiddleware(
@@ -93,6 +94,17 @@ const requestTimelineMiddleware = createMiddleware(
   }
 )
 
+const requestInfoMiddleware = createMiddleware(
+  requestInfo.getType(),
+  ({ dispatch, nextDispatch, action }) => {
+    pushMessage('info', {})
+      .then(resp => {
+        dispatch(updateInfo(resp))
+      })
+    nextDispatch(action)
+  }
+)
+
 export default composeMiddleware(
   submitPostMiddleware,
   requestRandomPostMiddleware,
@@ -100,5 +112,6 @@ export default composeMiddleware(
   requestFollowMiddleware,
   requestUnfollowMiddleware,
   requestPublicTimelineMiddleware,
-  requestTimelineMiddleware
+  requestTimelineMiddleware,
+  requestInfoMiddleware
 )

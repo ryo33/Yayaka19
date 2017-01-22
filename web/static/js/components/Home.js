@@ -2,11 +2,12 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import { userPage } from '../pages.js'
-import { userSelector, homePostSelector } from '../selectors.js'
+import { infoSelector, userSelector, homePostSelector } from '../selectors.js'
 import Post from './Post.js'
 
 const mapStateToProps = state => {
   return {
+    info: infoSelector(state),
     user: userSelector(state),
     post: homePostSelector(state)
   }
@@ -28,7 +29,16 @@ class Home extends Component {
     userPageAction({name: user.name})
   }
 
-  render() {
+  renderInfo() {
+    const { users, posts, following } = this.props.info
+    return (
+      <p>
+        <strong>{users}</strong> users and <strong>{posts}</strong> posts.
+      </p>
+    )
+  }
+
+  renderPost() {
     const { post, user } = this.props
     if (post.user != null) {
       return (
@@ -39,11 +49,17 @@ class Home extends Component {
         />
       )
     } else {
-      return (
-        <div>
-        </div>
-      )
+      return null
     }
+  }
+
+  render() {
+    return (
+      <div>
+        {this.renderInfo()}
+        {this.renderPost()}
+      </div>
+    )
   }
 }
 

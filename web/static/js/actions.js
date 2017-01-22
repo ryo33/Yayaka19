@@ -1,5 +1,8 @@
 import { createAction } from 'redux-act'
 
+export const requestInfo = createAction('request info')
+export const updateInfo = createAction('update info', info => info)
+
 export const setUser = createAction('set user', user => user)
 export const setFollowing = createAction('set following', following => following)
 

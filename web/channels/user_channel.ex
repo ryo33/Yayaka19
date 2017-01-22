@@ -61,10 +61,10 @@ defmodule Share.UserChannel do
         query = from f in Follow, where: f.target_user_id == ^user.id
         followed_count = Repo.aggregate(query, :count, :id)
         res = %{
-          user: user,
-          "postCount": post_count,
-          "following": follow_count,
-          "followers": followed_count
+          "user" => user,
+          "postCount" => post_count,
+          "following" => follow_count,
+          "followers" => followed_count
         }
         {:reply, {:ok, res}, socket}
     end
@@ -112,7 +112,7 @@ defmodule Share.UserChannel do
     {:reply, {:ok, %{posts: posts}}, socket}
   end
 
-  def handle_in("timeline", _paramss, socket) do
+  def handle_in("timeline", _params, socket) do
     user = socket.assigns.user
     query = from f in Follow,
       select: f.target_user_id,
@@ -128,5 +128,15 @@ defmodule Share.UserChannel do
     posts = Repo.all(query)
     {posts, socket} = Enum.map_reduce(posts, socket, &Post.encode(&1, &2))
     {:reply, {:ok, %{posts: posts}}, socket}
+  end
+
+  def handle_in("info", _params, socket) do
+    post_count = Repo.aggregate(Post, :count, :id)
+    user_count = Repo.aggregate(User, :count, :id)
+    res = %{
+      posts: post_count,
+      users: user_count
+    }
+    {:reply, {:ok, res}, socket}
   end
 end

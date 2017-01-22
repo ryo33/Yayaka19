@@ -5,6 +5,7 @@ import { createPagesReducer } from 'redux-pages'
 import { home } from '../pages.js'
 import { setUser, setFollowing, follow, unfollow } from '../actions.js'
 
+import info from './info.js'
 import homeReducer from './home.js'
 import newPostPage from './newPostPage.js'
 import userPage from './userPage.js'
@@ -24,6 +25,7 @@ const following = createReducer({
 }, [])
 
 export default combineReducers({
+  info,
   page,
   user,
   following,
