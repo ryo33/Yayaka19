@@ -18,7 +18,7 @@ button.link {
   background: none;
   text-decoration: underline;
   cursor: pointer;
-  padding: none;
+  padding: 0px;
   font-size: 1em;
 }
 
