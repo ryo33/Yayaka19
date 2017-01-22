@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { requestFollow, requestUnfollow } from '../actions.js'
 import { userSelector, userPageSelector, followingSelector } from '../selectors.js'
 
-const mapDispatchToProps = state => {
+const mapStateToProps = state => {
   const user = userSelector(state)
   const userPage = userPageSelector(state)
   return {
@@ -77,4 +77,4 @@ class UserPage extends Component {
   }
 }
 
-export default connect(mapDispatchToProps, actionCreators)(UserPage)
+export default connect(mapStateToProps, actionCreators)(UserPage)

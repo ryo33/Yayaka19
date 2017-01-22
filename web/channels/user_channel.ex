@@ -8,6 +8,7 @@ defmodule Share.UserChannel do
   require Logger
 
   def join("user", _params, socket) do
+    socket = assign(socket, :posts, %{})
     user = socket.assigns.user
     following = if user != nil do
       query = from f in Follow,
@@ -35,15 +36,13 @@ defmodule Share.UserChannel do
   end
 
   def handle_in("random_post", _params, socket) do
-    query = from p in Post, order_by: fragment("RANDOM()"), limit: 1
-    post = case Repo.one(query) do
-      nil -> %{}
-      post ->
-        post = Repo.preload(post, [:user])
-        %{
-          text: post.text,
-          user: post.user
-        }
+    query = from p in Post,
+      order_by: fragment("RANDOM()"),
+      preload: [:user],
+      limit: 1
+    {post, socket} = case Repo.one(query) do
+      nil -> {%{}, socket}
+      post -> Post.encode(post, socket)
     end
     res = %{
       post: post
@@ -98,5 +97,31 @@ defmodule Share.UserChannel do
         _ -> {:reply, :error, socket}
       end
     end
+  end
+
+  def handle_in("public_timeline", _params, socket) do
+    query = from p in Post,
+      order_by: fragment("RANDOM()"),
+      preload: [:user],
+      limit: 50
+    posts = Repo.all(query)
+    {posts, socket} = Enum.map_reduce(posts, socket, &Post.encode(&1, &2))
+    {:reply, {:ok, %{posts: posts}}, socket}
+  end
+
+  def handle_in("timeline", _paramss, socket) do
+    user = socket.assigns.user
+    query = from f in Follow,
+      select: f.target_user_id,
+      where: f.user_id == ^user.id
+    users = Repo.all(query)
+    query = from p in Post,
+      where: p.user_id in ^users,
+      order_by: fragment("RANDOM()"),
+      preload: [:user],
+      limit: 50
+    posts = Repo.all(query)
+    {posts, socket} = Enum.map_reduce(posts, socket, &Post.encode(&1, &2))
+    {:reply, {:ok, %{posts: posts}}, socket}
   end
 end

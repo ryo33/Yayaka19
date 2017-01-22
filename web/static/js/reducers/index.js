@@ -8,6 +8,8 @@ import { setUser, setFollowing, follow, unfollow } from '../actions.js'
 import homeReducer from './home.js'
 import newPostPage from './newPostPage.js'
 import userPage from './userPage.js'
+import publicTimeline from './publicTimeline.js'
+import timeline from './timeline.js'
 
 const page = createPagesReducer(home.name, {})
 
@@ -27,5 +29,7 @@ export default combineReducers({
   following,
   home: homeReducer,
   newPostPage,
-  userPage
+  userPage,
+  publicTimeline,
+  timeline
 })

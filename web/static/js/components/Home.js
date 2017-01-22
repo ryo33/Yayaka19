@@ -3,8 +3,9 @@ import { connect } from 'react-redux'
 
 import { userPage } from '../pages.js'
 import { homePostSelector } from '../selectors.js'
+import Post from './Post.js'
 
-const mapDispatchToProps = state => {
+const mapStateToProps = state => {
   return {
     post: homePostSelector(state)
   }
@@ -31,14 +32,10 @@ class Home extends Component {
     const { user, text } = post
     if (user != null) {
       return (
-        <div>
-          <button className="link" onClick={this.handleClickUser}>
-            {user.display}<small>@{user.name}</small>
-          </button>
-          <pre>
-            {text}
-          </pre>
-        </div>
+        <Post
+          post={post}
+          onClickUser={this.handleClickUser}
+        />
       )
     } else {
       return (
@@ -49,4 +46,4 @@ class Home extends Component {
   }
 }
 
-export default connect(mapDispatchToProps, actionCreators)(Home)
+export default connect(mapStateToProps, actionCreators)(Home)

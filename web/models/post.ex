@@ -22,4 +22,23 @@ defmodule Share.Post do
     |> validate_required(@required_fields)
     |> validate_length(:text, min: 1)
   end
+
+  def encode(post, socket) do
+    posts = socket.assigns.posts
+    {socket, id} = case Map.get(posts, post.id) do
+      nil ->
+        id = Map.size(posts)
+        posts = Map.put(posts, post.id, id)
+        socket = Phoenix.Socket.assign(socket, :posts, posts)
+        {socket, id}
+      id ->
+        {socket, id}
+    end
+    post = %{
+      id: id,
+      text: post.text,
+      user: post.user
+    }
+    {post, socket}
+  end
 end

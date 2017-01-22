@@ -13,7 +13,7 @@ import LoginPage from './LoginPage.js'
 import ErrorPage from './ErrorPage.js'
 import { pageSelector, userSelector, signedInSelector } from '../selectors.js'
 
-const mapDispatchToProps = state => {
+const mapStateToProps = state => {
   return {
     page: pageSelector(state),
     user: userSelector(state),
@@ -96,4 +96,4 @@ class App extends Component {
   }
 }
 
-export default connect(mapDispatchToProps, actionCreators)(App)
+export default connect(mapStateToProps, actionCreators)(App)

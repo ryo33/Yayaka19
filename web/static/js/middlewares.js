@@ -6,7 +6,9 @@ import {
   submitPost, updatePostText,
   requestRandomPost, setHomePost,
   requestUser, setUserInfo,
-  requestFollow, requestUnfollow, follow, unfollow
+  requestFollow, requestUnfollow, follow, unfollow,
+  requestPublicTimeline, updatePublicTimeline,
+  requestTimeline, updateTimeline
 } from './actions.js'
 
 const submitPostMiddleware = createMiddleware(
@@ -52,7 +54,6 @@ const requestFollowMiddleware = createMiddleware(
     pushMessage('follow', id)
       .then(resp => {
         dispatch(follow(id))
-      }, ({ error, timeout }) => {
       })
     nextDispatch(action)
   }
@@ -65,7 +66,28 @@ const requestUnfollowMiddleware = createMiddleware(
     pushMessage('unfollow', id)
       .then(resp => {
         dispatch(unfollow(id))
-      }, ({ error, timeout }) => {
+      })
+    nextDispatch(action)
+  }
+)
+
+const requestPublicTimelineMiddleware = createMiddleware(
+  requestPublicTimeline.getType(),
+  ({ dispatch, nextDispatch, action }) => {
+    pushMessage('public_timeline', {})
+      .then(resp => {
+        dispatch(updatePublicTimeline(resp))
+      })
+    nextDispatch(action)
+  }
+)
+
+const requestTimelineMiddleware = createMiddleware(
+  requestTimeline.getType(),
+  ({ dispatch, nextDispatch, action }) => {
+    pushMessage('timeline', {})
+      .then(resp => {
+        dispatch(updateTimeline(resp))
       })
     nextDispatch(action)
   }
@@ -76,5 +98,7 @@ export default composeMiddleware(
   requestRandomPostMiddleware,
   requestUserMiddleware,
   requestFollowMiddleware,
-  requestUnfollowMiddleware
+  requestUnfollowMiddleware,
+  requestPublicTimelineMiddleware,
+  requestTimelineMiddleware
 )

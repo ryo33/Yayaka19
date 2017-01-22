@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { submitPost, updatePostText } from '../actions.js'
 import { newPostPageSelector } from '../selectors.js'
 
-const mapDispatchToProps = state => {
+const mapStateToProps = state => {
   return newPostPageSelector(state)
 }
 
@@ -52,4 +52,4 @@ class NewPost extends Component {
   }
 }
 
-export default connect(mapDispatchToProps, actionCreators)(NewPost)
+export default connect(mapStateToProps, actionCreators)(NewPost)
