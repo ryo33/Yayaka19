@@ -7,7 +7,18 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title><%= Application.get_env(:share, :title) %></title>
+    <% title = Application.get_env(:share, :title) %>
+    <title><%= title %></title>
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="<%= title %>" />
+    <meta property="og:url" content="<%= Application.get_env(:share, :url) %>" />
+    <meta property="og:title" content="<%= title %>" />
+    <meta property="og:description" content="<%= Application.get_env(:share, :description) %>">
+    <meta property="og:image" content="<%= static_path(@conn, "/images/site.png") %>" />
+
+    <meta property="fb:app_id" content="938652226234734" />
+
+    <meta name="twitter:card" content="summary" />
   </head>
   <script>
     window.source = {

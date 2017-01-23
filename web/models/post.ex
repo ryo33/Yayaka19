@@ -45,6 +45,6 @@ defmodule Share.Post do
 
   def random(query) do
     query
-    |> order_by(fragment("RANDOM() * (LN(views + 1) + 1)"))
+    |> order_by(fragment("RANDOM() * (LN(views + 1) + SIN(views) + 1)"))
   end
 end
