@@ -15,6 +15,13 @@ import {
 import { pageSelector } from './selectors.js'
 
 const reloadMiddleware = composeMiddleware(
+  createMiddleware(
+    reload.getType(),
+    ({ dispatch, nextDispatch, action }) => {
+      dispatch(requestInfo())
+      nextDispatch(action)
+    }
+  ),
   createReplacer(
     reload.getType(),
     ({ getState }) => pageSelector(getState()).name === home.name,
