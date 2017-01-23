@@ -120,7 +120,7 @@ defmodule Share.UserChannel do
     query = from f in Follow,
       select: f.target_user_id,
       where: f.user_id == ^user.id
-    users = Repo.all(query)
+    users = [user.id | Repo.all(query)]
     random_query = from p in Post,
       where: p.user_id in ^users,
       limit: 50
