@@ -1,4 +1,5 @@
 import React from 'react'
+import Linkify from 'react-linkify'
 
 import FollowButton from './FollowButton.js'
 
@@ -13,7 +14,9 @@ const Post = ({ followButton = true, post: {user, text}, onClickUser }) => (
         : null
     }
     <pre>
-      {text}
+      <Linkify properties={{target: '_blank'}}>
+        {text}
+      </Linkify>
     </pre>
   </div>
 )
