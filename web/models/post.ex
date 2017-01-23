@@ -26,11 +26,14 @@ defmodule Share.Post do
 
   def encode(post, socket) do
     posts = socket.assigns.posts
+    client_posts = socket.assigns.client_posts
     {socket, id} = case Map.get(posts, post.id) do
       nil ->
-        id = Map.size(posts)
+        id = Map.size(client_posts)
         posts = Map.put(posts, post.id, id)
+        client_posts = Map.put(client_posts, id, post.id)
         socket = Phoenix.Socket.assign(socket, :posts, posts)
+        socket = Phoenix.Socket.assign(socket, :client_posts, client_posts)
         {socket, id}
       id ->
         {socket, id}

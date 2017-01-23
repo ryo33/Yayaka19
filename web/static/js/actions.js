@@ -5,6 +5,7 @@ export const updateInfo = createAction('update info', info => info)
 
 export const setUser = createAction('set user', user => user)
 export const setFollowing = createAction('set following', following => following)
+export const addFavs = createAction('add favs', favs => favs)
 
 export const reload = createAction('reload')
 
@@ -31,3 +32,8 @@ export const updatePublicTimeline = createAction('update public timeline', data 
 // Timeline
 export const requestTimeline = createAction('request timeline')
 export const updateTimeline = createAction('update timeline', data => data)
+
+export const fav = createAction('fav', id => id)
+export const unfav = createAction('unfav', id => id)
+export const requestFav = createAction('request fav', id => id)
+export const requestUnfav = createAction('request unfav', id => id)
