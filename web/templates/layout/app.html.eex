@@ -8,13 +8,14 @@
     <meta name="author" content="">
 
     <% title = Application.get_env(:share, :title) %>
+    <% url = Application.get_env(:share, :url) %>
     <title><%= title %></title>
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="<%= title %>" />
-    <meta property="og:url" content="<%= Application.get_env(:share, :url) %>" />
+    <meta property="og:url" content="<%= url %>" />
     <meta property="og:title" content="<%= title %>" />
     <meta property="og:description" content="<%= Application.get_env(:share, :description) %>">
-    <meta property="og:image" content="<%= static_path(@conn, "/images/site.png") %>" />
+    <meta property="og:image" content="<%= url %><%= static_path(@conn, "/images/site.png") %>" />
 
     <meta property="fb:app_id" content="938652226234734" />
 
