@@ -6,7 +6,7 @@ import FollowButton from './FollowButton.js'
 const Post = ({ followButton = true, post: {user, text}, onClickUser }) => (
   <div>
     <button className="link" onClick={onClickUser}>
-      {user.display}<small>@{user.name}</small>
+      {user.display} <small>@{user.name}</small>
     </button>
     {
       followButton
