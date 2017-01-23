@@ -3,11 +3,12 @@ import { createMiddleware, createReplacer, composeMiddleware } from 'redux-middl
 import { pushMessage } from './socket.js'
 import { home, timeline, publicTimeline } from './pages.js'
 import {
-  reload,
+  reload, addFavs,
   submitPost, updatePostText,
   requestRandomPost, setHomePost,
   requestUser, setUserInfo,
   requestFollow, requestUnfollow, follow, unfollow,
+  requestFav, requestUnfav, fav, unfav,
   requestPublicTimeline, updatePublicTimeline,
   requestTimeline, updateTimeline,
   requestInfo, updateInfo
@@ -18,8 +19,8 @@ const reloadMiddleware = composeMiddleware(
   createMiddleware(
     reload.getType(),
     ({ dispatch, nextDispatch, action }) => {
-      dispatch(requestInfo())
       nextDispatch(action)
+      dispatch(requestInfo())
     }
   ),
   createReplacer(
@@ -42,96 +43,123 @@ const reloadMiddleware = composeMiddleware(
 const submitPostMiddleware = createMiddleware(
   submitPost.getType(),
   ({ dispatch, nextDispatch, action }) => {
+    nextDispatch(action)
     pushMessage('new_post', action.payload)
       .then(() => {
-        dispatch(home.action())
+        dispatch(timeline.action())
         dispatch(updatePostText(''))
       })
-    nextDispatch(action)
   }
 )
 
 const requestRandomPostMiddleware = createMiddleware(
   requestRandomPost.getType(),
   ({ dispatch, nextDispatch, action }) => {
+    nextDispatch(action)
     setHomePost({})
     pushMessage('random_post', {})
-      .then(({ post }) => {
+      .then(({ post, favs }) => {
+        dispatch(addFavs(favs))
         dispatch(setHomePost(post))
       })
-    nextDispatch(action)
   }
 )
 
 const requestUserMiddleware = createMiddleware(
   requestUser.getType(),
   ({ dispatch, nextDispatch, action }) => {
+    nextDispatch(action)
     pushMessage('user_info', {name: action.payload})
       .then(resp => {
         dispatch(setUserInfo(resp))
       }, ({ error, timeout }) => {
         dispatch(home.action())
       })
-    nextDispatch(action)
   }
 )
 
 const requestFollowMiddleware = createMiddleware(
   requestFollow.getType(),
   ({ dispatch, nextDispatch, action }) => {
+    nextDispatch(action)
     const id = action.payload
-    pushMessage('follow', id)
+    pushMessage('follow', {id})
       .then(resp => {
         dispatch(follow(id))
       })
-    nextDispatch(action)
   }
 )
 
 const requestUnfollowMiddleware = createMiddleware(
   requestUnfollow.getType(),
   ({ dispatch, nextDispatch, action }) => {
+    nextDispatch(action)
     const id = action.payload
-    pushMessage('unfollow', id)
+    pushMessage('unfollow', {id})
       .then(resp => {
         dispatch(unfollow(id))
       })
+  }
+)
+
+const requestFavMiddleware = createMiddleware(
+  requestFav.getType(),
+  ({ dispatch, nextDispatch, action }) => {
     nextDispatch(action)
+    const id = action.payload
+    pushMessage('fav', {id})
+      .then(resp => {
+        dispatch(fav(id))
+      })
+  }
+)
+
+const requestUnfavMiddleware = createMiddleware(
+  requestUnfav.getType(),
+  ({ dispatch, nextDispatch, action }) => {
+    nextDispatch(action)
+    const id = action.payload
+    pushMessage('unfav', {id})
+      .then(resp => {
+        dispatch(unfav(id))
+      })
   }
 )
 
 const requestPublicTimelineMiddleware = createMiddleware(
   requestPublicTimeline.getType(),
   ({ dispatch, nextDispatch, action }) => {
+    nextDispatch(action)
     dispatch(updatePublicTimeline({posts: []}))
     pushMessage('public_timeline', {})
-      .then(resp => {
-        dispatch(updatePublicTimeline(resp))
+      .then(({ posts, favs }) => {
+        dispatch(addFavs(favs))
+        dispatch(updatePublicTimeline({posts}))
       })
-    nextDispatch(action)
   }
 )
 
 const requestTimelineMiddleware = createMiddleware(
   requestTimeline.getType(),
   ({ dispatch, nextDispatch, action }) => {
+    nextDispatch(action)
     dispatch(updateTimeline({posts: []}))
     pushMessage('timeline', {})
-      .then(resp => {
-        dispatch(updateTimeline(resp))
+      .then(({ posts, favs }) => {
+        dispatch(addFavs(favs))
+        dispatch(updateTimeline({posts}))
       })
-    nextDispatch(action)
   }
 )
 
 const requestInfoMiddleware = createMiddleware(
   requestInfo.getType(),
   ({ dispatch, nextDispatch, action }) => {
+    nextDispatch(action)
     pushMessage('info', {})
       .then(resp => {
         dispatch(updateInfo(resp))
       })
-    nextDispatch(action)
   }
 )
 
@@ -142,6 +170,8 @@ export default composeMiddleware(
   requestUserMiddleware,
   requestFollowMiddleware,
   requestUnfollowMiddleware,
+  requestFavMiddleware,
+  requestUnfavMiddleware,
   requestPublicTimelineMiddleware,
   requestTimelineMiddleware,
   requestInfoMiddleware

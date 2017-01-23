@@ -3,12 +3,14 @@ defmodule Share.UserChannel do
   alias Share.Follow
   alias Share.User
   alias Share.Post
+  alias Share.Fav
   alias Share.Repo
 
   require Logger
 
   def join("user", _params, socket) do
     socket = assign(socket, :posts, %{})
+    socket = assign(socket, :client_posts, %{})
     user = socket.assigns.user
     following = if user != nil do
       query = from f in Follow,
@@ -36,6 +38,7 @@ defmodule Share.UserChannel do
   end
 
   def handle_in("random_post", _params, socket) do
+    user = socket.assigns.user
     query = from p in Post,
       preload: [:user],
       limit: 1
@@ -47,7 +50,8 @@ defmodule Share.UserChannel do
         Post.encode(post, socket)
     end
     res = %{
-      post: post
+      post: post,
+      favs: Fav.get_favs(socket, [post.id])
     }
     {:reply, {:ok, res}, socket}
   end
@@ -72,7 +76,7 @@ defmodule Share.UserChannel do
     end
   end
 
-  def handle_in("follow", id, socket) do
+  def handle_in("follow", %{"id" => id}, socket) do
     user = socket.assigns.user
     query = from f in Follow,
       where: f.user_id == ^user.id,
@@ -88,7 +92,7 @@ defmodule Share.UserChannel do
     end
   end
 
-  def handle_in("unfollow", id, socket) do
+  def handle_in("unfollow", %{"id" => id}, socket) do
     user = socket.assigns.user
     query = from f in Follow,
       where: f.user_id == ^user.id,
@@ -103,6 +107,7 @@ defmodule Share.UserChannel do
   end
 
   def handle_in("public_timeline", _params, socket) do
+    user = socket.assigns.user
     random_query = from p in Post,
       limit: 50
     query = from p in subquery(Post.random(random_query)),
@@ -112,7 +117,8 @@ defmodule Share.UserChannel do
     post_ids = posts |> Enum.map(&(&1.id))
     Repo.update_all((from p in Post, where: p.id in ^post_ids), inc: [views: 1])
     {posts, socket} = Enum.map_reduce(posts, socket, &Post.encode(&1, &2))
-    {:reply, {:ok, %{posts: posts}}, socket}
+    favs = Fav.get_favs(socket, post_ids)
+    {:reply, {:ok, %{posts: posts, favs: favs}}, socket}
   end
 
   def handle_in("timeline", _params, socket) do
@@ -128,8 +134,10 @@ defmodule Share.UserChannel do
       order_by: [desc: p.id],
       preload: [:user]
     posts = Repo.all(query)
+    post_ids = posts |> Enum.map(&(&1.id))
     {posts, socket} = Enum.map_reduce(posts, socket, &Post.encode(&1, &2))
-    {:reply, {:ok, %{posts: posts}}, socket}
+    favs = Fav.get_favs(socket, post_ids)
+    {:reply, {:ok, %{posts: posts, favs: favs}}, socket}
   end
 
   def handle_in("info", _params, socket) do
@@ -140,5 +148,36 @@ defmodule Share.UserChannel do
       users: user_count
     }
     {:reply, {:ok, res}, socket}
+  end
+
+  def handle_in("fav", %{"id" => id}, socket) do
+    user = socket.assigns.user
+    id = socket.assigns.client_posts[id]
+    query = from f in Fav,
+      where: f.user_id == ^user.id,
+      where: f.post_id == ^id
+    with 0 <- Repo.aggregate(query, :count, :id),
+         params <- %{user_id: user.id, post_id: id},
+         changeset <- Fav.changeset(%Fav{}, params),
+         {:ok, _changeset} <- Repo.insert(changeset) do
+      {:reply, :ok, socket}
+    else
+      _ -> {:reply, :error, socket}
+    end
+  end
+
+  def handle_in("unfav", %{"id" => id}, socket) do
+    user = socket.assigns.user
+    id = socket.assigns.client_posts[id]
+    query = from f in Fav,
+      where: f.user_id == ^user.id,
+      where: f.post_id == ^id
+    case Repo.one(query) do
+      nil -> {:reply, :error, socket}
+      fav -> case Repo.delete(fav) do
+        {:ok, _} -> {:reply, :ok, socket}
+        _ -> {:reply, :error, socket}
+      end
+    end
   end
 end

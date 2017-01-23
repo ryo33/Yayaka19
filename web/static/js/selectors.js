@@ -3,6 +3,7 @@ export const infoSelector = ({ info }) => info
 export const pageSelector = ({ page }) => page
 export const userSelector = ({ user }) => user
 export const followingSelector = ({ following }) => following
+export const favsSelector = ({ favs }) => favs
 export const signedInSelector = ({ user }) => user != null
 
 // Home

@@ -2,22 +2,24 @@ import React from 'react'
 import Linkify from 'react-linkify'
 
 import FollowButton from './FollowButton.js'
+import FavButton from './FavButton.js'
 
-const Post = ({ followButton = true, post: {user, text}, onClickUser }) => (
+const Post = ({ followButton = true, post, onClickUser }) => (
   <div>
     <button className="link" onClick={onClickUser}>
-      {user.display} <small>@{user.name}</small>
+      {post.user.display} <small>@{post.user.name}</small>
     </button>
     {
       followButton
-        ? <FollowButton user={user} />
+        ? <FollowButton user={post.user} />
         : null
     }
     <pre>
       <Linkify properties={{target: '_blank'}}>
-        {text}
+        {post.text}
       </Linkify>
     </pre>
+    <FavButton post={post} />
   </div>
 )
 

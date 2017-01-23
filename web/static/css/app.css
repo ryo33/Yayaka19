@@ -89,3 +89,25 @@ button.unfollow:hover {
 button.unfollow:hover > span:after {
   content: "Unfollow";
 }
+
+button.fav {
+  background: white;
+  border: 2px solid black;
+  color: grey;
+}
+button.fav > span:after {
+  content: "Fav";
+}
+button.unfav {
+  border: 2px solid black;
+  background: yellow;
+}
+button.unfav > span:after {
+  content: "Fav";
+}
+button.unfav:hover {
+  background: red;
+}
+button.unfav:hover > span:after {
+  content: "Unfav";
+}
