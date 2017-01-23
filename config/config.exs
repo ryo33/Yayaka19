@@ -33,8 +33,8 @@ config :logger, :console,
 config :ueberauth, Ueberauth,
   providers: [
     google: {Ueberauth.Strategy.Google, [default_scope: "email"]},
-    facebook: {Ueberauth.Strategy.Facebook, [default_scope: "email"]},
-    github: {Ueberauth.Strategy.Github, [default_scope: "user"]}
+    facebook: {Ueberauth.Strategy.Facebook, [default_scope: ""]},
+    github: {Ueberauth.Strategy.Github, [default_scope: ""]}
   ]
 
 config :guardian, Guardian,
