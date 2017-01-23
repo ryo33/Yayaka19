@@ -6,11 +6,13 @@ import {
   requestRandomPost,
   requestTimeline,
   requestPublicTimeline,
-  requestUser,
-  requestInfo
+  requestUser
 } from './actions.js'
 import {
-  signedInSelector
+  signedInSelector,
+  homePostSelector,
+  publicTimelinePostsSelector,
+  timelinePostsSelector
 } from './selectors.js'
 
 export const pages = createPages()
@@ -32,15 +34,16 @@ const onlySignedInMiddleware = createReplacer(
 
 const homeHook = createMiddleware(
   ({ action }) => home.check(action),
+  ({ getState }) => homePostSelector(getState()).user == null,
   ({ dispatch, nextDispatch, action }) => {
     dispatch(requestRandomPost())
-    dispatch(requestInfo())
     nextDispatch(action)
   }
 )
 
 const publicTimelineHook = createMiddleware(
   ({ action }) => publicTimeline.check(action),
+  ({ getState }) => publicTimelinePostsSelector(getState()).length == 0,
   ({ dispatch, nextDispatch, action }) => {
     dispatch(requestPublicTimeline())
     nextDispatch(action)
@@ -49,6 +52,7 @@ const publicTimelineHook = createMiddleware(
 
 const timelineHook = createMiddleware(
   ({ action }) => timeline.check(action),
+  ({ getState }) => timelinePostsSelector(getState()).length == 0,
   ({ dispatch, nextDispatch, action }) => {
     dispatch(requestTimeline())
     nextDispatch(action)

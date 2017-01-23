@@ -6,6 +6,8 @@ export const updateInfo = createAction('update info', info => info)
 export const setUser = createAction('set user', user => user)
 export const setFollowing = createAction('set following', following => following)
 
+export const reload = createAction('reload')
+
 // Home
 export const requestRandomPost = createAction('request random post')
 export const setHomePost = createAction('set home post', post => post)

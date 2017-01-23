@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { userPage } from '../pages.js'
 import { infoSelector, userSelector, homePostSelector } from '../selectors.js'
 import Post from './Post.js'
+import ReloadButton from './ReloadButton.js'
 
 const mapStateToProps = state => {
   return {
@@ -30,12 +31,16 @@ class Home extends Component {
   }
 
   renderInfo() {
-    const { users, posts, following } = this.props.info
-    return (
-      <p>
-        <strong>{users}</strong> users and <strong>{posts}</strong> posts.
-      </p>
-    )
+    const { users, posts } = this.props.info
+    if (posts + users >= 1) {
+      return (
+        <p>
+          <strong>{users}</strong> users and <strong>{posts}</strong> posts.
+        </p>
+      )
+    } else {
+      return null
+    }
   }
 
   renderPost() {
@@ -57,6 +62,7 @@ class Home extends Component {
     return (
       <div>
         {this.renderInfo()}
+        <ReloadButton />
         {this.renderPost()}
       </div>
     )

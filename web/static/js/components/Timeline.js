@@ -5,6 +5,7 @@ import { timelinePostsSelector } from '../selectors.js'
 import { userPage } from '../pages.js'
 
 import PostList from './PostList.js'
+import ReloadButton from './ReloadButton.js'
 
 const mapStateToProps = state => {
   return {
@@ -18,10 +19,12 @@ const actionCreators = {
 
 const Timeline = ({ posts, userPageAction }) => (
   <div>
+    <ReloadButton />
     <PostList
       posts={posts}
       onClickUser={userPageAction}
     />
+    <ReloadButton />
   </div>
 )
 

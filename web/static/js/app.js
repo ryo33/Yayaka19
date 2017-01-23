@@ -10,7 +10,7 @@ import { pages, pagesMiddleware } from './pages.js'
 import reducer from './reducers/index.js'
 import { pageSelector } from './selectors.js'
 import middleware from './middlewares.js'
-import { setUser, setFollowing } from './actions.js'
+import { setUser, setFollowing, requestInfo } from './actions.js'
 import { joinChannel } from './socket.js'
 
 // Create the pagesMiddleware
@@ -35,6 +35,7 @@ const store = createStore(
 const respCallback = ({ user, following }) => {
   store.dispatch(setUser(user))
   store.dispatch(setFollowing(following))
+  store.dispatch(requestInfo())
   // Apply the current path
   pages.handleNavigation(store, history.location.pathname)
 }

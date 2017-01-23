@@ -1,8 +1,9 @@
-import { createMiddleware, composeMiddleware } from 'redux-middlewares'
+import { createMiddleware, createReplacer, composeMiddleware } from 'redux-middlewares'
 
 import { pushMessage } from './socket.js'
-import { home } from './pages.js'
+import { home, timeline, publicTimeline } from './pages.js'
 import {
+  reload,
   submitPost, updatePostText,
   requestRandomPost, setHomePost,
   requestUser, setUserInfo,
@@ -11,6 +12,25 @@ import {
   requestTimeline, updateTimeline,
   requestInfo, updateInfo
 } from './actions.js'
+import { pageSelector } from './selectors.js'
+
+const reloadMiddleware = composeMiddleware(
+  createReplacer(
+    reload.getType(),
+    ({ getState }) => pageSelector(getState()).name === home.name,
+    () => requestRandomPost()
+  ),
+  createReplacer(
+    reload.getType(),
+    ({ getState }) => pageSelector(getState()).name === publicTimeline.name,
+    () => requestPublicTimeline()
+  ),
+  createReplacer(
+    reload.getType(),
+    ({ getState }) => pageSelector(getState()).name === timeline.name,
+    () => requestTimeline()
+  )
+)
 
 const submitPostMiddleware = createMiddleware(
   submitPost.getType(),
@@ -27,6 +47,7 @@ const submitPostMiddleware = createMiddleware(
 const requestRandomPostMiddleware = createMiddleware(
   requestRandomPost.getType(),
   ({ dispatch, nextDispatch, action }) => {
+    setHomePost({})
     pushMessage('random_post', {})
       .then(({ post }) => {
         dispatch(setHomePost(post))
@@ -75,6 +96,7 @@ const requestUnfollowMiddleware = createMiddleware(
 const requestPublicTimelineMiddleware = createMiddleware(
   requestPublicTimeline.getType(),
   ({ dispatch, nextDispatch, action }) => {
+    dispatch(updatePublicTimeline({posts: []}))
     pushMessage('public_timeline', {})
       .then(resp => {
         dispatch(updatePublicTimeline(resp))
@@ -86,6 +108,7 @@ const requestPublicTimelineMiddleware = createMiddleware(
 const requestTimelineMiddleware = createMiddleware(
   requestTimeline.getType(),
   ({ dispatch, nextDispatch, action }) => {
+    dispatch(updateTimeline({posts: []}))
     pushMessage('timeline', {})
       .then(resp => {
         dispatch(updateTimeline(resp))
@@ -106,6 +129,7 @@ const requestInfoMiddleware = createMiddleware(
 )
 
 export default composeMiddleware(
+  reloadMiddleware,
   submitPostMiddleware,
   requestRandomPostMiddleware,
   requestUserMiddleware,
