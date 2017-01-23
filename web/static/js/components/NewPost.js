@@ -2,10 +2,14 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import { submitPost, updatePostText } from '../actions.js'
-import { newPostPageSelector } from '../selectors.js'
+import { newPostPageSelector, userSelector } from '../selectors.js'
+import Post from './Post.js'
 
 const mapStateToProps = state => {
-  return newPostPageSelector(state)
+  return {
+    user: userSelector(state),
+    ...newPostPageSelector(state)
+  }
 }
 
 const actionCreators = {
@@ -32,7 +36,7 @@ class NewPost extends Component {
     updatePostText(event.target.value)
   }
   render() {
-    const { text } = this.props
+    const { user, text } = this.props
     return (
       <div>
         <textarea
@@ -47,6 +51,11 @@ class NewPost extends Component {
           onClick={this.submit}
           disabled={text.length == 0}
         >Submit</button>
+        <h2>Preview</h2>
+        <Post
+          post={{ user, text }}
+          onClickUser={() => {}}
+        />
       </div>
     )
   }
