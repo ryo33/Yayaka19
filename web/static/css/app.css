@@ -39,6 +39,14 @@ button {
   margin: 0px 3px;
 }
 
+button.reload {
+  margin: 5px 3px;
+  color: black;
+  background: none;
+  border: 2px solid black;
+  display: inline-block;
+}
+
 button.submit {
   color: black;
   background: none;

@@ -37,12 +37,14 @@ defmodule Share.UserChannel do
 
   def handle_in("random_post", _params, socket) do
     query = from p in Post,
-      order_by: fragment("RANDOM()"),
       preload: [:user],
       limit: 1
-    {post, socket} = case Repo.one(query) do
+    {post, socket} = case Repo.one(Post.random(query)) do
       nil -> {%{}, socket}
-      post -> Post.encode(post, socket)
+      post ->
+        changeset = Ecto.Changeset.change(post, %{views: post.views + 1})
+        Repo.update(changeset)
+        Post.encode(post, socket)
     end
     res = %{
       post: post
@@ -102,12 +104,13 @@ defmodule Share.UserChannel do
 
   def handle_in("public_timeline", _params, socket) do
     random_query = from p in Post,
-      order_by: fragment("RANDOM()"),
       limit: 50
-    query = from p in subquery(random_query),
+    query = from p in subquery(Post.random(random_query)),
       order_by: [desc: p.id],
       preload: [:user]
     posts = Repo.all(query)
+    post_ids = posts |> Enum.map(&(&1.id))
+    Repo.update_all((from p in Post, where: p.id in ^post_ids), inc: [views: 1])
     {posts, socket} = Enum.map_reduce(posts, socket, &Post.encode(&1, &2))
     {:reply, {:ok, %{posts: posts}}, socket}
   end
@@ -120,9 +123,8 @@ defmodule Share.UserChannel do
     users = Repo.all(query)
     random_query = from p in Post,
       where: p.user_id in ^users,
-      order_by: fragment("RANDOM()"),
       limit: 50
-    query = from p in subquery(random_query),
+    query = from p in subquery(Post.random(random_query)),
       order_by: [desc: p.id],
       preload: [:user]
     posts = Repo.all(query)
