@@ -10,8 +10,8 @@ import { pages, pagesMiddleware } from './pages.js'
 import reducer from './reducers/index.js'
 import { pageSelector } from './selectors.js'
 import middleware from './middlewares.js'
-import { setUser, setFollowing, requestInfo, setCurrentNotices, updateNotices } from './actions.js'
-import { joinChannel, joinUserChannel } from './socket.js'
+import { setUser, setFollowing, requestInfo, setCurrentNotices } from './actions.js'
+import { joinChannel } from './socket.js'
 import { watchUserChannel } from './userChannel.js'
 
 // Create the pagesMiddleware
@@ -33,18 +33,17 @@ const store = createStore(
 )
 
 // Socket
-const joinUserChannelCallback = ({ notice, following, notices }) => {
+const joinUserChannelCallback = ({ notice }) => {
   store.dispatch(setCurrentNotices(notice))
-  store.dispatch(setFollowing(following))
-  store.dispatch(updateNotices(notices))
 }
 
-const respCallback = ({ user }) => {
+const respCallback = ({ user, following }) => {
   if (user.name) {
     const userChannel = joinUserChannel(user.name, joinUserChannelCallback)
     watchUserChannel(store, userChannel)
   }
   store.dispatch(setUser(user))
+  store.dispatch(setFollowing(following))
   store.dispatch(requestInfo())
   // Apply the current path
   pages.handleNavigation(store, history.location.pathname)

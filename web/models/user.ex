@@ -9,6 +9,9 @@ defmodule Share.User do
     field :provided_id, :string
     field :name, :string
     field :display, :string
+    belongs_to :fav, Share.Fav
+    belongs_to :follow, Share.Follow
+    belongs_to :post_address, Share.PostAddress
 
     timestamps()
   end

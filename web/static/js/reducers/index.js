@@ -9,6 +9,7 @@ import {
 } from '../actions.js'
 
 import info from './info.js'
+import notices from './notices.js'
 import homeReducer from './home.js'
 import newPostPage from './newPostPage.js'
 import userPage from './userPage.js'
@@ -35,6 +36,7 @@ const favs = createReducer({
 
 export default combineReducers({
   info,
+  notices,
   page,
   user,
   following,
