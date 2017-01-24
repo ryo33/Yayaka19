@@ -3,7 +3,8 @@ import { connect } from 'react-redux'
 
 import { source } from '../global.js'
 import {
-  home, publicTimeline, timeline, newPost, userPage, loginPage
+  home, publicTimeline, timeline, newPost, userPage, loginPage,
+  favNotices, followNotices, addressNotices
 } from '../pages.js'
 import Home from './Home.js'
 import PublicTimeline from './PublicTimeline.js'
@@ -12,13 +13,22 @@ import NewPost from './NewPost.js'
 import UserPage from './UserPage.js'
 import LoginPage from './LoginPage.js'
 import ErrorPage from './ErrorPage.js'
-import { pageSelector, userSelector, signedInSelector } from '../selectors.js'
+import FavNotices from './FavNotices.js'
+import FollowNotices from './FollowNotices.js'
+import AddressNotices from './AddressNotices.js'
+import {
+  pageSelector, userSelector, signedInSelector,
+  favNoticesCountSelctor, followNoticesCountSelctor, addressNoticesCountSelctor
+} from '../selectors.js'
 
 const mapStateToProps = state => {
   return {
     page: pageSelector(state),
     user: userSelector(state),
-    signedIn: signedInSelector(state)
+    signedIn: signedInSelector(state),
+    favCount: favNoticesCountSelctor(state),
+    followCount: followNoticesCountSelctor(state),
+    addressCount: addressNoticesCountSelctor(state),
   }
 }
 
@@ -27,7 +37,10 @@ const actionCreators = {
   publicTimelineAction: publicTimeline.action,
   timelineAction: timeline.action,
   newPostAction: newPost.action,
-  loginPageAction: loginPage.action
+  loginPageAction: loginPage.action,
+  favNoticesAction: favNotices.action,
+  followNoticesAction: followNotices.action,
+  addressNoticesAction: addressNotices.action
 }
 
 class App extends Component {
@@ -48,6 +61,12 @@ class App extends Component {
         return <NewPost />
       case userPage.name:
         return <UserPage params={page.params} />
+      case favNotices.name:
+        return <FavNotices />
+      case followNotices.name:
+        return <FollowNotices />
+      case addressNotices.name:
+        return <AddressNotices />
       case loginPage.name:
         return <LoginPage />
       default:
@@ -63,12 +82,25 @@ class App extends Component {
       publicTimelineAction,
       timelineAction,
       newPostAction,
-      loginPageAction
+      loginPageAction,
+      addressNoticesAction, followNoticesAction, favNoticesAction,
+      addressCount, followCount, favCount
     } = this.props
     if (signedIn) {
       return (
         <ul>
           <li><button className="link" onClick={homeAction}>Home</button></li>
+          <li>
+            <button className="link" onClick={addressNoticesAction}>
+              Address ({addressCount})
+            </button>
+            <button className="link" onClick={followNoticesAction}>
+              Follow ({followCount})
+            </button>
+            <button className="link" onClick={favNoticesAction}>
+              Fav ({favCount})
+            </button>
+          </li>
           <li><button className="link" onClick={timelineAction}>Timeline</button></li>
           <li><button className="link" onClick={publicTimelineAction}>Public Timeline</button></li>
           <li><button className="link" onClick={newPostAction}>New Post</button></li>

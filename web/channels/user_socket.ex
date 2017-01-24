@@ -2,7 +2,8 @@ defmodule Share.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  channel "user", Share.UserChannel
+  channel "page", Share.PageChannel
+  channel "user:*", Share.UserChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

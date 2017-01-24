@@ -6,7 +6,10 @@ import {
   requestRandomPost,
   requestTimeline,
   requestPublicTimeline,
-  requestUser
+  requestUser,
+  openFavNotices,
+  openFollowNotices,
+  openAddressNotices
 } from './actions.js'
 import {
   pageSelector,
@@ -24,6 +27,9 @@ export const publicTimeline = p('/p', 'public')
 export const timeline = p('/t', 'timeline')
 export const newPost = p('/new', 'new')
 export const userPage = p('/users/:name', 'user')
+export const favNotices = p('/n/fav', 'fav notices')
+export const followNotices = p('/n/follow', 'follow notices')
+export const addressNotices = p('/n/address', 'address notices')
 export const loginPage = p('/login', 'login')
 export const errorPage = p('/*', 'error')
 
@@ -80,10 +86,37 @@ const userPageHook = createMiddleware(
   }
 )
 
+const favNoticesHook = createMiddleware(
+  ({ action }) => favNotices.check(action),
+  ({ dispatch, nextDispatch, action }) => {
+    nextDispatch(action)
+    dispatch(openFavNotices())
+  }
+)
+
+const followNoticesHook = createMiddleware(
+  ({ action }) => followNotices.check(action),
+  ({ dispatch, nextDispatch, action }) => {
+    nextDispatch(action)
+    dispatch(openFollowNotices())
+  }
+)
+
+const addressNoticesHook = createMiddleware(
+  ({ action }) => addressNotices.check(action),
+  ({ dispatch, nextDispatch, action }) => {
+    nextDispatch(action)
+    dispatch(openAddressNotices())
+  }
+)
+
 export const pagesMiddleware = composeMiddleware(
   onlySignedInMiddleware,
   homeHook,
   publicTimelineHook,
   timelineHook,
-  userPageHook
+  userPageHook,
+  favNoticesHook,
+  followNoticesHook,
+  addressNoticesHook
 )

@@ -20,7 +20,7 @@ const PostAddresses = ({ addresses = [] }) => (
   </div>
 )
 
-const Post = ({ followButton = true, post, onClickUser }) => (
+const Post = ({ favButton = true, followButton = true, post, onClickUser }) => (
   <div>
     <button className="link" onClick={onClickUser}>
       {post.user.display} <small>@{post.user.name}</small>
@@ -36,7 +36,11 @@ const Post = ({ followButton = true, post, onClickUser }) => (
         {post.text}
       </Linkify>
     </pre>
-    <FavButton post={post} />
+    {
+      favButton
+        ? <FavButton post={post} />
+        : null
+    }
   </div>
 )
 
@@ -46,6 +50,7 @@ const user = React.PropTypes.shape({
 })
 Post.propTypes = {
   followButton: React.PropTypes.bool,
+  favButton: React.PropTypes.bool,
   post: React.PropTypes.shape({
     post_addresses: React.PropTypes.arrayOf(React.PropTypes.shape({
       user

@@ -9,6 +9,13 @@ export const addFavs = createAction('add favs', favs => favs)
 
 export const reload = createAction('reload')
 
+// Notices
+export const setCurrentNotices = createAction('set current notices', notices => notices)
+export const updateNotices = createAction('update notices', notices => notices)
+export const openFavNotices = createAction('open fav notices')
+export const openFollowNotices = createAction('open follow notices')
+export const openAddressNotices = createAction('open address notices')
+
 // Home
 export const requestRandomPost = createAction('request random post')
 export const setHomePost = createAction('set home post', post => post)
