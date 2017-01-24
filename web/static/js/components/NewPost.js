@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { submitPost, updatePostText } from '../actions.js'
+import { submitPost, updatePostText, updatePostAddress } from '../actions.js'
 import { newPostPageSelector, userSelector } from '../selectors.js'
 import Post from './Post.js'
 
@@ -14,34 +14,71 @@ const mapStateToProps = state => {
 
 const actionCreators = {
   submitPost,
-  updatePostText
+  updatePostText,
+  updatePostAddress
 }
 
 class NewPost extends Component {
   constructor(props) {
     super(props)
-    this.handleChange = this.handleChange.bind(this)
+    this.handleChangeText = this.handleChangeText.bind(this)
+    this.handleChangeAddress = this.handleChangeAddress.bind(this)
     this.submit = this.submit.bind(this)
-  }
-
-  submit() {
-    const { text, submitPost } = this.props
-    if (text.length >= 1) {
-      submitPost(text)
+    this.openAddress = this.openAddress.bind(this)
+    this.state = {
+      openAddress: false
     }
   }
 
-  handleChange(event) {
+  openAddress() {
+    this.setState({openAddress: true})
+  }
+
+  submit() {
+    const { text, address, submitPost } = this.props
+    if (text.length >= 1) {
+      submitPost(text, address)
+    }
+    this.setState({openAddress: false})
+  }
+
+  handleChangeText(event) {
     const { updatePostText } = this.props
     updatePostText(event.target.value)
   }
+
+  handleChangeAddress(event) {
+    const { updatePostAddress } = this.props
+    updatePostAddress(event.target.value)
+  }
+
+  renderAddress() {
+    const { address } = this.props
+    if (this.state.openAddress) {
+      return (
+        <input
+          type="text"
+          value={address}
+          onChange={this.handleChangeAddress}
+        />
+      )
+    } else {
+      return (
+        <button onClick={this.openAddress}>
+          Send to someone
+        </button>
+      )
+    }
+  }
+
   render() {
     const { user, text } = this.props
     return (
       <div>
+        {this.renderAddress()}
         <textarea
           value={text}
-          onChange={this.handleChange}
+          onChange={this.handleChangeText}
           rows={7}
           autoFocus
         >

@@ -25,22 +25,23 @@ defmodule Share.UserChannel do
     {:ok, res, socket}
   end
 
-  def handle_in("new_post", params, socket) do
+  def handle_in("new_post", %{"post" => params, "address" => address}, socket) do
     user = socket.assigns.user
     true = user != nil
-
     params = Map.put(params, "user_id", user.id)
     changeset = Post.changeset(%Post{}, params)
-    Repo.insert!(changeset)
+    post = Repo.insert!(changeset)
+    Share.PostHandler.handle_address(post, address, socket)
     {:reply, :ok, socket}
   end
 
   def handle_in("random_post", _params, socket) do
     user = socket.assigns.user
-    query = from p in Post,
-      preload: [:user],
-      limit: 1
-    post = case Repo.one(Post.random(query)) do
+    query = Post
+            |> limit(1)
+            |> Post.random()
+            |> Post.preload()
+    post = case Repo.one(query) do
       nil -> %{}
       post ->
         changeset = Ecto.Changeset.change(post, %{views: post.views + 1})
@@ -106,11 +107,12 @@ defmodule Share.UserChannel do
 
   def handle_in("public_timeline", _params, socket) do
     user = socket.assigns.user
-    random_query = from p in Post,
-      limit: 50
-    query = from p in subquery(Post.random(random_query)),
-      order_by: [desc: p.id],
-      preload: [:user]
+    query = Post
+            |> limit(50)
+            |> Post.random()
+    query = subquery(query)
+            |> order_by([p], [desc: p.id])
+            |> Post.preload()
     posts = Repo.all(query)
     post_ids = posts |> Enum.map(&(&1.id))
     Repo.update_all((from p in Post, where: p.id in ^post_ids), inc: [views: 1])
@@ -124,12 +126,13 @@ defmodule Share.UserChannel do
       select: f.target_user_id,
       where: f.user_id == ^user.id
     users = [user.id | Repo.all(query)]
-    random_query = from p in Post,
-      where: p.user_id in ^users,
-      limit: 50
-    query = from p in subquery(Post.random(random_query)),
-      order_by: [desc: p.id],
-      preload: [:user]
+    query = Post
+            |> where([p], p.user_id in ^users)
+            |> limit(50)
+            |> Post.random()
+    query = subquery(query)
+            |> order_by([p], [desc: p.id])
+            |> Post.preload()
     posts = Repo.all(query)
     post_ids = posts |> Enum.map(&(&1.id))
     favs = Fav.get_favs(socket, post_ids)
