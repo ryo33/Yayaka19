@@ -21,13 +21,12 @@ defmodule Share.Fav do
 
   def get_favs(socket, posts) do
     user = socket.assigns.user
-    posts = Enum.map(posts, fn id -> socket.assigns.posts[id] end)
     if is_nil(user) do
       []
     else
       query = from p in Share.Post,
-        join: f in Share.Fav,
-        where: f.post_id == p.id and f.user_id == ^user.id,
+        left_join: f in Share.Fav, on: f.post_id == p.id and f.user_id == ^user.id,
+        where: not is_nil(f.id),
         where: p.id in ^posts,
         select: p.id
       Share.Repo.all(query)
