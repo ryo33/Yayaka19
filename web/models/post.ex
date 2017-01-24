@@ -29,7 +29,7 @@ defmodule Share.Post do
     client_posts = socket.assigns.client_posts
     {socket, id} = case Map.get(posts, post.id) do
       nil ->
-        id = Map.size(client_posts)
+        id = Map.size(client_posts) + 1
         posts = Map.put(posts, post.id, id)
         client_posts = Map.put(client_posts, id, post.id)
         socket = Phoenix.Socket.assign(socket, :posts, posts)
