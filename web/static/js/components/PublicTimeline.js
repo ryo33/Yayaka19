@@ -19,6 +19,7 @@ const actionCreators = {
 
 const PublicTimeline = ({ posts, userPageAction }) => (
   <div>
+    <h2>Public Timeline</h2>
     <ReloadButton />
     <PostList
       posts={posts}
