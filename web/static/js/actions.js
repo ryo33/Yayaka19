@@ -15,7 +15,8 @@ export const setHomePost = createAction('set home post', post => post)
 
 // New post page
 export const updatePostText = createAction('update post text', text => text)
-export const submitPost = createAction('submit post', text => ({text}))
+export const updatePostAddress = createAction('update post address', address => address)
+export const submitPost = createAction('submit post', (text, address) => ({text, address}))
 
 // User
 export const requestUser = createAction('request user', name => name)

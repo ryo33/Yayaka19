@@ -44,7 +44,8 @@ const submitPostMiddleware = createMiddleware(
   submitPost.getType(),
   ({ dispatch, nextDispatch, action }) => {
     nextDispatch(action)
-    pushMessage('new_post', action.payload)
+    const { text, address } = action.payload
+    pushMessage('new_post', {post: {text}, address})
       .then(() => {
         dispatch(timeline.action())
         dispatch(updatePostText(''))

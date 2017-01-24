@@ -1,7 +1,7 @@
 defmodule Share.Post do
   use Share.Web, :model
   @derive {Poison.Encoder, only: [
-    :id, :text, :user
+    :id, :text, :user, :post_addresses
   ]}
 
   schema "posts" do
@@ -9,6 +9,8 @@ defmodule Share.Post do
     field :views, :integer, default: 0
     belongs_to :user, Share.User
     belongs_to :post, Share.Post
+
+    has_many :post_addresses, Share.PostAddress
 
     timestamps()
   end
@@ -30,5 +32,10 @@ defmodule Share.Post do
   def random(query) do
     query
     |> order_by(fragment("RANDOM() * (LN(views + 1) + SIN(views) + 1)"))
+  end
+
+  def preload(query) do
+    query
+    |> preload([:user, post_addresses: :user])
   end
 end
