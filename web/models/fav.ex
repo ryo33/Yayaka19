@@ -30,7 +30,7 @@ defmodule Share.Fav do
         where: p.id in ^posts,
         select: p.id
       Share.Repo.all(query)
-      |> Enum.map(fn id -> socket.assigns.client_posts[id] end)
+      |> Enum.map(fn id -> socket.assigns.posts[id] end)
     end
   end
 end
