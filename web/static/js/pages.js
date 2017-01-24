@@ -9,6 +9,7 @@ import {
   requestUser
 } from './actions.js'
 import {
+  pageSelector,
   signedInSelector,
   homePostSelector,
   publicTimelinePostsSelector,
@@ -34,7 +35,11 @@ const onlySignedInMiddleware = createReplacer(
 
 const homeHook = createMiddleware(
   ({ action }) => home.check(action),
-  ({ getState }) => homePostSelector(getState()).user == null,
+  ({ getState }) => {
+    const state = getState()
+    const notLoaded = !homePostSelector(getState()).user
+    return notLoaded || pageSelector(state).name != home.name
+  },
   ({ dispatch, nextDispatch, action }) => {
     dispatch(requestRandomPost())
     nextDispatch(action)
@@ -43,7 +48,11 @@ const homeHook = createMiddleware(
 
 const publicTimelineHook = createMiddleware(
   ({ action }) => publicTimeline.check(action),
-  ({ getState }) => publicTimelinePostsSelector(getState()).length == 0,
+  ({ getState }) => {
+    const state = getState()
+    const notLoaded = publicTimelinePostsSelector(getState()).length == 0
+    return notLoaded || pageSelector(state).name != publicTimeline.name
+  },
   ({ dispatch, nextDispatch, action }) => {
     dispatch(requestPublicTimeline())
     nextDispatch(action)
@@ -52,7 +61,11 @@ const publicTimelineHook = createMiddleware(
 
 const timelineHook = createMiddleware(
   ({ action }) => timeline.check(action),
-  ({ getState }) => timelinePostsSelector(getState()).length == 0,
+  ({ getState }) => {
+    const state = getState()
+    const notLoaded = timelinePostsSelector(getState()).length == 0
+    return notLoaded || pageSelector(state).name != timeline.name
+  },
   ({ dispatch, nextDispatch, action }) => {
     dispatch(requestTimeline())
     nextDispatch(action)

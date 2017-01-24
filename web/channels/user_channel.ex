@@ -9,8 +9,6 @@ defmodule Share.UserChannel do
   require Logger
 
   def join("user", _params, socket) do
-    socket = assign(socket, :posts, %{})
-    socket = assign(socket, :client_posts, %{})
     user = socket.assigns.user
     following = if user != nil do
       query = from f in Follow,
@@ -42,12 +40,12 @@ defmodule Share.UserChannel do
     query = from p in Post,
       preload: [:user],
       limit: 1
-    {post, socket} = case Repo.one(Post.random(query)) do
-      nil -> {%{}, socket}
+    post = case Repo.one(Post.random(query)) do
+      nil -> %{}
       post ->
         changeset = Ecto.Changeset.change(post, %{views: post.views + 1})
         Repo.update(changeset)
-        Post.encode(post, socket)
+        post
     end
     res = %{
       post: post,
@@ -116,7 +114,6 @@ defmodule Share.UserChannel do
     posts = Repo.all(query)
     post_ids = posts |> Enum.map(&(&1.id))
     Repo.update_all((from p in Post, where: p.id in ^post_ids), inc: [views: 1])
-    {posts, socket} = Enum.map_reduce(posts, socket, &Post.encode(&1, &2))
     favs = Fav.get_favs(socket, post_ids)
     {:reply, {:ok, %{posts: posts, favs: favs}}, socket}
   end
@@ -135,7 +132,6 @@ defmodule Share.UserChannel do
       preload: [:user]
     posts = Repo.all(query)
     post_ids = posts |> Enum.map(&(&1.id))
-    {posts, socket} = Enum.map_reduce(posts, socket, &Post.encode(&1, &2))
     favs = Fav.get_favs(socket, post_ids)
     {:reply, {:ok, %{posts: posts, favs: favs}}, socket}
   end
@@ -152,7 +148,6 @@ defmodule Share.UserChannel do
 
   def handle_in("fav", %{"id" => id}, socket) do
     user = socket.assigns.user
-    id = socket.assigns.client_posts[id]
     query = from f in Fav,
       where: f.user_id == ^user.id,
       where: f.post_id == ^id
@@ -168,7 +163,6 @@ defmodule Share.UserChannel do
 
   def handle_in("unfav", %{"id" => id}, socket) do
     user = socket.assigns.user
-    id = socket.assigns.client_posts[id]
     query = from f in Fav,
       where: f.user_id == ^user.id,
       where: f.post_id == ^id

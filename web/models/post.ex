@@ -1,5 +1,8 @@
 defmodule Share.Post do
   use Share.Web, :model
+  @derive {Poison.Encoder, only: [
+    :id, :text, :user
+  ]}
 
   schema "posts" do
     field :text, :string
@@ -22,28 +25,6 @@ defmodule Share.Post do
     |> cast(params, @fields)
     |> validate_required(@required_fields)
     |> validate_length(:text, min: 1)
-  end
-
-  def encode(post, socket) do
-    posts = socket.assigns.posts
-    client_posts = socket.assigns.client_posts
-    {socket, id} = case Map.get(posts, post.id) do
-      nil ->
-        id = Map.size(client_posts) + 1
-        posts = Map.put(posts, post.id, id)
-        client_posts = Map.put(client_posts, id, post.id)
-        socket = Phoenix.Socket.assign(socket, :posts, posts)
-        socket = Phoenix.Socket.assign(socket, :client_posts, client_posts)
-        {socket, id}
-      id ->
-        {socket, id}
-    end
-    post = %{
-      id: id,
-      text: post.text,
-      user: post.user
-    }
-    {post, socket}
   end
 
   def random(query) do
