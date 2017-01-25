@@ -2,7 +2,7 @@ import { createMiddleware, createReplacer, composeMiddleware } from 'redux-middl
 
 import { signedIn } from './global.js'
 import { pushMessage, channel, userChannel } from './socket.js'
-import { home, timeline, publicTimeline } from './pages.js'
+import { loginPage, home, timeline, publicTimeline } from './pages.js'
 import {
   reload, addFavs,
   submitPost, updatePostText,
@@ -15,6 +15,12 @@ import {
   openNoticesPage
 } from './actions.js'
 import { pageSelector } from './selectors.js'
+
+const redirectLoginPageMiddleware = createReplacer(
+  () => !signedIn,
+  [requestFav.getType()],
+  () => loginPage.action()
+)
 
 const reloadMiddleware = composeMiddleware(
   createMiddleware(
@@ -90,10 +96,8 @@ const requestFavMiddleware = createMiddleware(
   ({ dispatch, nextDispatch, action }) => {
     nextDispatch(action)
     const id = action.payload
-    pushMessage(userChannel, 'fav', {id})
-      .then(resp => {
-        dispatch(fav(id))
-      })
+      pushMessage(userChannel, 'fav', {id})
+        .then(resp => { dispatch(fav(id)) })
   }
 )
 
@@ -103,9 +107,7 @@ const requestUnfavMiddleware = createMiddleware(
     nextDispatch(action)
     const id = action.payload
     pushMessage(userChannel, 'unfav', {id})
-      .then(resp => {
-        dispatch(unfav(id))
-      })
+      .then(resp => { dispatch(unfav(id)) })
   }
 )
 
@@ -165,6 +167,7 @@ if (signedIn) {
 
 export default composeMiddleware(
   ...signedInMiddlewares,
+  redirectLoginPageMiddleware,
   reloadMiddleware,
   requestUserMiddleware,
   requestPublicTimelineMiddleware
