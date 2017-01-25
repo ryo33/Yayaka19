@@ -40,7 +40,7 @@ const joinUserChannelCallback = ({ notice, following, notices }) => {
 }
 
 const respCallback = ({ user }) => {
-  if (user.name) {
+  if (user) {
     const userChannel = joinUserChannel(user.name, joinUserChannelCallback)
     watchUserChannel(store, userChannel)
   }
