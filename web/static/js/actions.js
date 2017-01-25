@@ -10,6 +10,7 @@ export const reload = createAction('reload')
 export const setCurrentNotices = createAction('set current notices', notices => notices)
 export const updateNotices = createAction('update notices', notices => notices)
 export const openNoticesPage = createAction('open notices')
+export const addNotices = createAction('add notices', notices => notices)
 
 // New post page
 export const updatePostText = createAction('update post text', text => text)

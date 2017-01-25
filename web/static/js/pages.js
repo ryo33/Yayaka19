@@ -84,13 +84,16 @@ const userPageHook = createMiddleware(
   }
 )
 
-const noticesPageHook = createMiddleware(
-  ({ action }) => noticesPage.check(action),
+const noticesPageLeaveHook = createMiddleware(
+  CHANGE_PAGE,
+  ({ getState }) => pageSelector(getState()).name == noticesPage.name,
+  ({ action }) => !noticesPage.check(action),
   ({ dispatch, nextDispatch, action }) => {
     nextDispatch(action)
     dispatch(openNoticesPage())
   }
 )
+
 
 export const pagesMiddleware = composeMiddleware(
   onlySignedInMiddleware,
@@ -99,5 +102,5 @@ export const pagesMiddleware = composeMiddleware(
   publicTimelineHook,
   timelineHook,
   userPageHook,
-  noticesPageHook
+  noticesPageLeaveHook
 )
