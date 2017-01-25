@@ -5,9 +5,6 @@ export const userSelector = ({ user }) => user
 export const followingSelector = ({ following }) => following
 export const favsSelector = ({ favs }) => favs
 
-// Home
-export const homePostSelector = ({ home }) => home.post
-
 // New post page
 export const newPostPageSelector = ({ newPostPage }) => newPostPage
 

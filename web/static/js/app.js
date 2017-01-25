@@ -11,7 +11,7 @@ import { pages, pagesMiddleware } from './pages.js'
 import reducer from './reducers/index.js'
 import { pageSelector } from './selectors.js'
 import middleware from './middlewares.js'
-import { setUser, setFollowing, requestInfo, setCurrentNotices, updateNotices } from './actions.js'
+import { setUser, setFollowing, setCurrentNotices, updateNotices } from './actions.js'
 import { joinChannel, joinUserChannel } from './socket.js'
 import { watchUserChannel } from './userChannel.js'
 
@@ -46,7 +46,6 @@ if (signedIn) {
 }
 
 const respCallback = () => {
-  store.dispatch(requestInfo())
   // Apply the current path
   pages.handleNavigation(store, history.location.pathname)
 }

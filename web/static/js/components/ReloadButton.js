@@ -1,6 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import { Button } from 'semantic-ui-react'
+
 import { reload } from '../actions.js'
 
 const actionCreators = {
@@ -8,7 +10,7 @@ const actionCreators = {
 }
 
 const ReloadButton = ({ reload }) => (
-  <button className="reload" onClick={reload}>Reload</button>
+  <Button onClick={reload}>Reload</Button>
 )
 
 export default connect(null, actionCreators)(ReloadButton)

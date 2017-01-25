@@ -1,8 +1,5 @@
 import { createAction } from 'redux-act'
 
-export const requestInfo = createAction('request info')
-export const updateInfo = createAction('update info', info => info)
-
 export const setUser = createAction('set user', user => user)
 export const setFollowing = createAction('set following', following => following)
 export const addFavs = createAction('add favs', favs => favs)
@@ -12,13 +9,7 @@ export const reload = createAction('reload')
 // Notices
 export const setCurrentNotices = createAction('set current notices', notices => notices)
 export const updateNotices = createAction('update notices', notices => notices)
-export const openFavNotices = createAction('open fav notices')
-export const openFollowNotices = createAction('open follow notices')
-export const openAddressNotices = createAction('open address notices')
-
-// Home
-export const requestRandomPost = createAction('request random post')
-export const setHomePost = createAction('set home post', post => post)
+export const openNoticesPage = createAction('open notices')
 
 // New post page
 export const updatePostText = createAction('update post text', text => text)

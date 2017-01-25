@@ -21,6 +21,5 @@ window.userID = "<%= @user_id %>"
   background-image: url("<%= static_path(@conn, "/images/btn_google_signin_light_pressed_web@2x.png") %>");
 }
 </style>
-<div id="root">
+<div id="root"></div>
 <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
-</div>

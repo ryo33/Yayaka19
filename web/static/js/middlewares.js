@@ -1,19 +1,18 @@
 import { createMiddleware, createReplacer, composeMiddleware } from 'redux-middlewares'
 
-import { pushMessage, channel } from './socket.js'
+import { signedIn } from './global.js'
+import { pushMessage, channel, userChannel } from './socket.js'
 import { home, timeline, publicTimeline } from './pages.js'
 import {
   reload, addFavs,
   submitPost, updatePostText,
-  requestRandomPost, setHomePost,
   requestUser, setUserInfo,
   requestFollow, requestUnfollow, follow, unfollow,
   requestFav, requestUnfav, fav, unfav,
   requestPublicTimeline, updatePublicTimeline,
   requestTimeline, updateTimeline,
-  requestInfo, updateInfo,
   setCurrentNotices,
-  openFavNotices, openFollowNotices, openAddressNotices
+  openNoticesPage
 } from './actions.js'
 import { pageSelector } from './selectors.js'
 
@@ -22,13 +21,7 @@ const reloadMiddleware = composeMiddleware(
     reload.getType(),
     ({ dispatch, nextDispatch, action }) => {
       nextDispatch(action)
-      dispatch(requestInfo())
     }
-  ),
-  createReplacer(
-    reload.getType(),
-    ({ getState }) => pageSelector(getState()).name === home.name,
-    () => requestRandomPost()
   ),
   createReplacer(
     reload.getType(),
@@ -47,23 +40,10 @@ const submitPostMiddleware = createMiddleware(
   ({ dispatch, nextDispatch, action }) => {
     nextDispatch(action)
     const { text, address } = action.payload
-    pushMessage(channel, 'new_post', {post: {text}, address})
+    pushMessage(userChannel, 'new_post', {post: {text}, address})
       .then(() => {
         dispatch(timeline.action())
         dispatch(updatePostText(''))
-      })
-  }
-)
-
-const requestRandomPostMiddleware = createMiddleware(
-  requestRandomPost.getType(),
-  ({ dispatch, nextDispatch, action }) => {
-    nextDispatch(action)
-    setHomePost({})
-    pushMessage(channel, 'random_post', {})
-      .then(({ post, favs }) => {
-        dispatch(addFavs(favs))
-        dispatch(setHomePost(post))
       })
   }
 )
@@ -86,7 +66,7 @@ const requestFollowMiddleware = createMiddleware(
   ({ dispatch, nextDispatch, action }) => {
     nextDispatch(action)
     const id = action.payload
-    pushMessage(channel, 'follow', {id})
+    pushMessage(userChannel, 'follow', {id})
       .then(resp => {
         dispatch(follow(id))
       })
@@ -98,7 +78,7 @@ const requestUnfollowMiddleware = createMiddleware(
   ({ dispatch, nextDispatch, action }) => {
     nextDispatch(action)
     const id = action.payload
-    pushMessage(channel, 'unfollow', {id})
+    pushMessage(userChannel, 'unfollow', {id})
       .then(resp => {
         dispatch(unfollow(id))
       })
@@ -110,7 +90,7 @@ const requestFavMiddleware = createMiddleware(
   ({ dispatch, nextDispatch, action }) => {
     nextDispatch(action)
     const id = action.payload
-    pushMessage(channel, 'fav', {id})
+    pushMessage(userChannel, 'fav', {id})
       .then(resp => {
         dispatch(fav(id))
       })
@@ -122,7 +102,7 @@ const requestUnfavMiddleware = createMiddleware(
   ({ dispatch, nextDispatch, action }) => {
     nextDispatch(action)
     const id = action.payload
-    pushMessage(channel, 'unfav', {id})
+    pushMessage(userChannel, 'unfav', {id})
       .then(resp => {
         dispatch(unfav(id))
       })
@@ -147,7 +127,7 @@ const requestTimelineMiddleware = createMiddleware(
   ({ dispatch, nextDispatch, action }) => {
     nextDispatch(action)
     dispatch(updateTimeline({posts: []}))
-    pushMessage(channel, 'timeline', {})
+    pushMessage(userChannel, 'timeline', {})
       .then(({ posts, favs }) => {
         dispatch(addFavs(favs))
         dispatch(updateTimeline({posts}))
@@ -155,69 +135,37 @@ const requestTimelineMiddleware = createMiddleware(
   }
 )
 
-const requestInfoMiddleware = createMiddleware(
-  requestInfo.getType(),
-  ({ dispatch, nextDispatch, action }) => {
-    nextDispatch(action)
-    pushMessage(channel, 'info', {})
-      .then(resp => {
-        dispatch(updateInfo(resp))
-      })
-  }
-)
-
-const openFavNoticesMiddleware = createMiddleware(
-  openFavNotices.getType(),
+const openNoticesPageMiddleware = createMiddleware(
+  openNoticesPage.getType(),
   ({ dispatch, nextDispatch, action, getState }) => {
     nextDispatch(action)
-    const { notices: { fav, favs }} = getState()
+    const { notices: { fav, favs, follow, follows, address, addresses }} = getState()
     const nextFav = favs.length >= 1 ? favs[0].id : null
-    if (fav !== nextFav) {
-      pushMessage(channel, 'open_fav_notice', {id: nextFav})
-        .then(resp => dispatch(setCurrentNotices(resp)))
-    }
-  }
-)
-
-const openFollowNoticesMiddleware = createMiddleware(
-  openFollowNotices.getType(),
-  ({ dispatch, nextDispatch, action, getState }) => {
-    nextDispatch(action)
-    const { notices: { follow, follows }} = getState()
     const nextFollow = follows.length >= 1 ? follows[0].id : null
-    if (follow !== nextFollow) {
-      pushMessage(channel, 'open_follow_notice', {id: nextFollow})
+    const nextAddress = addresses.length >= 1 ? addresses[0].post_addresses[0].id : null
+    if (address !== nextAddress || follow !== nextFollow || fav !== nextFav) {
+      pushMessage(userChannel, 'open_notices', {fav: nextFav, follow: nextFollow, address: nextAddress})
         .then(resp => dispatch(setCurrentNotices(resp)))
     }
   }
 )
 
-const openAddressNoticesMiddleware = createMiddleware(
-  openAddressNotices.getType(),
-  ({ dispatch, nextDispatch, action, getState }) => {
-    nextDispatch(action)
-    const { notices: { address, addresses }} = getState()
-    const nextAddress = addresses.length >= 1 ? addresses[0].post_addresses[0].id : null
-    if (address !== nextAddress) {
-      pushMessage(channel, 'open_address_notice', {id: nextAddress})
-        .then(resp => dispatch(setCurrentNotices(resp)))
-    }
-  }
-)
+let signedInMiddlewares = []
+if (signedIn) {
+  signedInMiddlewares = [
+    submitPostMiddleware,
+    requestFollowMiddleware,
+    requestUnfollowMiddleware,
+    requestFavMiddleware,
+    requestUnfavMiddleware,
+    requestTimelineMiddleware,
+    openNoticesPageMiddleware
+  ]
+}
 
 export default composeMiddleware(
+  ...signedInMiddlewares,
   reloadMiddleware,
-  submitPostMiddleware,
-  requestRandomPostMiddleware,
   requestUserMiddleware,
-  requestFollowMiddleware,
-  requestUnfollowMiddleware,
-  requestFavMiddleware,
-  requestUnfavMiddleware,
-  requestPublicTimelineMiddleware,
-  requestTimelineMiddleware,
-  requestInfoMiddleware,
-  openFavNoticesMiddleware,
-  openFollowNoticesMiddleware,
-  openAddressNoticesMiddleware
+  requestPublicTimelineMiddleware
 )

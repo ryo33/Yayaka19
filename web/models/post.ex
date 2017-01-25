@@ -1,7 +1,7 @@
 defmodule Share.Post do
   use Share.Web, :model
   @derive {Poison.Encoder, only: [
-    :id, :text, :user, :post_addresses
+    :id, :text, :user, :post_addresses, :inserted_at
   ]}
 
   schema "posts" do

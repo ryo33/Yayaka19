@@ -2,21 +2,19 @@ import { combineReducers } from 'redux'
 import { createReducer } from 'redux-act'
 import { createPagesReducer } from 'redux-pages'
 
-import { home } from '../pages.js'
+import { publicTimeline } from '../pages.js'
 import {
   setUser, setFollowing, follow, unfollow,
   addFavs, fav, unfav
 } from '../actions.js'
 
-import info from './info.js'
 import notices from './notices.js'
-import homeReducer from './home.js'
 import newPostPage from './newPostPage.js'
 import userPage from './userPage.js'
-import publicTimeline from './publicTimeline.js'
+import publicTimelineReducer from './publicTimeline.js'
 import timeline from './timeline.js'
 
-const page = createPagesReducer(home.name, {})
+const page = createPagesReducer(publicTimeline.name, {})
 
 const user = createReducer({
   [setUser]: (state, payload) => payload
@@ -35,15 +33,13 @@ const favs = createReducer({
 }, [])
 
 export default combineReducers({
-  info,
   notices,
   page,
   user,
   following,
   favs,
-  home: homeReducer,
   newPostPage,
   userPage,
-  publicTimeline,
+  publicTimeline: publicTimelineReducer,
   timeline
 })
