@@ -1,16 +1,18 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import { Button } from 'semantic-ui-react'
+
 import { userPage } from '../pages.js'
 
 const actionCreators = {
   userPageAction: userPage.action
 }
 
-const UserButton = ({ user, children, userPageAction, className }) => (
-  <button onClick={() => userPageAction({name: user.name})} className={className}>
+const UserButton = ({ user, children, userPageAction }) => (
+  <Button size='mini' onClick={() => userPageAction({name: user.name})}>
     {children}
-  </button>
+  </Button>
 )
 
 const component = connect(null, actionCreators)(UserButton)

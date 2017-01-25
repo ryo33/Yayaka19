@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { userSelector, userPageSelector, followingSelector } from '../selectors.js'
+import { Card, Icon } from 'semantic-ui-react'
 
+import { userSelector, userPageSelector, followingSelector } from '../selectors.js'
 import FollowButton from './FollowButton.js'
 
 const mapStateToProps = state => {
@@ -21,18 +22,31 @@ class UserPage extends Component {
     if (user != null) {
       return (
         <div>
-          <ul>
-            {
-              isNotMe
-                ? <FollowButton user={user} />
-                : null
-            }
-            <li>Display: {user.display}</li>
-            <li>Name: {user.name}</li>
-            <li>Number of posts: {postCount}</li>
-            <li>Following: {following}</li>
-            <li>Followers: {followers}</li>
-          </ul>
+          {
+            isNotMe
+              ? <FollowButton user={user} />
+              : null
+          }
+          <Card>
+            <Card.Content>
+              <Card.Header>
+                {user.display}
+              </Card.Header>
+              <Card.Meta>
+                @{user.name} {postCount} Posts
+              </Card.Meta>
+              <Card.Content extra>
+                <span>
+                  <Icon name='user' />
+                  {following} Following
+                </span>
+                <span>
+                  <Icon name='user' />
+                  {followers} Followers
+                </span>
+              </Card.Content>
+            </Card.Content>
+          </Card>
         </div>
       )
     } else {

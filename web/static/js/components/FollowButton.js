@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
+import { Button, Icon } from 'semantic-ui-react'
+
 import { requestFollow, requestUnfollow } from '../actions.js'
 import { userSelector, followingSelector } from '../selectors.js'
 
@@ -42,21 +44,27 @@ class FollowButton extends Component {
     }
     if (following.includes(targetUser.id)) {
       return (
-        <button className="unfollow" onClick={this.unfollow}><span /></button>
+        <Button primary onClick={this.unfollow}>
+          <Button.Content>
+            Following
+          </Button.Content>
+        </Button>
       )
     } else {
       return (
-        <button className="follow" onClick={this.follow}><span /></button>
+        <Button onClick={this.follow}>
+          <Button.Content>
+            <Icon name='add user' />
+            Follow
+          </Button.Content>
+        </Button>
       )
     }
   }
 }
 
-const component = connect(mapStateToProps, actionCreators)(FollowButton)
-
-component.propTypes = {
+FollowButton.propTypes = {
   user: React.PropTypes.object.isRequired,
 }
 
-export default component
-
+export default connect(mapStateToProps, actionCreators)(FollowButton)

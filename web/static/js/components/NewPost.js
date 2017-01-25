@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
+import { Header, Segment, Button, Form } from 'semantic-ui-react'
+
 import { submitPost, updatePostText, updatePostAddress } from '../actions.js'
 import { newPostPageSelector, userSelector } from '../selectors.js'
 import Post from './Post.js'
@@ -24,22 +26,27 @@ class NewPost extends Component {
     this.handleChangeText = this.handleChangeText.bind(this)
     this.handleChangeAddress = this.handleChangeAddress.bind(this)
     this.submit = this.submit.bind(this)
-    this.openAddress = this.openAddress.bind(this)
+    this.toggleAddress = this.toggleAddress.bind(this)
     this.state = {
-      openAddress: false
+      addressEnabled: false
     }
   }
 
-  openAddress() {
-    this.setState({openAddress: true})
+  toggleAddress() {
+    const { addressEnabled } = this.state
+    this.setState({addressEnabled: !addressEnabled})
+    if (addressEnabled) {
+      updatePostAddress('')
+    }
   }
 
-  submit() {
+  submit(e) {
+    e.preventDefault()
     const { text, address, submitPost } = this.props
     if (text.length >= 1) {
       submitPost(text, address)
     }
-    this.setState({openAddress: false})
+    this.setState({addressEnabled: false})
   }
 
   handleChangeText(event) {
@@ -52,48 +59,38 @@ class NewPost extends Component {
     updatePostAddress(event.target.value)
   }
 
-  renderAddress() {
-    const { address } = this.props
-    if (this.state.openAddress) {
-      return (
-        <input
-          type="text"
-          value={address}
-          onChange={this.handleChangeAddress}
-        />
-      )
-    } else {
-      return (
-        <button onClick={this.openAddress}>
-          Send to someone
-        </button>
-      )
-    }
-  }
-
   render() {
-    const { user, text } = this.props
+    const { user, text, address, postAddresses } = this.props
+    const { addressEnabled } = this.state
     return (
-      <div>
-        {this.renderAddress()}
-        <textarea
-          value={text}
-          onChange={this.handleChangeText}
-          rows={7}
-          autoFocus
-        >
-        </textarea>
-        <button
-          className="submit"
-          onClick={this.submit}
-          disabled={text.length == 0}
-        >Submit</button>
-        <h2>Preview</h2>
-        <Post
-          post={{ user, text }}
-          onClickUser={() => {}}
-        />
-      </div>
+      <Segment.Group>
+        <Segment>
+          <Header>New Post</Header>
+          <Segment>
+            <Form onSubmit={this.submit}>
+              <Form.Group inline>
+                <Form.Checkbox name='sendto' checked={addressEnabled} onChange={this.toggleAddress}
+                  label='Send to' />
+                <Form.Input name='address' value={address} onChange={this.handleChangeAddress}
+                  disabled={!addressEnabled} inline placeholder='Name' />
+              </Form.Group>
+              <Form.TextArea name='text' value={text} onChange={this.handleChangeText}
+                label='Text' placeholder={'What\'s in your head?'} rows='6' autoFocus />
+              <Form.Button disabled={text.length == 0} primary>Submit</Form.Button>
+            </Form>
+          </Segment>
+        </Segment>
+        <Segment>
+          <Header>Preview</Header>
+          <Segment>
+            <Post
+              favButton={false}
+              post={{ user, text, post_addresses: postAddresses }}
+              onClickUser={() => {}}
+            />
+          </Segment>
+        </Segment>
+      </Segment.Group>
     )
   }
 }

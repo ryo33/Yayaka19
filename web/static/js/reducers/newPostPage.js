@@ -11,6 +11,9 @@ const address = createReducer({
   [updatePostAddress]: (state, payload) => payload
 }, '')
 
+const postAddresses = createReducer({
+}, [])
+
 export default combineReducers({
-  text, address
+  text, address, postAddresses
 })
