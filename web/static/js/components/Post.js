@@ -80,7 +80,10 @@ class Post extends Component {
       <Comment.Group>
         <Comment>
           <Comment.Content>
-            <Comment.Author as={React.span} onClick={onClickUser}>
+            <Comment.Author as={React.a} href='#' onClick={(e) => {
+              e.preventDefault()
+              onClickUser()
+            }}>
               {post.user.display} <small>@{post.user.name}</small>
             </Comment.Author>
             <Comment.Text>
