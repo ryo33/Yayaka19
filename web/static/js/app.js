@@ -5,6 +5,7 @@ import { Provider } from 'react-redux'
 import createLogger from 'redux-logger'
 import createHistory from 'history/createBrowserHistory'
 
+import { signedIn, userID } from './global.js'
 import App from './components/App.js'
 import { pages, pagesMiddleware } from './pages.js'
 import reducer from './reducers/index.js'
@@ -33,18 +34,18 @@ const store = createStore(
 )
 
 // Socket
-const joinUserChannelCallback = ({ notice, following, notices }) => {
+const userChannelCallback = ({ user, notice, following, notices }) => {
+  store.dispatch(setUser(user))
   store.dispatch(setCurrentNotices(notice))
   store.dispatch(setFollowing(following))
   store.dispatch(updateNotices(notices))
 }
+if (signedIn) {
+  joinUserChannel(userChannelCallback)
+  watchUserChannel(store)
+}
 
-const respCallback = ({ user }) => {
-  if (user) {
-    const userChannel = joinUserChannel(user.name, joinUserChannelCallback)
-    watchUserChannel(store, userChannel)
-  }
-  store.dispatch(setUser(user))
+const respCallback = () => {
   store.dispatch(requestInfo())
   // Apply the current path
   pages.handleNavigation(store, history.location.pathname)

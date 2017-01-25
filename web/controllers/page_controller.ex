@@ -15,7 +15,7 @@ defmodule Share.PageController do
           user: user
         }
         token = Phoenix.Token.sign(Share.Endpoint, "channel", client)
-        render conn, "index.html", signed_in: true, token: token
+        render conn, "index.html", signed_in: true, token: token, user_id: user.name
     end
   end
 end

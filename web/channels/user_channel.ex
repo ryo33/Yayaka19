@@ -9,9 +9,9 @@ defmodule Share.UserChannel do
 
   require Logger
 
-  def join("user:" <> id, _params, socket) do
+  def join("user:" <> name, _params, socket) do
     user = socket.assigns.user
-    true = id == user.name
+    true = name == user.name
 
     query = from f in Follow,
       select: f.target_user_id,

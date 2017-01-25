@@ -1,7 +1,7 @@
 import { createPages, CHANGE_PAGE } from 'redux-pages'
 import { createReplacer, createMiddleware, composeMiddleware } from 'redux-middlewares'
 
-import { token } from './global.js'
+import { signedIn } from './global.js'
 import {
   requestRandomPost,
   requestTimeline,
@@ -13,7 +13,6 @@ import {
 } from './actions.js'
 import {
   pageSelector,
-  signedInSelector,
   homePostSelector,
   publicTimelinePostsSelector,
   timelinePostsSelector
@@ -35,7 +34,7 @@ export const errorPage = p('/*', 'error')
 
 const onlySignedInMiddleware = createReplacer(
   ({ action }) => newPost.check(action) || timeline.check(action),
-  ({ getState }) => signedInSelector(getState()) === false,
+  () => signedIn === false,
   () => home.action()
 )
 
