@@ -3,7 +3,7 @@ defmodule Share.Follow do
 
   schema "follows" do
     belongs_to :user, Share.User
-    belongs_to :target_user, Share.TargetUser
+    belongs_to :target_user, Share.User
 
     timestamps()
   end
@@ -17,5 +17,13 @@ defmodule Share.Follow do
     struct
     |> cast(params, @fields)
     |> validate_required(@fields)
+  end
+
+  def preload(%Share.Follow{} = follow) do
+    Share.Repo.preload(follow, [:user, :target_user])
+  end
+
+  def preload(query) do
+    Ecto.Query.preload(query, [:user, :target_user])
   end
 end

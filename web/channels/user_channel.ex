@@ -22,28 +22,25 @@ defmodule Share.UserChannel do
       join: post in Post,
       on: post.id == fav.post_id,
       where: post.user_id == ^user.id,
-      preload: [:user, post: [:user, post_addresses: :user]],
       order_by: [desc: :id],
       limit: 50
-    favs = Repo.all(query)
+    favs = Repo.all(Fav.preload(query))
            |> Enum.map(fn fav -> %{id: fav.id, user: fav.user, post: fav.post, inserted_at: fav.inserted_at} end)
 
     query = from follow in Follow,
       where: follow.target_user_id == ^user.id,
-      preload: [:user],
       order_by: [desc: :id],
       limit: 50
-    follows = Repo.all(query)
+    follows = Repo.all(Follow.preload(query))
               |> Enum.map(fn follow -> %{id: follow.id, user: follow.user, inserted_at: follow.inserted_at} end)
 
     query = from post in Post,
       join: address in PostAddress,
       on: post.id == address.post_id,
       where: address.user_id == ^user.id,
-      preload: [:user, post_addresses: :user],
       order_by: [desc: :id],
       limit: 50
-    addresses = Repo.all(query)
+    addresses = Repo.all(Post.preload(query))
 
     res = %{
       user: user,
@@ -68,7 +65,7 @@ defmodule Share.UserChannel do
     params = Map.put(params, "user_id", user.id)
     changeset = Post.changeset(%Post{}, params)
     post = Repo.insert!(changeset)
-    Share.PostHandler.handle_address(post, address, socket)
+    Task.start(fn -> Share.PostHandler.handle_address(post, address, socket) end)
     {:reply, :ok, socket}
   end
 
@@ -80,7 +77,8 @@ defmodule Share.UserChannel do
     with 0 <- Repo.aggregate(query, :count, :id),
          params <- %{user_id: user.id, post_id: id},
          changeset <- Fav.changeset(%Fav{}, params),
-         {:ok, _changeset} <- Repo.insert(changeset) do
+         {:ok, fav} <- Repo.insert(changeset) do
+      Task.start(fn -> Share.Notice.add_fav_notice(user, Fav.preload(fav)) end)
       {:reply, :ok, socket}
     else
       _ -> {:reply, :error, socket}
@@ -110,7 +108,8 @@ defmodule Share.UserChannel do
          0 <- Repo.aggregate(query, :count, :id),
          params <- %{user_id: user.id, target_user_id: id},
          changeset <- Follow.changeset(%Follow{}, params),
-         {:ok, _changeset} <- Repo.insert(changeset) do
+         {:ok, follow} <- Repo.insert(changeset) do
+      Task.start(fn -> Share.Notice.add_follow_notice(user, Follow.preload(follow)) end)
       {:reply, :ok, socket}
     else
       _ -> {:reply, :error, socket}

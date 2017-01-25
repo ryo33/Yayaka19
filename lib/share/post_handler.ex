@@ -14,6 +14,8 @@ defmodule Share.PostHandler do
           params = %{user_id: user.id, post_id: post.id}
           changeset = PostAddress.changeset(%PostAddress{}, params)
           Repo.insert!(changeset)
+          post = post |> Post.preload()
+          Share.Notice.add_address_notice(post)
       end
     end
   end
