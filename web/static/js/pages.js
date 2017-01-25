@@ -7,9 +7,7 @@ import {
   requestTimeline,
   requestPublicTimeline,
   requestUser,
-  openFavNotices,
-  openFollowNotices,
-  openAddressNotices
+  openNoticesPage
 } from './actions.js'
 import {
   pageSelector,
@@ -26,28 +24,24 @@ export const publicTimeline = p('/p', 'public')
 export const timeline = p('/t', 'timeline')
 export const newPost = p('/new', 'new')
 export const userPage = p('/users/:name', 'user')
-export const favNotices = p('/n/fav', 'fav notices')
-export const followNotices = p('/n/follow', 'follow notices')
-export const addressNotices = p('/n/address', 'address notices')
+export const noticesPage = p('/n', 'notices')
 export const loginPage = p('/login', 'login')
 export const errorPage = p('/*', 'error')
 
 const onlySignedInMiddleware = createReplacer(
-  ({ action }) => newPost.check(action) || timeline.check(action),
+  ({ action }) => newPost.check(action) || timeline.check(action) || noticesPage.check(action),
   () => signedIn === false,
-  () => home.action()
+  () => loginPage.action()
 )
 
-const homeHook = createMiddleware(
+const homeHook = createReplacer(
   ({ action }) => home.check(action),
-  ({ getState }) => {
-    const state = getState()
-    const notLoaded = !homePostSelector(getState()).user
-    return notLoaded || pageSelector(state).name != home.name
-  },
-  ({ dispatch, nextDispatch, action }) => {
-    dispatch(requestRandomPost())
-    nextDispatch(action)
+  () => {
+    if (signedIn) {
+      return timeline.action()
+    } else {
+      return publicTimeline.action()
+    }
   }
 )
 
@@ -85,27 +79,11 @@ const userPageHook = createMiddleware(
   }
 )
 
-const favNoticesHook = createMiddleware(
-  ({ action }) => favNotices.check(action),
+const noticesPageHook = createMiddleware(
+  ({ action }) => noticesPage.check(action),
   ({ dispatch, nextDispatch, action }) => {
     nextDispatch(action)
-    dispatch(openFavNotices())
-  }
-)
-
-const followNoticesHook = createMiddleware(
-  ({ action }) => followNotices.check(action),
-  ({ dispatch, nextDispatch, action }) => {
-    nextDispatch(action)
-    dispatch(openFollowNotices())
-  }
-)
-
-const addressNoticesHook = createMiddleware(
-  ({ action }) => addressNotices.check(action),
-  ({ dispatch, nextDispatch, action }) => {
-    nextDispatch(action)
-    dispatch(openAddressNotices())
+    dispatch(openNoticesPage())
   }
 )
 
@@ -115,7 +93,5 @@ export const pagesMiddleware = composeMiddleware(
   publicTimelineHook,
   timelineHook,
   userPageHook,
-  favNoticesHook,
-  followNoticesHook,
-  addressNoticesHook
+  noticesPageHook
 )

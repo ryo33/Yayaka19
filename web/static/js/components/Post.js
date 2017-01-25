@@ -1,9 +1,26 @@
-import React from 'react'
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import Linkify from 'react-linkify'
 
+import { Comment, Icon, Segment } from 'semantic-ui-react'
+
 import FollowButton from './FollowButton.js'
-import FavButton from './FavButton.js'
 import UserButton from './UserButton.js'
+import { requestFav, requestUnfav } from '../actions.js'
+import { userSelector, favsSelector } from '../selectors.js'
+
+const mapStateToProps = (state) => {
+  const user = userSelector(state)
+  const favs = favsSelector(state)
+  return {
+    user,
+    favs
+  }
+}
+
+const actionCreators = {
+  requestFav, requestUnfav
+}
 
 const PostAddresses = ({ addresses = [] }) => (
   <div>
@@ -11,38 +28,76 @@ const PostAddresses = ({ addresses = [] }) => (
       addresses.map(({ user }) => (
         <span key={user.name}>
           <UserButton user={user} className="link">
-            @{user.name}
+            <Icon name='send' />
+            {user.display} (@{user.name})
           </UserButton>
-          ({user.display})
         </span>
       ))
     }
   </div>
 )
 
-const Post = ({ favButton = true, followButton = true, post, onClickUser }) => (
-  <div>
-    <button className="link" onClick={onClickUser}>
-      {post.user.display} <small>@{post.user.name}</small>
-    </button>
-    {
-      followButton
-        ? <FollowButton user={post.user} />
-        : null
+class Post extends Component {
+  constructor(props) {
+    super(props)
+    this.fav = this.fav.bind(this)
+    this.unfav = this.unfav.bind(this)
+  }
+
+  fav() {
+    const { requestFav, post } = this.props
+    requestFav(post.id)
+  }
+
+  unfav() {
+    const { requestUnfav, post } = this.props
+    requestUnfav(post.id)
+  }
+
+  renderFavButton() {
+    const { user, favs, post } = this.props
+    if (user == null) {
+      return null
     }
-    <PostAddresses addresses={post.post_addresses} />
-    <pre>
-      <Linkify properties={{target: '_blank'}}>
-        {post.text}
-      </Linkify>
-    </pre>
-    {
-      favButton
-        ? <FavButton post={post} />
-        : null
+    if (favs.includes(post.id)) {
+      return (
+        <Comment.Action onClick={this.unfav}>
+          <Icon name='star' color='yellow' size="large" />
+        </Comment.Action>
+      )
+    } else {
+      return (
+        <Comment.Action onClick={this.fav}>
+          <Icon name='empty star' size="large" />
+        </Comment.Action>
+      )
     }
-  </div>
-)
+  }
+
+  render() {
+    const { list = false, favButton = true, followButton = true, post, onClickUser } = this.props
+    return (
+      <Comment.Group>
+        <Comment>
+          <Comment.Content>
+            <Comment.Author as={React.span} onClick={onClickUser}>
+              {post.user.display} <small>@{post.user.name}</small>
+            </Comment.Author>
+            <Comment.Text>
+              <PostAddresses addresses={post.post_addresses} />
+              <pre>
+                <Linkify properties={{target: '_blank'}}>
+                  {post.text}
+                </Linkify>
+              </pre>
+            </Comment.Text>
+            {favButton ? <Comment.Actions>{this.renderFavButton()}</Comment.Actions> : null}
+          </Comment.Content>
+        </Comment>
+      </Comment.Group>
+    )
+  }
+}
 
 const user = React.PropTypes.shape({
   name: React.PropTypes.string.isRequired,
@@ -61,4 +116,4 @@ Post.propTypes = {
   onClickUser: React.PropTypes.func.isRequired
 }
 
-export default Post
+export default connect(mapStateToProps, actionCreators)(Post)

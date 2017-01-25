@@ -1,21 +1,19 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
+import { Icon, Menu, Label, Sidebar, Segment, Container, Confirm, Button } from 'semantic-ui-react'
+
 import { signedIn, source } from '../global.js'
 import {
-  home, publicTimeline, timeline, newPost, userPage, loginPage,
-  favNotices, followNotices, addressNotices
+  home, publicTimeline, timeline, newPost, userPage, loginPage, noticesPage
 } from '../pages.js'
-import Home from './Home.js'
 import PublicTimeline from './PublicTimeline.js'
 import Timeline from './Timeline.js'
 import NewPost from './NewPost.js'
 import UserPage from './UserPage.js'
 import LoginPage from './LoginPage.js'
 import ErrorPage from './ErrorPage.js'
-import FavNotices from './FavNotices.js'
-import FollowNotices from './FollowNotices.js'
-import AddressNotices from './AddressNotices.js'
+import NoticesPage from './NoticesPage.js'
 import {
   pageSelector, userSelector,
   favNoticesCountSelctor, followNoticesCountSelctor, addressNoticesCountSelctor
@@ -37,21 +35,40 @@ const actionCreators = {
   timelineAction: timeline.action,
   newPostAction: newPost.action,
   loginPageAction: loginPage.action,
-  favNoticesAction: favNotices.action,
-  followNoticesAction: followNotices.action,
-  addressNoticesAction: addressNotices.action
+  noticesPageAction: noticesPage.action
 }
 
 class App extends Component {
   constructor(props) {
     super(props)
+    this.toggleSidebar = this.toggleSidebar.bind(this)
+    this.openLogoutDialog = this.openLogoutDialog.bind(this)
+    this.closeLogoutDialog = this.closeLogoutDialog.bind(this)
+    this.state = {
+      sidebar: false,
+      logout: false,
+    }
+  }
+
+  toggleSidebar() {
+    this.setState({sidebar: !this.state.sidebar})
+  }
+
+  openLogoutDialog() {
+    this.setState({logout: true})
+  }
+
+  closeLogoutDialog() {
+    this.setState({logout: false})
+  }
+
+  handleLogout() {
+    window.location.href = '/logout'
   }
 
   renderPage() {
     const { page } = this.props
     switch (page.name) {
-      case home.name:
-        return <Home />
       case publicTimeline.name:
         return <PublicTimeline />
       case timeline.name:
@@ -60,12 +77,8 @@ class App extends Component {
         return <NewPost />
       case userPage.name:
         return <UserPage params={page.params} />
-      case favNotices.name:
-        return <FavNotices />
-      case followNotices.name:
-        return <FollowNotices />
-      case addressNotices.name:
-        return <AddressNotices />
+      case noticesPage.name:
+        return <NoticesPage />
       case loginPage.name:
         return <LoginPage />
       default:
@@ -73,7 +86,7 @@ class App extends Component {
     }
   }
 
-  renderHeader() {
+  render() {
     const {
       user,
       homeAction,
@@ -81,49 +94,68 @@ class App extends Component {
       timelineAction,
       newPostAction,
       loginPageAction,
-      addressNoticesAction, followNoticesAction, favNoticesAction,
+      noticesPageAction,
       addressCount, followCount, favCount
     } = this.props
-    if (signedIn) {
-      return (
-        <ul>
-          <li><button className="link" onClick={homeAction}>Home</button></li>
-          <li>
-            <button className="link" onClick={addressNoticesAction}>
-              Address ({addressCount})
-            </button>
-            <button className="link" onClick={followNoticesAction}>
-              Follow ({followCount})
-            </button>
-            <button className="link" onClick={favNoticesAction}>
-              Fav ({favCount})
-            </button>
-          </li>
-          <li><button className="link" onClick={timelineAction}>Timeline</button></li>
-          <li><button className="link" onClick={publicTimelineAction}>Public Timeline</button></li>
-          <li><button className="link" onClick={newPostAction}>New Post</button></li>
-          <li><a href={source.url}>GitHub</a></li>
-          <li><a href="/logout">Sign out</a></li>
-        </ul>
-      )
-    } else {
-      return (
-        <ul>
-          <li><button className="link" onClick={homeAction}>Home</button></li>
-          <li><button className="link" onClick={publicTimelineAction}>Public Timeline</button></li>
-          <li><button className="link" onClick={loginPageAction}>Sign in</button></li>
-          <li><a href={source.url}>GitHub</a></li>
-        </ul>
-      )
-      // Not signed in
-    }
-  }
-
-  render() {
+    const { sidebar, logout } = this.state
+    const noticesCount = addressCount + followCount + favCount
     return (
       <div>
-        {this.renderHeader()}
-        {this.renderPage()}
+        <Menu>
+          <Container>
+            <Menu.Item onClick={this.toggleSidebar}>
+              <Icon name='bars' size='large' />
+            </Menu.Item>
+            <Menu.Item onClick={signedIn ? timelineAction : publicTimelineAction}>
+              <Icon name='home' size='large' />
+            </Menu.Item>
+            <Menu.Item onClick={newPostAction}>
+              <Icon name='write' size='large' />
+            </Menu.Item>
+            <Menu.Item onClick={noticesPageAction}>
+              <Icon name='alarm' size='large' />
+              { noticesCount >= 1 ? <Label color='red'>{noticesCount}</Label> : null }
+            </Menu.Item>
+            <Menu.Menu position='right'>
+              {
+                !signedIn
+                  ? <Button primary onClick={loginPageAction}>Sign in</Button>
+                  : null
+              }
+            </Menu.Menu>
+          </Container>
+        </Menu>
+        <Container>
+          <Sidebar.Pushable as={React.div} style={{minHeight: '100%'}}>
+            <Sidebar onClick={this.toggleSidebar}
+              as={Menu} animation='overlay' width='thin' direction='top' visible={sidebar} vertical>
+              <Menu.Item onClick={publicTimelineAction}>
+                Public Timeline
+              </Menu.Item>
+              <Menu.Item link href={source.url} target="_blank">
+                Source Code
+              </Menu.Item>
+              {
+                signedIn
+                  ? <Menu.Item name='Sign out' onClick={this.openLogoutDialog}>
+                    Sign out
+                  </Menu.Item>
+                  : null
+              }
+              <Confirm
+                open={logout}
+                content='Are you sure you want to sign out?'
+                onCancel={this.closeLogoutDialog}
+                onConfirm={this.handleLogout}
+              />
+            </Sidebar>
+            <Sidebar.Pusher style={{minHeight: '100%'}}>
+              <Segment basic>
+                {this.renderPage()}
+              </Segment>
+            </Sidebar.Pusher>
+          </Sidebar.Pushable>
+        </Container>
       </div>
     )
   }
