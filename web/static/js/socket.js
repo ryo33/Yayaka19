@@ -1,12 +1,13 @@
 import { Socket } from 'phoenix'
 
-import { token } from './global.js'
+import { token, userID } from './global.js'
 
 export const socket = new Socket('/socket', {
   params: { token },
 })
 
 export const channel = socket.channel("page")
+export const userChannel = socket.channel(`user:${userID}`)
 
 export const pushMessage = (channel, event, params) => {
   return new Promise((resolve, reject) => {
@@ -17,11 +18,9 @@ export const pushMessage = (channel, event, params) => {
   })
 }
 
-export const joinUserChannel = (name, respCallback) => {
-  const channel = socket.channel(`user:${name}`)
-  channel.join()
+export const joinUserChannel = (respCallback) => {
+  userChannel.join()
     .receive("ok", respCallback)
-  return channel
 }
 
 export const joinChannel = (respCallback, errorCallback) => {

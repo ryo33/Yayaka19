@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { source } from '../global.js'
+import { signedIn, source } from '../global.js'
 import {
   home, publicTimeline, timeline, newPost, userPage, loginPage,
   favNotices, followNotices, addressNotices
@@ -17,7 +17,7 @@ import FavNotices from './FavNotices.js'
 import FollowNotices from './FollowNotices.js'
 import AddressNotices from './AddressNotices.js'
 import {
-  pageSelector, userSelector, signedInSelector,
+  pageSelector, userSelector,
   favNoticesCountSelctor, followNoticesCountSelctor, addressNoticesCountSelctor
 } from '../selectors.js'
 
@@ -25,7 +25,6 @@ const mapStateToProps = state => {
   return {
     page: pageSelector(state),
     user: userSelector(state),
-    signedIn: signedInSelector(state),
     favCount: favNoticesCountSelctor(state),
     followCount: followNoticesCountSelctor(state),
     addressCount: addressNoticesCountSelctor(state),
@@ -76,7 +75,6 @@ class App extends Component {
 
   renderHeader() {
     const {
-      signedIn,
       user,
       homeAction,
       publicTimelineAction,

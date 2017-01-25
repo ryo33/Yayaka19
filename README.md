@@ -1,19 +1,12 @@
 # Share
 
-To start your Phoenix app:
+sha.herokuapp.com is a social networking service where users post texts.
 
-  * Install dependencies with `mix deps.get`
-  * Create and migrate your database with `mix ecto.create && mix ecto.migrate`
-  * Start Phoenix endpoint with `mix phoenix.server`
+As the first big feature, posts displayed on the timeline are randomly chosen.
+This feature make it difficult to completely follow posts on the timeline.
+If you want someone to certainly read a post, you should reply.
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+Second, all posts don't have unique URLs.
+It is impossible to bookmark and share posts.
 
-Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
-
-## Learn more
-
-  * Official website: http://www.phoenixframework.org/
-  * Guides: http://phoenixframework.org/docs/overview
-  * Docs: https://hexdocs.pm/phoenix
-  * Mailing list: http://groups.google.com/group/phoenix-talk
-  * Source: https://github.com/phoenixframework/phoenix
+You need to login to post, follow users, use personal timeline, and favorite posts.

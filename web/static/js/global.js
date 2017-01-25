@@ -3,4 +3,6 @@ function getGlobal(key) {
 }
 
 export const token = getGlobal('token')
+export const signedIn = getGlobal('signedIn')
+export const userID = getGlobal('userID')
 export const source = getGlobal('source')

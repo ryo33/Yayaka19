@@ -9,10 +9,7 @@ defmodule Share.PageChannel do
   require Logger
 
   def join("page", _params, socket) do
-    res = %{
-      user: socket.assigns.user
-    }
-    {:ok, res, socket}
+    {:ok, socket}
   end
 
   def handle_in("new_post", %{"post" => params, "address" => address}, socket) do
