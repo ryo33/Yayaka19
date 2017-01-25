@@ -34,6 +34,11 @@ const onlySignedInMiddleware = createReplacer(
   () => loginPage.action()
 )
 
+const errorPageHook = createReplacer(
+  ({ action }) => errorPage.check(action),
+  () => home.action()
+)
+
 const homeHook = createReplacer(
   ({ action }) => home.check(action),
   () => {
@@ -89,6 +94,7 @@ const noticesPageHook = createMiddleware(
 
 export const pagesMiddleware = composeMiddleware(
   onlySignedInMiddleware,
+  errorPageHook,
   homeHook,
   publicTimelineHook,
   timelineHook,

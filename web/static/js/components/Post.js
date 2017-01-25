@@ -10,10 +10,8 @@ import { requestFav, requestUnfav } from '../actions.js'
 import { userSelector, favsSelector } from '../selectors.js'
 
 const mapStateToProps = (state) => {
-  const user = userSelector(state)
   const favs = favsSelector(state)
   return {
-    user,
     favs
   }
 }
@@ -55,10 +53,7 @@ class Post extends Component {
   }
 
   renderFavButton() {
-    const { user, favs, post } = this.props
-    if (user == null) {
-      return null
-    }
+    const { favs, post } = this.props
     if (favs.includes(post.id)) {
       return (
         <Comment.Action onClick={this.unfav}>
