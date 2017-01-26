@@ -23,10 +23,12 @@ export const joinUserChannel = (respCallback) => {
     .receive("ok", respCallback)
 }
 
-export const joinChannel = (respCallback, errorCallback) => {
+export const joinChannel = (respCallback) => {
+  let errorCount = 0
   socket.onError(() => {
-    if (confirm("Failed to connect to the server. Do you want to reload?")) {
-      errorCallback()
+    errorCount += 1
+    if (errorCount == 3 && confirm("Failed to connect to the server. Do you want to reload?")) {
+      window.location.reload(true)
     }
   })
   socket.connect()
