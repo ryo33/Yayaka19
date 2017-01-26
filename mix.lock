@@ -17,6 +17,7 @@
   "mime": {:hex, :mime, "1.0.1", "05c393850524767d13a53627df71beeebb016205eb43bfbd92d14d24ec7a1b51", [:mix], []},
   "mimerl": {:hex, :mimerl, "1.0.2", "993f9b0e084083405ed8252b99460c4f0563e41729ab42d9074fd5e52439be88", [:rebar3], []},
   "mimetype_parser": {:hex, :mimetype_parser, "0.1.2", "221d2d3f727e89d80de5e1610fc2ce444514aa56f873da1b8fc9c033143e5d6a", [:mix], []},
+  "oauth": {:git, "https://github.com/tim/erlang-oauth.git", "bd19896e31125f99ff45bb5850b1c0e74b996743", []},
   "oauth2": {:hex, :oauth2, "0.6.0", "f3967aba3f358e64fb70046f659f04ea753d7a407ce032046dd048fc2e2e4be3", [:mix], [{:httpoison, "~> 0.7", [hex: :httpoison, optional: false]}, {:mimetype_parser, "~> 0.1", [hex: :mimetype_parser, optional: false]}, {:poison, "~> 1.3 or ~> 2.0", [hex: :poison, optional: false]}]},
   "phoenix": {:hex, :phoenix, "1.2.1", "6dc592249ab73c67575769765b66ad164ad25d83defa3492dc6ae269bd2a68ab", [:mix], [{:cowboy, "~> 1.0", [hex: :cowboy, optional: true]}, {:phoenix_pubsub, "~> 1.0", [hex: :phoenix_pubsub, optional: false]}, {:plug, "~> 1.1", [hex: :plug, optional: false]}, {:poison, "~> 1.5 or ~> 2.0", [hex: :poison, optional: false]}]},
   "phoenix_ecto": {:hex, :phoenix_ecto, "3.2.1", "6cf11d590c61977f50fcb98ad8a10ee90ba8670a82cbf5eaf49cfaee2e95e8b7", [:mix], [{:ecto, "~> 2.1", [hex: :ecto, optional: false]}, {:phoenix_html, "~> 2.9", [hex: :phoenix_html, optional: false]}, {:plug, "~> 1.0", [hex: :plug, optional: false]}]},
@@ -33,4 +34,5 @@
   "ueberauth_facebook": {:hex, :ueberauth_facebook, "0.5.0", "68c3e5ab86a5b5db21209252bc68e050881bd733128543b1c7b4a2f0ac254495", [:mix], [{:oauth2, "0.6.0", [hex: :oauth2, optional: false]}, {:ueberauth, "~> 0.4", [hex: :ueberauth, optional: false]}]},
   "ueberauth_github": {:hex, :ueberauth_github, "0.4.0", "3fe9a20b88c3379bc1eed55f43a6cbf37b4c5e088d565abd07382dc1c99230a2", [:mix], [{:oauth2, "0.6.0", [hex: :oauth2, optional: false]}, {:ueberauth, "~> 0.4", [hex: :ueberauth, optional: false]}]},
   "ueberauth_google": {:hex, :ueberauth_google, "0.4.0", "824683b203f67ee825299bddc11d39f1841723ea47f2f15f36197bc23ca2e61d", [:mix], [{:oauth2, "0.6.0", [hex: :oauth2, optional: false]}, {:ueberauth, "~> 0.4", [hex: :ueberauth, optional: false]}]},
+  "ueberauth_twitter": {:hex, :ueberauth_twitter, "0.2.3", "e601d6d9c610f7a1cf747a0de92da939ea6246ca8fcfe541cfdf5f2f35b9517b", [:mix], [{:httpoison, "~> 0.7", [hex: :httpoison, optional: false]}, {:ueberauth, "~> 0.2", [hex: :ueberauth, optional: false]}]},
   "uuid": {:hex, :uuid, "1.1.6", "4927232f244e69c6e255643014c2d639dad5b8313dc2a6976ee1c3724e6ca60d", [:mix], []}}

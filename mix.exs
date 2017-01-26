@@ -20,7 +20,8 @@ defmodule Share.Mixfile do
     [mod: {Share, []},
      applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext,
                     :phoenix_ecto, :postgrex,
-                    :ueberauth, :ueberauth_google, :ueberauth_facebook, :ueberauth_github]]
+                    :ueberauth, :ueberauth_google, :ueberauth_facebook,
+                    :ueberauth_twitter, :ueberauth_github]]
   end
 
   # Specifies which paths to compile per environment.
@@ -43,7 +44,9 @@ defmodule Share.Mixfile do
      {:ueberauth, "~> 0.4.0"},
      {:ueberauth_google, "~> 0.4.0"},
      {:ueberauth_facebook, "~> 0.5.0"},
-     {:ueberauth_github, "~> 0.4.0"}]
+     {:ueberauth_github, "~> 0.4.0"},
+     {:ueberauth_twitter, "~> 0.2"},
+     {:oauth, github: "tim/erlang-oauth"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

@@ -5,7 +5,7 @@ defmodule Share.AuthController do
   alias Ueberauth.Strategy.Helpers
   alias Share.User
 
-  @providers [:google, :github, :facebook]
+  @providers [:google, :github, :facebook, :twitter]
 
   def request(conn, _params) do
     render(conn, "request.html", callback_url: Helpers.callback_url(conn))
