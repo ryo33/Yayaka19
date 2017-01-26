@@ -22,14 +22,13 @@ const p = pages.addPage.bind(pages)
 export const home = p('/', 'home')
 export const publicTimeline = p('/p', 'public')
 export const timeline = p('/t', 'timeline')
-export const newPost = p('/new', 'new')
 export const userPage = p('/users/:name', 'user')
 export const noticesPage = p('/n', 'notices')
 export const loginPage = p('/login', 'login')
 export const errorPage = p('/*', 'error')
 
 const onlySignedInMiddleware = createReplacer(
-  ({ action }) => newPost.check(action) || timeline.check(action) || noticesPage.check(action),
+  ({ action }) => timeline.check(action) || noticesPage.check(action),
   () => signedIn === false,
   () => loginPage.action()
 )

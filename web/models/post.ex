@@ -34,12 +34,16 @@ defmodule Share.Post do
     |> order_by(fragment("RANDOM() * (LN(views + 1) + SIN(views) + 1)"))
   end
 
+  @preload [:user, post_addresses: :user]
+
+  def preload_params, do: @preload
+
   def preload(%Share.Post{} = post) do
-    Share.Repo.preload(post, [:user, post_addresses: :user])
+    Share.Repo.preload(post, @preload)
   end
 
   def preload(query) do
     query
-    |> preload([:user, post_addresses: :user])
+    |> preload(^@preload)
   end
 end

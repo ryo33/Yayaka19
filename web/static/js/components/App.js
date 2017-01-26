@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { Icon, Menu, Label, Sidebar, Segment, Container, Confirm, Button } from 'semantic-ui-react'
+import {
+  Icon, Menu, Label, Sidebar, Segment, Container, Confirm, Button
+} from 'semantic-ui-react'
 
 import { signedIn, source } from '../global.js'
 import {
-  home, publicTimeline, timeline, newPost, userPage, loginPage, noticesPage
+  home, publicTimeline, timeline, userPage, loginPage, noticesPage
 } from '../pages.js'
 import PublicTimeline from './PublicTimeline.js'
 import Timeline from './Timeline.js'
@@ -15,17 +17,14 @@ import LoginPage from './LoginPage.js'
 import ErrorPage from './ErrorPage.js'
 import NoticesPage from './NoticesPage.js'
 import {
-  pageSelector, userSelector,
-  favNoticesCountSelctor, followNoticesCountSelctor, addressNoticesCountSelctor
+  pageSelector, userSelector, noticesCountSelctor
 } from '../selectors.js'
 
 const mapStateToProps = state => {
   return {
     page: pageSelector(state),
     user: userSelector(state),
-    favCount: favNoticesCountSelctor(state),
-    followCount: followNoticesCountSelctor(state),
-    addressCount: addressNoticesCountSelctor(state),
+    noticesCount: noticesCountSelctor(state)
   }
 }
 
@@ -33,7 +32,6 @@ const actionCreators = {
   homeAction: home.action,
   publicTimelineAction: publicTimeline.action,
   timelineAction: timeline.action,
-  newPostAction: newPost.action,
   loginPageAction: loginPage.action,
   noticesPageAction: noticesPage.action
 }
@@ -44,7 +42,10 @@ class App extends Component {
     this.toggleSidebar = this.toggleSidebar.bind(this)
     this.openLogoutDialog = this.openLogoutDialog.bind(this)
     this.closeLogoutDialog = this.closeLogoutDialog.bind(this)
+    this.openNewPost = this.openNewPost.bind(this)
+    this.closeNewPost = this.closeNewPost.bind(this)
     this.state = {
+      newPost: false,
       sidebar: false,
       logout: false,
     }
@@ -62,6 +63,14 @@ class App extends Component {
     this.setState({logout: false})
   }
 
+  openNewPost() {
+    this.setState({newPost: true})
+  }
+
+  closeNewPost() {
+    this.setState({newPost: false})
+  }
+
   handleLogout() {
     window.location.href = '/logout'
   }
@@ -73,8 +82,6 @@ class App extends Component {
         return <PublicTimeline />
       case timeline.name:
         return <Timeline />
-      case newPost.name:
-        return <NewPost />
       case userPage.name:
         return <UserPage params={page.params} />
       case noticesPage.name:
@@ -95,10 +102,9 @@ class App extends Component {
       newPostAction,
       loginPageAction,
       noticesPageAction,
-      addressCount, followCount, favCount
+      noticesCount
     } = this.props
-    const { sidebar, logout } = this.state
-    const noticesCount = addressCount + followCount + favCount
+    const { newPost, sidebar, logout } = this.state
     return (
       <div>
         <Menu>
@@ -109,12 +115,12 @@ class App extends Component {
             <Menu.Item onClick={signedIn ? timelineAction : publicTimelineAction}>
               <Icon name='home' size='large' />
             </Menu.Item>
-            <Menu.Item onClick={newPostAction}>
-              <Icon name='write' size='large' />
-            </Menu.Item>
             <Menu.Item onClick={noticesPageAction}>
               <Icon name='alarm' size='large' />
               { noticesCount >= 1 ? <Label color='red'>{noticesCount}</Label> : null }
+            </Menu.Item>
+            <Menu.Item onClick={newPost ? this.closeNewPost : this.openNewPost}>
+              <Icon color='blue' name='write' size='large' />
             </Menu.Item>
             <Menu.Menu position='right'>
               {
@@ -126,7 +132,7 @@ class App extends Component {
           </Container>
         </Menu>
         <Container>
-          <Sidebar.Pushable as={React.div} style={{minHeight: '100%'}}>
+          <Sidebar.Pushable as={React.div}>
             <Sidebar onClick={this.toggleSidebar}
               as={Menu} animation='overlay' width='thin' direction='top' visible={sidebar} vertical>
               <Menu.Item onClick={publicTimelineAction}>
@@ -149,8 +155,9 @@ class App extends Component {
                 onConfirm={this.handleLogout}
               />
             </Sidebar>
-            <Sidebar.Pusher style={{minHeight: '100%'}}>
+            <Sidebar.Pusher>
               <Segment basic>
+                {newPost ? <NewPost onSubmitHandler={this.closeNewPost} /> : null}
                 {this.renderPage()}
               </Segment>
             </Sidebar.Pusher>

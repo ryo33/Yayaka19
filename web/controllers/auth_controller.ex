@@ -66,6 +66,6 @@ defmodule Share.AuthController do
   defp login(conn, user) do
     conn
     |> Guardian.Plug.sign_in(user)
-    |> redirect(to: "/")
+    |> redirect(to: "/p")
   end
 end

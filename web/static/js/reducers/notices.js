@@ -1,36 +1,34 @@
 import { combineReducers } from 'redux'
 import { createReducer } from 'redux-act'
 
-import { setCurrentNotices, updateNotices, addNotices } from '../actions.js'
+import { updateNoticed, updateNotices, addNotices } from '../actions.js'
 
-const fav = createReducer({
-  [setCurrentNotices]: (state, { fav }) => fav
+const noticed = createReducer({
+  [updateNoticed]: (state, noticed) => noticed
 }, null)
 
-const follow = createReducer({
-  [setCurrentNotices]: (state, { follow }) => follow
-}, null)
-
-const address = createReducer({
-  [setCurrentNotices]: (state, { address }) => address
-}, null)
+const desc = (a, b) => b.id - a.id
 
 const favs = createReducer({
   [updateNotices]: (state, { favs }) => favs,
-  [addNotices]: (state, { favs }) => state.concat(favs).sort((a, b) => b.id - a.id) // DESC
+  [addNotices]: (state, { favs }) => state.concat(favs).sort(desc)
 }, [])
 
 const follows = createReducer({
   [updateNotices]: (state, { follows }) => follows,
-  [addNotices]: (state, { follows }) => state.concat(follows).sort((a, b) => b.id - a.id) // DESC
+  [addNotices]: (state, { follows }) => state.concat(follows).sort(desc)
 }, [])
 
 const addresses = createReducer({
   [updateNotices]: (state, { addresses }) => addresses,
-  [addNotices]: (state, { addresses }) => state.concat(addresses).sort((a, b) => b.id - a.id) // DESC
+  [addNotices]: (state, { addresses }) => state.concat(addresses).sort(desc)
+}, [])
+
+const replies = createReducer({
+  [updateNotices]: (state, { replies }) => replies,
+  [addNotices]: (state, { replies }) => state.concat(replies).sort(desc)
 }, [])
 
 export default combineReducers({
-  fav, follow, address,
-  favs, follows, addresses
+  noticed, favs, follows, addresses, replies
 })

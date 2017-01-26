@@ -7,15 +7,15 @@ export const addFavs = createAction('add favs', favs => favs)
 export const reload = createAction('reload')
 
 // Notices
-export const setCurrentNotices = createAction('set current notices', notices => notices)
+export const updateNoticed = createAction('update noticed', noticed => noticed)
 export const updateNotices = createAction('update notices', notices => notices)
 export const openNoticesPage = createAction('open notices')
 export const addNotices = createAction('add notices', notices => notices)
 
 // New post page
-export const updatePostText = createAction('update post text', text => text)
 export const updatePostAddress = createAction('update post address', address => address)
-export const submitPost = createAction('submit post', (text, address) => ({text, address}))
+export const submitPost = createAction('submit post',
+  (text, address, post) => ({text, address, post}))
 
 // User
 export const requestUser = createAction('request user', name => name)
