@@ -138,15 +138,19 @@ const openNoticesPageMiddleware = createMiddleware(
   openNoticesPage.getType(),
   ({ dispatch, nextDispatch, action, getState }) => {
     nextDispatch(action)
-    const { notices: { noticed, favs, follows, addresses, replies }} = getState()
-    const ns = [favs, follows, addresses, replies]
-      .filter(n => n.length != 0)
-      .map(n => n[0])
-    if (ns.length != 0) {
-      const max = ns.sort(compareNotices)[0].inserted_at
-      pushMessage(userChannel, 'open_notices', {noticed: max})
-        .then(({noticed}) => dispatch(updateNoticed(noticed)))
-    }
+    setTimeout(() => {
+      const { notices: { noticed, favs, follows, addresses, replies }} = getState()
+      const ns = [favs, follows, addresses, replies]
+        .filter(n => n.length != 0)
+        .map(n => n[0])
+      if (ns.length != 0) {
+        const max = ns.sort(compareNotices)[0].inserted_at
+        if (max != noticed) {
+          pushMessage(userChannel, 'open_notices', {noticed: max})
+            .then(({noticed}) => dispatch(updateNoticed(noticed)))
+        }
+      }
+    }, 0)
   }
 )
 

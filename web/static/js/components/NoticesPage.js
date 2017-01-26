@@ -44,6 +44,7 @@ const FavNotice = ({ fav: { user, post }, userPageAction }) => (
         <Segment>
           <Post
             favButton={false}
+            replyButton={false}
             post={post}
             onClickUser={() => {}}
           />

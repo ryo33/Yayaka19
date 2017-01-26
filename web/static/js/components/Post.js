@@ -144,12 +144,10 @@ class Post extends Component {
                 </Segment>
               ) : null}
             </Comment.Text>
-            {replyButton || favButton ? (
-              <Comment.Actions>
-                {replyButton ? this.renderReplyButton() : null}
-                {favButton ? this.renderFavButton() : null}
-              </Comment.Actions>
-            ) : null}
+            <Comment.Actions>
+              {replyButton ? this.renderReplyButton() : null}
+              {favButton ? this.renderFavButton() : null}
+            </Comment.Actions>
             { openReply ? (
               <NewPost
                 post={post}
