@@ -7,10 +7,10 @@ import { userSelector } from '../selectors.js'
 import Post from './Post.js'
 
 const PostList = ({ posts, onClickUser }) => (
-  <div>
+  <Segment.Group>
     {
       posts.map(post => (
-        <Segment key={post.id} vertical>
+        <Segment key={post.id} size='tiny'>
           <Post
             list
             followButton={true}
@@ -20,7 +20,7 @@ const PostList = ({ posts, onClickUser }) => (
         </Segment>
       ))
     }
-  </div>
+  </Segment.Group>
 )
 
 PostList.propTypes = {

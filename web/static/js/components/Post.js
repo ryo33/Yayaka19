@@ -111,7 +111,7 @@ class Post extends Component {
     } = this.props
     const { openReply } = this.state
     return (
-      <Comment.Group>
+      <Comment.Group style={{padding: '0px'}}>
         <Comment>
           <Comment.Content>
             <Comment.Author as={React.a} href='#' onClick={(e) => {
@@ -122,24 +122,42 @@ class Post extends Component {
             </Comment.Author>
             <Comment.Text>
               <PostAddresses addresses={post.post_addresses} />
-              <pre>
+              <pre style={{
+                marginBottom: '0px',
+                overflow: 'auto',
+                wordWrap: 'normal',
+                whiteSpace: 'pre-wrap',
+                fontSize: '1.1em'
+              }}>
                 <Linkify properties={{target: '_blank'}}>
                   {post.text}
                 </Linkify>
               </pre>
+              {post.post ? (
+                <Segment>
+                  <Post
+                    favButton={false}
+                    replyButton={false}
+                    post={post.post}
+                    onClickUser={() => userPageAction(post.post.user.name)}
+                  />
+                </Segment>
+              ) : null}
             </Comment.Text>
-            <Comment.Actions>
-              {replyButton ? this.renderReplyButton() : null}
-              {favButton ? this.renderFavButton() : null}
-            </Comment.Actions>
+            {replyButton || favButton ? (
+              <Comment.Actions>
+                {replyButton ? this.renderReplyButton() : null}
+                {favButton ? this.renderFavButton() : null}
+              </Comment.Actions>
+            ) : null}
+            { openReply ? (
+              <NewPost
+                post={post}
+                onSubmitHandler={this.closeReply}
+              />
+            ) : null }
           </Comment.Content>
         </Comment>
-        { openReply ? (
-          <NewPost
-            post={post}
-            onSubmitHandler={this.closeReply}
-          />
-        ) : null }
       </Comment.Group>
     )
   }
