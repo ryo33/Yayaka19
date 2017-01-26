@@ -9,7 +9,7 @@ defmodule Share.Post do
       end
       |> Map.from_struct
       |> Enum.filter(fn {key, _} -> Enum.member?([
-        :id, :text, :user, :post, :post_addresses
+        :id, :text, :user, :post, :post_addresses, :inserted_at
       ], key) end)
       |> Enum.into(%{})
       |> Poison.encode!(options)
