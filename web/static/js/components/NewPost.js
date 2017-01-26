@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { Header, Segment, Button, Form } from 'semantic-ui-react'
+import { Grid, Header, Segment, Button, Form } from 'semantic-ui-react'
 
-import { submitPost, updatePostText, updatePostAddress } from '../actions.js'
+import { submitPost, updatePostAddress } from '../actions.js'
 import { newPostPageSelector, userSelector } from '../selectors.js'
 import Post from './Post.js'
 
@@ -16,7 +16,6 @@ const mapStateToProps = state => {
 
 const actionCreators = {
   submitPost,
-  updatePostText,
   updatePostAddress
 }
 
@@ -28,11 +27,13 @@ class NewPost extends Component {
     this.submit = this.submit.bind(this)
     this.toggleAddress = this.toggleAddress.bind(this)
     this.state = {
+      text: '',
       addressEnabled: false
     }
   }
 
   toggleAddress() {
+    const { updatePostAddress } = this.props
     const { addressEnabled } = this.state
     this.setState({addressEnabled: !addressEnabled})
     if (addressEnabled) {
@@ -40,18 +41,30 @@ class NewPost extends Component {
     }
   }
 
+  reset() {
+    updatePostAddress('')
+    this.setState({text: '', addressEnabled: false})
+  }
+
   submit(e) {
     e.preventDefault()
-    const { text, address, submitPost } = this.props
+    const { post, address, submitPost, onSubmitHandler } = this.props
+    const { text } = this.state
     if (text.length >= 1) {
-      submitPost(text, address)
+      if (post) {
+        submitPost(text, '', post.id)
+      } else {
+        submitPost(text, address, null)
+      }
+      this.reset()
+      if (onSubmitHandler) {
+        onSubmitHandler()
+      }
     }
-    this.setState({addressEnabled: false})
   }
 
   handleChangeText(event) {
-    const { updatePostText } = this.props
-    updatePostText(event.target.value)
+    this.setState({text: event.target.value})
   }
 
   handleChangeAddress(event) {
@@ -60,35 +73,26 @@ class NewPost extends Component {
   }
 
   render() {
-    const { user, text, address, postAddresses } = this.props
+    const { post, user, address, postAddresses } = this.props
+    const { text } = this.state
     const { addressEnabled } = this.state
     return (
       <Segment.Group>
         <Segment>
           <Header>New Post</Header>
-          <Segment>
-            <Form onSubmit={this.submit}>
+          <Form onSubmit={this.submit}>
+            { post ? null : (
               <Form.Group inline>
                 <Form.Checkbox name='sendto' checked={addressEnabled} onChange={this.toggleAddress}
                   label='Send to' />
                 <Form.Input name='address' value={address} onChange={this.handleChangeAddress}
                   disabled={!addressEnabled} inline placeholder='Name' />
               </Form.Group>
-              <Form.TextArea name='text' value={text} onChange={this.handleChangeText}
-                label='Text' placeholder={'What\'s in your head?'} rows='6' autoFocus />
-              <Form.Button disabled={text.length == 0} primary>Submit</Form.Button>
-            </Form>
-          </Segment>
-        </Segment>
-        <Segment>
-          <Header>Preview</Header>
-          <Segment>
-            <Post
-              favButton={false}
-              post={{ user, text, post_addresses: postAddresses }}
-              onClickUser={() => {}}
-            />
-          </Segment>
+            ) }
+            <Form.TextArea name='text' value={text} onChange={this.handleChangeText}
+              label='Text' placeholder={'What\'s in your head?'} rows='6' autoFocus />
+            <Form.Button disabled={text.length == 0} primary>Submit</Form.Button>
+          </Form>
         </Segment>
       </Segment.Group>
     )

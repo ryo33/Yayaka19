@@ -42,30 +42,40 @@ defmodule Share.UserChannel do
       limit: 50
     addresses = Repo.all(Post.preload(query))
 
+    query = from post in Post,
+      join: target in Post,
+      on: post.post_id == target.id,
+      where: target.user_id == ^user.id,
+      order_by: [desc: :id],
+      preload: [post: ^Post.preload_params],
+      limit: 50
+    replies = Repo.all(Post.preload(query))
+              |> Enum.map(fn reply -> %{id: reply.id, post: reply, target: reply.post, inserted_at: reply.inserted_at} end)
+
     res = %{
       user: user,
       following: following,
-      notice: %{
-        fav: user.fav_id,
-        follow: user.follow_id,
-        address: user.post_address_id
-      },
+      noticed: user.noticed,
       notices: %{
         favs: favs,
         follows: follows,
-        addresses: addresses
+        addresses: addresses,
+        replies: replies
       }
     }
     {:ok, res, socket}
   end
 
-  def handle_in("new_post", %{"post" => params, "address" => address}, socket) do
+  def handle_in("new_post", params, socket) do
+    %{"post" => params, "address" => address} = params
     user = socket.assigns.user
     true = user != nil
     params = Map.put(params, "user_id", user.id)
     changeset = Post.changeset(%Post{}, params)
     post = Repo.insert!(changeset)
-    Task.start(fn -> Share.PostHandler.handle_address(post, address, socket) end)
+    Task.start(fn ->
+      Share.PostHandler.handle_address(post, address, socket)
+    end)
     {:reply, :ok, socket}
   end
 
@@ -130,18 +140,14 @@ defmodule Share.UserChannel do
     end
   end
 
-  def handle_in("open_notices", %{"fav" => fav, "follow" => follow, "address" => address}, socket) do
+  def handle_in("open_notices", %{"noticed" => noticed}, socket) do
     user = socket.assigns.user
     user = Repo.get!(User, user.id)
-    changeset = Ecto.Changeset.change(user, fav_id: fav, follow_id: follow, post_address_id: address)
+    {:ok, noticed} = NaiveDateTime.from_iso8601(noticed)
+    changeset = Ecto.Changeset.change(user, noticed: noticed)
     case Repo.update(changeset) do
       {:ok, user} ->
-        res = %{
-          fav: user.fav_id,
-          follow: user.follow_id,
-          address: user.post_address_id
-        }
-        {:reply, {:ok, res}, socket}
+        {:reply, {:ok, %{noticed: user.noticed}}, socket}
       _ -> {:reply, :error, socket}
     end
   end

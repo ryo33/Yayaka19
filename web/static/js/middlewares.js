@@ -11,10 +11,10 @@ import {
   requestFav, requestUnfav, fav, unfav,
   requestPublicTimeline, updatePublicTimeline,
   requestTimeline, updateTimeline,
-  setCurrentNotices,
-  openNoticesPage
+  openNoticesPage, updateNoticed
 } from './actions.js'
 import { pageSelector } from './selectors.js'
+import { compareNotices } from './utils.js'
 
 const redirectLoginPageMiddleware = createReplacer(
   () => !signedIn,
@@ -45,12 +45,9 @@ const submitPostMiddleware = createMiddleware(
   submitPost.getType(),
   ({ dispatch, nextDispatch, action }) => {
     nextDispatch(action)
-    const { text, address } = action.payload
-    pushMessage(userChannel, 'new_post', {post: {text}, address})
-      .then(() => {
-        dispatch(timeline.action())
-        dispatch(updatePostText(''))
-      })
+    const { text, address, post } = action.payload
+    const payload = {post: {text, post_id: post}, address}
+    pushMessage(userChannel, 'new_post', payload).then(() => {})
   }
 )
 
@@ -141,13 +138,14 @@ const openNoticesPageMiddleware = createMiddleware(
   openNoticesPage.getType(),
   ({ dispatch, nextDispatch, action, getState }) => {
     nextDispatch(action)
-    const { notices: { fav, favs, follow, follows, address, addresses }} = getState()
-    const nextFav = favs.length >= 1 ? favs[0].id : null
-    const nextFollow = follows.length >= 1 ? follows[0].id : null
-    const nextAddress = addresses.length >= 1 ? addresses[0].post_addresses[0].id : null
-    if (address !== nextAddress || follow !== nextFollow || fav !== nextFav) {
-      pushMessage(userChannel, 'open_notices', {fav: nextFav, follow: nextFollow, address: nextAddress})
-        .then(resp => dispatch(setCurrentNotices(resp)))
+    const { notices: { noticed, favs, follows, addresses, replies }} = getState()
+    const ns = [favs, follows, addresses, replies]
+      .filter(n => n.length != 0)
+      .map(n => n[0])
+    if (ns.length != 0) {
+      const max = ns.sort(compareNotices)[0].inserted_at
+      pushMessage(userChannel, 'open_notices', {noticed: max})
+        .then(({noticed}) => dispatch(updateNoticed(noticed)))
     }
   }
 )

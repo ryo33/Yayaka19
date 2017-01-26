@@ -18,24 +18,13 @@ export const publicTimelinePostsSelector = ({ publicTimeline }) => publicTimelin
 export const timelinePostsSelector = ({ timeline }) => timeline.posts
 
 // Notices
-export const favNoticesCountSelctor = ({ notices: { fav, favs }}) => {
-  if (fav) {
-    return favs.filter(f => f.id > fav).length
+export const noticesCountSelctor = ({ notices: { noticed, favs, follows, addresses, replies }}) => {
+  if (noticed) {
+    return favs.filter(f => f.inserted_at > noticed).length
+      + follows.filter(f => f.inserted_at > noticed).length
+      + addresses.filter(a => a.inserted_at > noticed).length
+      + replies.filter(r => r.inserted_at > noticed).length
   } else {
-    return favs.length
-  }
-}
-export const followNoticesCountSelctor = ({ notices: { follow, follows }}) => {
-  if (follow) {
-    return follows.filter(f => f.id > follow).length
-  } else {
-    return follows.length
-  }
-}
-export const addressNoticesCountSelctor = ({ notices: { address, addresses }}) => {
-  if (address) {
-    return addresses.filter(a => a.post_addresses[0].id > address).length
-  } else {
-    return addresses.length
+    return favs.length + follows.length + addresses.length + replies.length
   }
 }
