@@ -47,10 +47,9 @@ defmodule Share.UserChannel do
       on: post.post_id == target.id,
       where: target.user_id == ^user.id,
       order_by: [desc: :id],
-      preload: [post: ^Post.preload_params],
       limit: 50
     replies = Repo.all(Post.preload(query))
-              |> Enum.map(fn reply -> %{id: reply.id, post: reply, target: reply.post, inserted_at: reply.inserted_at} end)
+              |> Enum.map(fn reply -> %{id: reply.id, post: reply, inserted_at: reply.inserted_at} end)
 
     res = %{
       user: user,

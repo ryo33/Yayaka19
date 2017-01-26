@@ -1,8 +1,20 @@
 defmodule Share.Post do
   use Share.Web, :model
-  @derive {Poison.Encoder, only: [
-    :id, :text, :user, :post_addresses, :inserted_at
-  ]}
+
+  defimpl Poison.Encoder, for: Share.Post do
+    def encode(params, options) do
+      case params.post do
+        %Ecto.Association.NotLoaded{} -> Map.delete(params, :post)
+        _ -> params
+      end
+      |> Map.from_struct
+      |> Enum.filter(fn {key, _} -> Enum.member?([
+        :id, :text, :user, :post, :post_addresses
+      ], key) end)
+      |> Enum.into(%{})
+      |> Poison.encode!(options)
+    end
+  end
 
   schema "posts" do
     field :text, :string
@@ -34,7 +46,7 @@ defmodule Share.Post do
     |> order_by(fragment("RANDOM() * (LN(views + 1) + SIN(views) + 1)"))
   end
 
-  @preload [:user, post_addresses: :user]
+  @preload [:user, post_addresses: :user, post: [:user, post_addresses: :user]]
 
   def preload_params, do: @preload
 

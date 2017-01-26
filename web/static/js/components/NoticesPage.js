@@ -91,7 +91,7 @@ const AddressNotice = ({ address, userPageAction }) => (
   </Feed.Event>
 )
 
-const ReplyNotice = ({ reply: { post, target }, userPageAction }) => (
+const ReplyNotice = ({ reply: { post }, userPageAction }) => (
   <Feed.Event>
     <Feed.Label>
       <Icon name='comment' />
@@ -103,22 +103,10 @@ const ReplyNotice = ({ reply: { post, target }, userPageAction }) => (
         </Feed.User> (@{post.user.name}) replied to you
       </Feed.Summary>
       <Feed.Extra text>
-        <Segment.Group>
-          <Segment>
-            <Post
-              favButton={false}
-              replyButton={false}
-              post={target}
-              onClickUser={() => userPageAction(post.user.name)}
-            />
-          </Segment>
-          <Segment>
-            <Post
-              post={post}
-              onClickUser={() => userPageAction(post.user.name)}
-            />
-          </Segment>
-        </Segment.Group>
+        <Post
+          post={post}
+          onClickUser={() => userPageAction(post.user.name)}
+        />
       </Feed.Extra>
     </Feed.Content>
   </Feed.Event>

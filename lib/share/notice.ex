@@ -27,7 +27,7 @@ defmodule Share.Notice do
   def add_reply_notice(post) do
     post = Share.Repo.preload(post, [post: Share.Post.preload_params])
     target_user = post.post.user
-    payload = %{replies: [%{id: post.id, post: post, target: post.post, inserted_at: post.inserted_at}]}
+    payload = %{replies: [%{id: post.id, post: post, inserted_at: post.inserted_at}]}
     |> format_notices
     Share.Endpoint.broadcast! "user:" <> target_user.name, "add_notices", payload
   end
