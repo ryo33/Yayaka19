@@ -25,5 +25,9 @@ config :ueberauth, Ueberauth.Strategy.Github.OAuth,
   client_id: System.get_env("GITHUB_ID"),
   client_secret: System.get_env("GITHUB_SECRET")
 
+config :ueberauth, Ueberauth.Strategy.Twitter.OAuth,
+  consumer_key: System.get_env("TWITTER_ID"),
+  consumer_secret: System.get_env("TWITTER_SECRET")
+
 config :guardian, Guardian,
   secret_key: System.get_env("GUARDIAN_SECRET")
