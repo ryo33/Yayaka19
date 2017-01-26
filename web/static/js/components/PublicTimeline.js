@@ -1,6 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import { Message } from 'semantic-ui-react'
+
+import { signedIn } from '../global.js'
 import { publicTimelinePostsSelector } from '../selectors.js'
 import { userPage } from '../pages.js'
 
@@ -19,6 +22,17 @@ const actionCreators = {
 
 const PublicTimeline = ({ posts, userPageAction }) => (
   <div>
+    { signedIn ? null : (
+      <Message>
+        <Message.Header>
+          Welcome!
+        </Message.Header>
+        <p>
+          This is a social networking service that randomly choose posts to display on the timeline.<br />
+          You need to login to post, follow users, use personal timeline, favorite posts, etc.
+        </p>
+      </Message>
+    )}
     <h2>Public Timeline</h2>
     <ReloadButton />
     <PostList
