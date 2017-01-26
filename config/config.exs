@@ -34,7 +34,8 @@ config :ueberauth, Ueberauth,
   providers: [
     google: {Ueberauth.Strategy.Google, [default_scope: "email"]},
     facebook: {Ueberauth.Strategy.Facebook, [default_scope: ""]},
-    github: {Ueberauth.Strategy.Github, [default_scope: ""]}
+    github: {Ueberauth.Strategy.Github, [default_scope: ""]},
+    twitter: {Ueberauth.Strategy.Twitter, []}
   ]
 
 config :guardian, Guardian,
