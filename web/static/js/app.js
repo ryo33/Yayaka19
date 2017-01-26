@@ -49,8 +49,7 @@ const respCallback = () => {
   // Apply the current path
   pages.handleNavigation(store, history.location.pathname)
 }
-const errorCallback = () => window.location.reload(true)
-joinChannel(respCallback, errorCallback)
+joinChannel(respCallback)
 
 // Listen for changes
 history.listen((location, action) => {
