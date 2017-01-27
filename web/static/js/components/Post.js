@@ -144,7 +144,7 @@ class Post extends Component {
                     favButton={false}
                     replyButton={false}
                     post={post.post}
-                    onClickUser={() => userPageAction(post.post.user.name)}
+                    onClickUser={() => userPageAction({name: post.post.user.name})}
                   />
                 </Segment>
               ) : null}
