@@ -11,7 +11,9 @@ import { pages, pagesMiddleware } from './pages.js'
 import reducer from './reducers/index.js'
 import { pageSelector } from './selectors.js'
 import middleware from './middlewares.js'
-import { setUser, setFollowing, updateNoticed, updateNotices } from './actions.js'
+import {
+  addFavs, updateTimeline, setUser, setFollowing, updateNoticed, updateNotices
+} from './actions.js'
 import { joinChannel, joinUserChannel } from './socket.js'
 import { watchUserChannel } from './userChannel.js'
 
@@ -34,11 +36,14 @@ const store = createStore(
 )
 
 // Socket
-const userChannelCallback = ({ user, noticed, following, notices }) => {
+const userChannelCallback = ({ user, noticed, following, notices, timeline }) => {
+  const { favs, posts } = timeline
   store.dispatch(setUser(user))
-  store.dispatch(setFollowing(following))
+  store.dispatch(addFavs(favs))
+  store.dispatch(updateTimeline(posts))
   store.dispatch(updateNoticed(noticed))
   store.dispatch(updateNotices(notices))
+  store.dispatch(setFollowing(following))
 }
 if (signedIn) {
   joinUserChannel(userChannelCallback)

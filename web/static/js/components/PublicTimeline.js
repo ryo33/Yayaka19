@@ -1,14 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { Segment, Message, Header } from 'semantic-ui-react'
+import { Segment, Message, Header, Button } from 'semantic-ui-react'
 
 import { signedIn } from '../global.js'
 import { publicTimelinePostsSelector } from '../selectors.js'
 import { userPage } from '../pages.js'
+import { requestPublicTimeline } from '../actions.js'
 
 import PostList from './PostList.js'
-import ReloadButton from './ReloadButton.js'
 
 const mapStateToProps = state => {
   return {
@@ -17,6 +17,7 @@ const mapStateToProps = state => {
 }
 
 const actionCreators = {
+  requestPublicTimeline,
   userPageAction: name => userPage.action({name})
 }
 
@@ -35,13 +36,15 @@ const PublicTimeline = ({ posts, userPageAction }) => (
     )}
     <Segment vertical>
       <Header>Public Timeline</Header>
-      <ReloadButton />
+      <Button onClick={requestPublicTimeline}>Reload</Button>
     </Segment>
     <PostList
       posts={posts}
       onClickUser={userPageAction}
     />
-    <ReloadButton />
+    <Segment vertical>
+      <Button onClick={requestPublicTimeline}>Reload</Button>
+    </Segment>
   </div>
 )
 

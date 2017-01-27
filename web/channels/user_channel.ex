@@ -15,6 +15,8 @@ defmodule Share.UserChannel do
 
     user = Repo.get!(User, user.id)
 
+    timeline = get_timeline(user, socket)
+
     query = from f in Follow,
       select: f.target_user_id,
       where: f.user_id == ^user.id
@@ -55,6 +57,7 @@ defmodule Share.UserChannel do
 
     res = %{
       user: user,
+      timeline: timeline,
       following: following,
       noticed: user.noticed,
       notices: %{
@@ -155,6 +158,11 @@ defmodule Share.UserChannel do
 
   def handle_in("timeline", _params, socket) do
     user = socket.assigns.user
+    timeline = get_timeline(user, socket)
+    {:reply, {:ok, timeline}, socket}
+  end
+
+  def get_timeline(user, socket) do
     query = from f in Follow,
       select: f.target_user_id,
       where: f.user_id == ^user.id
@@ -169,6 +177,6 @@ defmodule Share.UserChannel do
     posts = Repo.all(query)
     post_ids = posts |> Enum.map(&(&1.id))
     favs = Fav.get_favs(socket, post_ids)
-    {:reply, {:ok, %{posts: posts, favs: favs}}, socket}
+    %{posts: posts, favs: favs}
   end
 end
