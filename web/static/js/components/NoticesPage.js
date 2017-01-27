@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { Feed, Segment, Icon } from 'semantic-ui-react'
+import { Header, Feed, Segment, Icon } from 'semantic-ui-react'
 
 import { userPage } from '../pages.js'
 import Post from './Post.js'
@@ -104,31 +104,38 @@ const ReplyNotice = ({ reply: { post }, userPageAction }) => (
         </Feed.User> (@{post.user.name}) replied to you
       </Feed.Summary>
       <Feed.Extra text>
-        <Post
-          post={post}
-          onClickUser={() => userPageAction(post.user.name)}
-        />
+        <Segment>
+          <Post
+            post={post}
+            onClickUser={() => userPageAction(post.user.name)}
+          />
+        </Segment>
       </Feed.Extra>
     </Feed.Content>
   </Feed.Event>
 )
 
 const NoticesPage = ({ notices, userPageAction }) => (
-  <Feed>
-    {
-      notices.map(({ fav, follow, address, reply }) => {
-        if (fav) {
-          return <FavNotice key={`fav${fav.id}`} fav={fav} userPageAction={userPageAction} />
-        } else if (follow) {
-          return <FollowNotice key={`follow${follow.id}`} follow={follow} userPageAction={userPageAction} />
-        } else if (address) {
-          return <AddressNotice key={`address${address.id}`} address={address} userPageAction={userPageAction} />
-        } else if (reply) {
-          return <ReplyNotice key={`reply${reply.id}`} reply={reply} userPageAction={userPageAction} />
-        }
-      })
-    }
-  </Feed>
+  <div>
+    <Segment vertical>
+      <Header>Notifications</Header>
+    </Segment>
+    <Feed>
+      {
+        notices.map(({ fav, follow, address, reply }) => {
+          if (fav) {
+            return <FavNotice key={`fav${fav.id}`} fav={fav} userPageAction={userPageAction} />
+          } else if (follow) {
+            return <FollowNotice key={`follow${follow.id}`} follow={follow} userPageAction={userPageAction} />
+          } else if (address) {
+            return <AddressNotice key={`address${address.id}`} address={address} userPageAction={userPageAction} />
+          } else if (reply) {
+            return <ReplyNotice key={`reply${reply.id}`} reply={reply} userPageAction={userPageAction} />
+          }
+        })
+      }
+    </Feed>
+  </div>
 )
 
 export default connect(mapStateToProps, actionCreators)(NoticesPage)

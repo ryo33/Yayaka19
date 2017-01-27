@@ -109,35 +109,40 @@ class App extends Component {
       <div>
         <Menu>
           <Container>
-            <Menu.Item onClick={this.toggleSidebar}>
-              <Icon name='bars' size='large' />
+            <Menu.Item onClick={publicTimelineAction}>
+              <Icon name='world' size='large' />
             </Menu.Item>
-            <Menu.Item onClick={signedIn ? timelineAction : publicTimelineAction}>
-              <Icon name='home' size='large' />
-            </Menu.Item>
-            <Menu.Item onClick={noticesPageAction}>
-              <Icon name='alarm' size='large' />
-              { noticesCount >= 1 ? <Label color='red'>{noticesCount}</Label> : null }
-            </Menu.Item>
-            <Menu.Item onClick={newPost ? this.closeNewPost : this.openNewPost}>
-              <Icon color='blue' name='write' size='large' />
-            </Menu.Item>
+            {signedIn ? (
+              <Menu.Item onClick={timelineAction}>
+                <Icon name='home' size='large' />
+              </Menu.Item>
+            ) : null}
+            {signedIn ? (
+              <Menu.Item onClick={noticesPageAction}>
+                <Icon name='alarm' size='large' />
+                { noticesCount >= 1 ? <Label color='red'>{noticesCount}</Label> : null }
+              </Menu.Item>
+            ) : null }
+            {signedIn ? (
+              <Menu.Item onClick={newPost ? this.closeNewPost : this.openNewPost}>
+                <Icon color='blue' name='write' size='large' />
+              </Menu.Item>
+            ) : null}
             <Menu.Menu position='right'>
-              {
-                !signedIn
-                  ? <Button primary onClick={loginPageAction}>Sign in</Button>
-                  : null
-              }
+              { !signedIn ? (
+                <Menu.Item>
+                  <Button primary onClick={loginPageAction}>Sign in</Button>
+                </Menu.Item>
+              ) : null }
+              <Menu.Item onClick={this.toggleSidebar}>
+                <Icon name='caret down' size='large' />
+              </Menu.Item>
             </Menu.Menu>
           </Container>
         </Menu>
-        <Container>
           <Sidebar.Pushable as={React.div}>
             <Sidebar onClick={this.toggleSidebar}
               as={Menu} animation='overlay' width='thin' direction='top' visible={sidebar} vertical>
-              <Menu.Item onClick={publicTimelineAction}>
-                Public Timeline
-              </Menu.Item>
               <Menu.Item link href={source.url} target="_blank">
                 Source Code
               </Menu.Item>
@@ -156,13 +161,12 @@ class App extends Component {
               />
             </Sidebar>
             <Sidebar.Pusher>
-              <Segment basic>
+              <Container>
                 {newPost ? <NewPost onSubmitHandler={this.closeNewPost} /> : null}
                 {this.renderPage()}
-              </Segment>
+              </Container>
             </Sidebar.Pusher>
           </Sidebar.Pushable>
-        </Container>
       </div>
     )
   }

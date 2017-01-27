@@ -1,6 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import { Segment, Header } from 'semantic-ui-react'
+
 import { timelinePostsSelector } from '../selectors.js'
 import { userPage } from '../pages.js'
 
@@ -19,8 +21,10 @@ const actionCreators = {
 
 const Timeline = ({ posts, userPageAction }) => (
   <div>
-    <h2>Timeline</h2>
-    <ReloadButton />
+    <Segment vertical>
+      <Header>Timeline</Header>
+      <ReloadButton />
+    </Segment>
     <PostList
       posts={posts}
       onClickUser={userPageAction}

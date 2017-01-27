@@ -134,7 +134,7 @@ class Post extends Component {
                 </Linkify>
               </pre>
               {post.post ? (
-                <Segment>
+                <Segment size='tiny'>
                   <Post
                     favButton={false}
                     replyButton={false}

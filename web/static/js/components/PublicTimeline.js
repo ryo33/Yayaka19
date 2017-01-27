@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { Message } from 'semantic-ui-react'
+import { Segment, Message, Header } from 'semantic-ui-react'
 
 import { signedIn } from '../global.js'
 import { publicTimelinePostsSelector } from '../selectors.js'
@@ -33,8 +33,10 @@ const PublicTimeline = ({ posts, userPageAction }) => (
         </p>
       </Message>
     )}
-    <h2>Public Timeline</h2>
-    <ReloadButton />
+    <Segment vertical>
+      <Header>Public Timeline</Header>
+      <ReloadButton />
+    </Segment>
     <PostList
       posts={posts}
       onClickUser={userPageAction}

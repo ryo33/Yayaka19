@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { Card, Icon } from 'semantic-ui-react'
+import { Card, Icon, Segment } from 'semantic-ui-react'
 
 import { userSelector, userPageSelector, followingSelector } from '../selectors.js'
 import FollowButton from './FollowButton.js'
@@ -21,7 +21,7 @@ class UserPage extends Component {
     const { user, postCount, following, followers } = userPage
     if (user != null) {
       return (
-        <div>
+        <Segment>
           {
             isNotMe
               ? <FollowButton user={user} />
@@ -47,7 +47,7 @@ class UserPage extends Component {
               </Card.Content>
             </Card.Content>
           </Card>
-        </div>
+        </Segment>
       )
     } else {
       return (
