@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import Helmet from "react-helmet"
 
 import {
   Icon, Menu, Label, Sidebar, Segment, Container, Confirm, Button
@@ -108,6 +109,9 @@ class App extends Component {
     const { newPost, sidebar, logout } = this.state
     return (
       <div>
+        <Helmet title={
+          noticesCount == 0 ? 'Share' : `(${noticesCount}) Share`
+        } />
         <Menu>
           <Container>
             <Menu.Item active={name == publicTimeline.name} onClick={publicTimelineAction}>

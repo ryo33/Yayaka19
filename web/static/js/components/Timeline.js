@@ -30,11 +30,11 @@ const Timeline = ({
   <div>
     <Segment vertical>
       <Header>Timeline</Header>
+      <Rail internal position='right'>
+        <Button floated='right' icon='refresh' onClick={requestTimeline}>
+        </Button>
+      </Rail>
     </Segment>
-    <Rail internal position='right'>
-      <Button floated='right' icon='refresh' onClick={requestTimeline}>
-      </Button>
-    </Rail>
     { newPosts.length != 0 ? (
       <Segment vertical>
         <Button fluid basic color='blue' onClick={loadNewPosts}>
