@@ -15,7 +15,7 @@ export const userPageSelector = ({ userPage }) => userPage
 export const publicTimelinePostsSelector = ({ publicTimeline }) => publicTimeline.posts
 
 // Timeline
-export const timelinePostsSelector = ({ timeline }) => timeline.posts
+export const timelineSelector = ({ timeline }) => timeline
 
 // Notices
 export const noticesCountSelctor = ({ notices: { noticed, favs, follows, addresses, replies }}) => {

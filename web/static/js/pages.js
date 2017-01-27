@@ -12,8 +12,6 @@ import {
 import {
   pageSelector,
   homePostSelector,
-  publicTimelinePostsSelector,
-  timelinePostsSelector
 } from './selectors.js'
 
 export const pages = createPages()
@@ -53,8 +51,7 @@ const publicTimelineHook = createMiddleware(
   ({ action }) => publicTimeline.check(action),
   ({ getState }) => {
     const state = getState()
-    const notLoaded = publicTimelinePostsSelector(getState()).length == 0
-    return notLoaded || pageSelector(state).name != publicTimeline.name
+    return pageSelector(state).name != publicTimeline.name
   },
   ({ dispatch, nextDispatch, action }) => {
     dispatch(requestPublicTimeline())
@@ -66,8 +63,7 @@ const timelineHook = createMiddleware(
   ({ action }) => timeline.check(action),
   ({ getState }) => {
     const state = getState()
-    const notLoaded = timelinePostsSelector(getState()).length == 0
-    return notLoaded || pageSelector(state).name != timeline.name
+    return pageSelector(state).name != timeline.name
   },
   ({ dispatch, nextDispatch, action }) => {
     dispatch(requestTimeline())
