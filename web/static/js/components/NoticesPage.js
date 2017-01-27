@@ -94,7 +94,7 @@ const AddressNotice = ({ address, userPageAction }) => (
         <Segment>
           <Post
             post={address}
-            onClickUser={() => userPageAction(address.user.name)}
+            onClickUser={() => userPageAction({name: address.user.name})}
           />
         </Segment>
       </Feed.Extra>
@@ -120,7 +120,7 @@ const ReplyNotice = ({ reply: { post, inserted_at }, userPageAction }) => (
         <Segment>
           <Post
             post={post}
-            onClickUser={() => userPageAction(post.user.name)}
+            onClickUser={() => userPageAction({name: post.user.name})}
           />
         </Segment>
       </Feed.Extra>
