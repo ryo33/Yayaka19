@@ -4,13 +4,12 @@ import { signedIn } from './global.js'
 import { pushMessage, channel, userChannel } from './socket.js'
 import { loginPage, home, timeline, publicTimeline } from './pages.js'
 import {
-  reload, addFavs,
   submitPost, updatePostText,
   requestUser, setUserInfo,
   requestFollow, requestUnfollow, follow, unfollow,
   requestFav, requestUnfav, fav, unfav,
   requestPublicTimeline, updatePublicTimeline,
-  requestTimeline, updateTimeline,
+  requestTimeline, updateTimeline, addFavs,
   openNoticesPage, updateNoticed
 } from './actions.js'
 import { pageSelector } from './selectors.js'
@@ -20,25 +19,6 @@ const redirectLoginPageMiddleware = createReplacer(
   () => !signedIn,
   [requestFav.getType()],
   () => loginPage.action()
-)
-
-const reloadMiddleware = composeMiddleware(
-  createMiddleware(
-    reload.getType(),
-    ({ dispatch, nextDispatch, action }) => {
-      nextDispatch(action)
-    }
-  ),
-  createReplacer(
-    reload.getType(),
-    ({ getState }) => pageSelector(getState()).name === publicTimeline.name,
-    () => requestPublicTimeline()
-  ),
-  createReplacer(
-    reload.getType(),
-    ({ getState }) => pageSelector(getState()).name === timeline.name,
-    () => requestTimeline()
-  )
 )
 
 const submitPostMiddleware = createMiddleware(
@@ -170,7 +150,6 @@ if (signedIn) {
 export default composeMiddleware(
   ...signedInMiddlewares,
   redirectLoginPageMiddleware,
-  reloadMiddleware,
   requestUserMiddleware,
   requestPublicTimelineMiddleware
 )

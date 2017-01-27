@@ -59,18 +59,6 @@ const publicTimelineHook = createMiddleware(
   }
 )
 
-const timelineHook = createMiddleware(
-  ({ action }) => timeline.check(action),
-  ({ getState }) => {
-    const state = getState()
-    return pageSelector(state).name != timeline.name
-  },
-  ({ dispatch, nextDispatch, action }) => {
-    dispatch(requestTimeline())
-    nextDispatch(action)
-  }
-)
-
 const userPageHook = createMiddleware(
   ({ action }) => userPage.check(action),
   ({ dispatch, nextDispatch, action }) => {
@@ -95,7 +83,6 @@ export const pagesMiddleware = composeMiddleware(
   errorPageHook,
   homeHook,
   publicTimelineHook,
-  timelineHook,
   userPageHook,
   noticesPageLeaveHook
 )

@@ -1,14 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { Segment, Header, Button } from 'semantic-ui-react'
+import { Segment, Header, Button, Rail, Icon } from 'semantic-ui-react'
 
-import { loadNewPosts } from '../actions.js'
+import { loadNewPosts, requestTimeline } from '../actions.js'
 import { timelineSelector, userSelector } from '../selectors.js'
 import { userPage } from '../pages.js'
 
 import PostList from './PostList.js'
-import ReloadButton from './ReloadButton.js'
 
 const mapStateToProps = state => {
   const { posts, newPosts } = timelineSelector(state)
@@ -21,14 +20,21 @@ const mapStateToProps = state => {
 
 const actionCreators = {
   userPageAction: name => userPage.action({name}),
-  loadNewPosts
+  loadNewPosts,
+  requestTimeline
 }
 
-const Timeline = ({ posts, newPosts, userPageAction, loadNewPosts, myNewPostsCount }) => (
+const Timeline = ({
+  posts, newPosts, userPageAction, loadNewPosts, myNewPostsCount, requestTimeline
+}) => (
   <div>
     <Segment vertical>
       <Header>Timeline</Header>
     </Segment>
+    <Rail internal position='right'>
+      <Button floated='right' icon='refresh' onClick={requestTimeline}>
+      </Button>
+    </Rail>
     { newPosts.length != 0 ? (
       <Segment vertical>
         <Button fluid basic color='blue' onClick={loadNewPosts}>
@@ -46,9 +52,6 @@ const Timeline = ({ posts, newPosts, userPageAction, loadNewPosts, myNewPostsCou
       posts={posts}
       onClickUser={userPageAction}
     />
-    <Segment vertical>
-      <ReloadButton />
-    </Segment>
   </div>
 )
 

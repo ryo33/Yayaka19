@@ -4,8 +4,6 @@ export const setUser = createAction('set user', user => user)
 export const setFollowing = createAction('set following', following => following)
 export const addFavs = createAction('add favs', favs => favs)
 
-export const reload = createAction('reload')
-
 // Notices
 export const updateNoticed = createAction('update noticed', noticed => noticed)
 export const updateNotices = createAction('update notices', notices => notices)
