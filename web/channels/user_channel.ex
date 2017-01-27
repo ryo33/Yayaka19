@@ -13,6 +13,8 @@ defmodule Share.UserChannel do
     user = socket.assigns.user
     true = name == user.name
 
+    user = Repo.get!(User, user.id)
+
     query = from f in Follow,
       select: f.target_user_id,
       where: f.user_id == ^user.id
