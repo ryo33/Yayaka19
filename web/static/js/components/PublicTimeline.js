@@ -21,7 +21,7 @@ const actionCreators = {
   userPageAction: name => userPage.action({name})
 }
 
-const PublicTimeline = ({ posts, userPageAction }) => (
+const PublicTimeline = ({ posts, userPageAction, requestPublicTimeline }) => (
   <div>
     { signedIn ? null : (
       <Message>
