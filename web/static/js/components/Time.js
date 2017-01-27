@@ -1,9 +1,9 @@
 import React from 'react'
-
+import moment from 'moment'
 import TimeAgo from 'react-timeago'
 
 const Time = ({ time }) => (
-  <TimeAgo date={new Date(time + 'z')} />
+  <TimeAgo date={moment.utc(time).format()} />
 )
 
 Time.propTypes = {
