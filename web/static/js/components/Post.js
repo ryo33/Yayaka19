@@ -119,11 +119,12 @@ class Post extends Component {
               e.preventDefault()
               onClickUser()
             }}>
-              {post.user.display} <small>@{post.user.name}</small>
-              <Comment.Metadata>
-                <Time time={post.inserted_at} />
-              </Comment.Metadata>
+              {post.user.display}
             </Comment.Author>
+            <Comment.Metadata>
+              <span>@{post.user.name}</span>
+              <Time time={post.inserted_at} />
+            </Comment.Metadata>
             <Comment.Text>
               <PostAddresses addresses={post.post_addresses} />
               <pre style={{

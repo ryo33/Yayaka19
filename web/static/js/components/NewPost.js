@@ -81,17 +81,20 @@ class NewPost extends Component {
         <Segment>
           <Header>New Post</Header>
           <Form onSubmit={this.submit}>
-            { post ? null : (
+            <Form.TextArea name='text' value={text} onChange={this.handleChangeText}
+              label='Text' placeholder={'What\'s in your head?'} rows='6' autoFocus />
+            { post ? (
+              <Form.Button disabled={text.length == 0} primary>Submit</Form.Button>
+            ) : (
               <Form.Group inline>
+                <Form.Button disabled={text.length == 0} primary>Submit</Form.Button>
                 <Form.Checkbox name='sendto' checked={addressEnabled} onChange={this.toggleAddress}
-                  label='Send to' />
+                  label='@' />
                 <Form.Input name='address' value={address} onChange={this.handleChangeAddress}
                   disabled={!addressEnabled} inline placeholder='Name' />
               </Form.Group>
             ) }
-            <Form.TextArea name='text' value={text} onChange={this.handleChangeText}
-              label='Text' placeholder={'What\'s in your head?'} rows='6' autoFocus />
-            <Form.Button disabled={text.length == 0} primary>Submit</Form.Button>
+
           </Form>
         </Segment>
       </Segment.Group>
