@@ -32,6 +32,8 @@ export const updatePublicTimeline = createAction('update public timeline', data 
 // Timeline
 export const requestTimeline = createAction('request timeline')
 export const updateTimeline = createAction('update timeline', data => data)
+export const addNewPosts = createAction('add new posts', posts => posts)
+export const loadNewPosts = createAction('load new posts')
 
 export const fav = createAction('fav', id => id)
 export const unfav = createAction('unfav', id => id)

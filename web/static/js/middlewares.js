@@ -125,11 +125,11 @@ const requestTimelineMiddleware = createMiddleware(
   requestTimeline.getType(),
   ({ dispatch, nextDispatch, action }) => {
     nextDispatch(action)
-    dispatch(updateTimeline({posts: []}))
+    dispatch(updateTimeline([]))
     pushMessage(userChannel, 'timeline', {})
       .then(({ posts, favs }) => {
         dispatch(addFavs(favs))
-        dispatch(updateTimeline({posts}))
+        dispatch(updateTimeline(posts))
       })
   }
 )
