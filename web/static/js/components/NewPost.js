@@ -42,6 +42,7 @@ class NewPost extends Component {
   }
 
   reset() {
+    const { updatePostAddress } = this.props
     updatePostAddress('')
     this.setState({text: '', addressEnabled: false})
   }
