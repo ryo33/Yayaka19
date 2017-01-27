@@ -95,6 +95,7 @@ class App extends Component {
 
   render() {
     const {
+      page: { name },
       user,
       homeAction,
       publicTimelineAction,
@@ -109,22 +110,22 @@ class App extends Component {
       <div>
         <Menu>
           <Container>
-            <Menu.Item onClick={publicTimelineAction}>
+            <Menu.Item active={name == publicTimeline.name} onClick={publicTimelineAction}>
               <Icon name='world' size='large' />
             </Menu.Item>
             {signedIn ? (
-              <Menu.Item onClick={timelineAction}>
+              <Menu.Item active={name == timeline.name} onClick={timelineAction}>
                 <Icon name='home' size='large' />
               </Menu.Item>
             ) : null}
             {signedIn ? (
-              <Menu.Item onClick={noticesPageAction}>
+              <Menu.Item active={name == noticesPage.name} onClick={noticesPageAction}>
                 <Icon name='alarm' size='large' />
                 { noticesCount >= 1 ? <Label color='red'>{noticesCount}</Label> : null }
               </Menu.Item>
             ) : null }
             {signedIn ? (
-              <Menu.Item onClick={newPost ? this.closeNewPost : this.openNewPost}>
+              <Menu.Item active={newPost} onClick={newPost ? this.closeNewPost : this.openNewPost}>
                 <Icon color='blue' name='write' size='large' />
               </Menu.Item>
             ) : null}
