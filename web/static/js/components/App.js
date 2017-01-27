@@ -163,7 +163,7 @@ class App extends Component {
             </Sidebar>
             <Sidebar.Pusher>
               <Container>
-                {newPost ? <NewPost onSubmitHandler={this.closeNewPost} /> : null}
+                {newPost ? <NewPost /> : null}
                 {this.renderPage()}
               </Container>
             </Sidebar.Pusher>
