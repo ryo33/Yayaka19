@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import Helmet from "react-helmet"
+import Helmet from 'react-helmet'
+import ReactPullToRefresh from 'react-pull-to-refresh'
 
 import {
   Icon, Menu, Label, Sidebar, Segment, Container, Confirm, Button
@@ -17,6 +18,7 @@ import UserPage from './UserPage.js'
 import LoginPage from './LoginPage.js'
 import ErrorPage from './ErrorPage.js'
 import NoticesPage from './NoticesPage.js'
+import { loadNewPosts } from '../actions.js'
 import {
   pageSelector, userSelector, noticesCountSelctor
 } from '../selectors.js'
@@ -30,6 +32,7 @@ const mapStateToProps = state => {
 }
 
 const actionCreators = {
+  loadNewPosts,
   homeAction: home.action,
   publicTimelineAction: publicTimeline.action,
   timelineAction: timeline.action,
@@ -45,6 +48,7 @@ class App extends Component {
     this.closeLogoutDialog = this.closeLogoutDialog.bind(this)
     this.openNewPost = this.openNewPost.bind(this)
     this.closeNewPost = this.closeNewPost.bind(this)
+    this.handleRefresh = this.handleRefresh.bind(this)
     this.state = {
       newPost: false,
       sidebar: false,
@@ -74,6 +78,12 @@ class App extends Component {
 
   handleLogout() {
     window.location.href = '/logout'
+  }
+
+  handleRefresh(resolve, reject) {
+    const { loadNewPosts } = this.props
+    loadNewPosts()
+    resolve()
   }
 
   renderPage() {
@@ -108,10 +118,10 @@ class App extends Component {
     } = this.props
     const { newPost, sidebar, logout } = this.state
     return (
-      <div>
-        <Helmet title={
-          noticesCount == 0 ? 'Share' : `(${noticesCount}) Share`
-        } />
+      <ReactPullToRefresh
+        onRefresh={this.handleRefresh}
+      >
+        <Helmet title={ noticesCount == 0 ? 'Share' : `(${noticesCount}) Share` } />
         <Menu>
           <Container>
             <Menu.Item active={name == publicTimeline.name} onClick={publicTimelineAction}>
@@ -145,34 +155,34 @@ class App extends Component {
             </Menu.Menu>
           </Container>
         </Menu>
-          <Sidebar.Pushable as={React.div}>
-            <Sidebar onClick={this.toggleSidebar}
-              as={Menu} animation='overlay' width='thin' direction='top' visible={sidebar} vertical>
-              <Menu.Item link href={source.url} target="_blank">
-                Source Code
-              </Menu.Item>
-              {
-                signedIn
-                  ? <Menu.Item name='Sign out' onClick={this.openLogoutDialog}>
-                    Sign out
-                  </Menu.Item>
-                  : null
-              }
-              <Confirm
-                open={logout}
-                content='Are you sure you want to sign out?'
-                onCancel={this.closeLogoutDialog}
-                onConfirm={this.handleLogout}
-              />
-            </Sidebar>
-            <Sidebar.Pusher>
-              <Container>
-                {newPost ? <NewPost /> : null}
-                {this.renderPage()}
-              </Container>
-            </Sidebar.Pusher>
-          </Sidebar.Pushable>
-      </div>
+        <Sidebar.Pushable as={React.div}>
+          <Sidebar onClick={this.toggleSidebar}
+            as={Menu} animation='overlay' width='thin' direction='top' visible={sidebar} vertical>
+            <Menu.Item link href={source.url} target="_blank">
+              Source Code
+            </Menu.Item>
+            {
+              signedIn
+                ? <Menu.Item name='Sign out' onClick={this.openLogoutDialog}>
+                  Sign out
+                </Menu.Item>
+                : null
+            }
+            <Confirm
+              open={logout}
+              content='Are you sure you want to sign out?'
+              onCancel={this.closeLogoutDialog}
+              onConfirm={this.handleLogout}
+            />
+          </Sidebar>
+          <Sidebar.Pusher>
+            <Container>
+              {newPost ? <NewPost /> : null}
+              {this.renderPage()}
+            </Container>
+          </Sidebar.Pusher>
+        </Sidebar.Pushable>
+      </ReactPullToRefresh>
     )
   }
 }
