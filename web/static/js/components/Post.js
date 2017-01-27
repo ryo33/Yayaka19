@@ -4,6 +4,7 @@ import Linkify from 'react-linkify'
 
 import { Comment, Icon, Segment } from 'semantic-ui-react'
 
+import Time from './Time.js'
 import FollowButton from './FollowButton.js'
 import UserButton from './UserButton.js'
 import NewPost from './NewPost.js'
@@ -119,6 +120,9 @@ class Post extends Component {
               onClickUser()
             }}>
               {post.user.display} <small>@{post.user.name}</small>
+              <Comment.Metadata>
+                <Time time={post.inserted_at} />
+              </Comment.Metadata>
             </Comment.Author>
             <Comment.Text>
               <PostAddresses addresses={post.post_addresses} />

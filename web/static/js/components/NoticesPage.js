@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 
 import { Header, Feed, Segment, Icon } from 'semantic-ui-react'
 
+import Time from './Time.js'
 import { userPage } from '../pages.js'
 import Post from './Post.js'
 import FollowButton from './FollowButton.js'
@@ -29,7 +30,7 @@ const actionCreators = {
   userPageAction: userPage.action
 }
 
-const FavNotice = ({ fav: { user, post }, userPageAction }) => (
+const FavNotice = ({ fav: { user, post, inserted_at }, userPageAction }) => (
   <Feed.Event>
     <Feed.Label>
       <Icon name='star' />
@@ -39,6 +40,9 @@ const FavNotice = ({ fav: { user, post }, userPageAction }) => (
         <Feed.User onClick={() => userPageAction({name: user.name})}>
           {user.display}
         </Feed.User> (@{user.name}) favorited
+        <Feed.Date>
+          <Time time={inserted_at} />
+        </Feed.Date>
       </Feed.Summary>
       <Feed.Extra text>
         <Segment>
@@ -54,7 +58,7 @@ const FavNotice = ({ fav: { user, post }, userPageAction }) => (
   </Feed.Event>
 )
 
-const FollowNotice = ({ follow: { user }, userPageAction}) => (
+const FollowNotice = ({ follow: { user, inserted_at }, userPageAction}) => (
   <Feed.Event>
     <Feed.Label>
       <Icon name='add user' />
@@ -64,6 +68,9 @@ const FollowNotice = ({ follow: { user }, userPageAction}) => (
         <Feed.User onClick={() => userPageAction({name: user.name})}>
           {user.display}
         </Feed.User> (@{user.name}) followed you <FollowButton user={user} />
+        <Feed.Date>
+          <Time time={inserted_at} />
+        </Feed.Date>
       </Feed.Summary>
     </Feed.Content>
   </Feed.Event>
@@ -79,6 +86,9 @@ const AddressNotice = ({ address, userPageAction }) => (
         <Feed.User onClick={() => userPageAction({name: address.user.name})}>
           {address.user.display}
         </Feed.User> (@{address.user.name}) addressed you
+        <Feed.Date>
+          <Time time={address.inserted_at} />
+        </Feed.Date>
       </Feed.Summary>
       <Feed.Extra text>
         <Segment>
@@ -92,7 +102,7 @@ const AddressNotice = ({ address, userPageAction }) => (
   </Feed.Event>
 )
 
-const ReplyNotice = ({ reply: { post }, userPageAction }) => (
+const ReplyNotice = ({ reply: { post, inserted_at }, userPageAction }) => (
   <Feed.Event>
     <Feed.Label>
       <Icon name='comment' />
@@ -102,6 +112,9 @@ const ReplyNotice = ({ reply: { post }, userPageAction }) => (
         <Feed.User onClick={() => userPageAction({name: post.user.name})}>
           {post.user.display}
         </Feed.User> (@{post.user.name}) replied to you
+        <Feed.Date>
+          <Time time={inserted_at} />
+        </Feed.Date>
       </Feed.Summary>
       <Feed.Extra text>
         <Segment>
