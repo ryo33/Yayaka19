@@ -35,6 +35,7 @@ const requestUserMiddleware = createMiddleware(
   requestUser.getType(),
   ({ dispatch, nextDispatch, action }) => {
     nextDispatch(action)
+    setUserInfo({})
     pushMessage(channel, 'user_info', {name: action.payload})
       .then(resp => {
         dispatch(setUserInfo(resp))
