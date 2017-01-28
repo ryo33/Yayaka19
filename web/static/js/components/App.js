@@ -148,6 +148,9 @@ class App extends Component {
           <Sidebar.Pushable as={React.div}>
             <Sidebar onClick={this.toggleSidebar}
               as={Menu} animation='overlay' width='thin' direction='top' visible={sidebar} vertical>
+              <Menu.Item link href='/profile'>
+                Edit your profile
+              </Menu.Item>
               <Menu.Item link href={source.url} target="_blank">
                 Source Code
               </Menu.Item>
