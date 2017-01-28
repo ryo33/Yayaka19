@@ -1,4 +1,4 @@
-import { createMiddleware, createReplacer, composeMiddleware } from 'redux-middlewares'
+import { createAsyncHook, createReplacer, composeMiddleware } from 'redux-middlewares'
 
 import { signedIn } from './global.js'
 import { pushMessage, channel, userChannel } from './socket.js'
@@ -21,20 +21,18 @@ const redirectLoginPageMiddleware = createReplacer(
   () => loginPage.action()
 )
 
-const submitPostMiddleware = createMiddleware(
+const submitPostMiddleware = createAsyncHook(
   submitPost.getType(),
-  ({ dispatch, nextDispatch, action }) => {
-    nextDispatch(action)
+  ({ dispatch, action }) => {
     const { text, address, post } = action.payload
     const payload = {post: {text, post_id: post}, address}
     pushMessage(userChannel, 'new_post', payload).then(() => {})
   }
 )
 
-const requestUserMiddleware = createMiddleware(
+const requestUserMiddleware = createAsyncHook(
   requestUser.getType(),
-  ({ dispatch, nextDispatch, action }) => {
-    nextDispatch(action)
+  ({ dispatch, action }) => {
     setUserInfo({})
     pushMessage(channel, 'user_info', {name: action.payload})
       .then(resp => {
@@ -45,10 +43,9 @@ const requestUserMiddleware = createMiddleware(
   }
 )
 
-const requestFollowMiddleware = createMiddleware(
+const requestFollowMiddleware = createAsyncHook(
   requestFollow.getType(),
-  ({ dispatch, nextDispatch, action }) => {
-    nextDispatch(action)
+  ({ dispatch, action }) => {
     const id = action.payload
     pushMessage(userChannel, 'follow', {id})
       .then(resp => {
@@ -57,10 +54,9 @@ const requestFollowMiddleware = createMiddleware(
   }
 )
 
-const requestUnfollowMiddleware = createMiddleware(
+const requestUnfollowMiddleware = createAsyncHook(
   requestUnfollow.getType(),
-  ({ dispatch, nextDispatch, action }) => {
-    nextDispatch(action)
+  ({ dispatch, action }) => {
     const id = action.payload
     pushMessage(userChannel, 'unfollow', {id})
       .then(resp => {
@@ -69,30 +65,27 @@ const requestUnfollowMiddleware = createMiddleware(
   }
 )
 
-const requestFavMiddleware = createMiddleware(
+const requestFavMiddleware = createAsyncHook(
   requestFav.getType(),
-  ({ dispatch, nextDispatch, action }) => {
-    nextDispatch(action)
+  ({ dispatch, action }) => {
     const id = action.payload
       pushMessage(userChannel, 'fav', {id})
         .then(resp => { dispatch(fav(id)) })
   }
 )
 
-const requestUnfavMiddleware = createMiddleware(
+const requestUnfavMiddleware = createAsyncHook(
   requestUnfav.getType(),
-  ({ dispatch, nextDispatch, action }) => {
-    nextDispatch(action)
+  ({ dispatch, action }) => {
     const id = action.payload
     pushMessage(userChannel, 'unfav', {id})
       .then(resp => { dispatch(unfav(id)) })
   }
 )
 
-const requestPublicTimelineMiddleware = createMiddleware(
+const requestPublicTimelineMiddleware = createAsyncHook(
   requestPublicTimeline.getType(),
-  ({ dispatch, nextDispatch, action }) => {
-    nextDispatch(action)
+  ({ dispatch, action }) => {
     dispatch(updatePublicTimeline({posts: []}))
     pushMessage(channel, 'public_timeline', {})
       .then(({ posts, favs }) => {
@@ -102,10 +95,9 @@ const requestPublicTimelineMiddleware = createMiddleware(
   }
 )
 
-const requestTimelineMiddleware = createMiddleware(
+const requestTimelineMiddleware = createAsyncHook(
   requestTimeline.getType(),
-  ({ dispatch, nextDispatch, action }) => {
-    nextDispatch(action)
+  ({ dispatch, action }) => {
     dispatch(updateTimeline([]))
     pushMessage(userChannel, 'timeline', {})
       .then(({ posts, favs }) => {
@@ -115,10 +107,9 @@ const requestTimelineMiddleware = createMiddleware(
   }
 )
 
-const openNoticesPageMiddleware = createMiddleware(
+const openNoticesPageMiddleware = createAsyncHook(
   openNoticesPage.getType(),
-  ({ dispatch, nextDispatch, action, getState }) => {
-    nextDispatch(action)
+  ({ dispatch, action, getState }) => {
     setTimeout(() => {
       const { notices: { noticed, favs, follows, addresses, replies }} = getState()
       const ns = [favs, follows, addresses, replies]
