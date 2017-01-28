@@ -3,6 +3,10 @@ defmodule Share.UserController do
 
   alias Share.User
 
+  plug Guardian.Plug.EnsureAuthenticated, %{handler: __MODULE__} when action in [
+    :edit, :update
+  ]
+
   def new(conn, _params) do
     changeset = User.changeset(%User{})
     render(conn, "new.html", changeset: changeset)
@@ -26,14 +30,14 @@ defmodule Share.UserController do
     render(conn, "show.html", user: user)
   end
 
-  def edit(conn, %{"id" => id}) do
-    user = Repo.get!(User, id)
+  def edit(conn, _params) do
+    user = Guardian.Plug.current_resource(conn)
     changeset = User.changeset(user)
     render(conn, "edit.html", user: user, changeset: changeset)
   end
 
-  def update(conn, %{"id" => id, "user" => user_params}) do
-    user = Repo.get!(User, id)
+  def update(conn, %{"user" => user_params}) do
+    user = Guardian.Plug.current_resource(conn)
     changeset = User.changeset(user, user_params)
 
     case Repo.update(changeset) do
@@ -55,6 +59,12 @@ defmodule Share.UserController do
 
     conn
     |> put_flash(:info, "User deleted successfully.")
+    |> redirect(to: "/")
+  end
+
+
+  def unauthenticated(conn, _params) do
+    conn
     |> redirect(to: "/")
   end
 end

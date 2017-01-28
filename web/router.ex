@@ -21,6 +21,9 @@ defmodule Share.Router do
   scope "/", Share do
     pipe_through [:browser, :browser_auth]
 
+    get "/profile", UserController, :edit
+    put "/profile", UserController, :update
+
     get "/login", PageController, :index
     post "/auth/login", AuthController, :login
     get "/logout", AuthController, :delete
