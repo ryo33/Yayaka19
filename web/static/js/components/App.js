@@ -19,12 +19,17 @@ import LoginPage from './LoginPage.js'
 import ErrorPage from './ErrorPage.js'
 import NoticesPage from './NoticesPage.js'
 import {
-  timelineSelector, pageSelector, userSelector, noticesCountSelctor
+  timelineSelector, pageSelector, userSelector,
+  noticesCountSelctor, newPostPageSelector
 } from '../selectors.js'
+import {
+  openNewPostDialog, closeNewPostDialog
+} from '../actions.js'
 
 const mapStateToProps = state => {
   const { newPosts } = timelineSelector(state)
   return {
+    newPost: newPostPageSelector(state).open,
     newPostsCount: newPosts.length,
     page: pageSelector(state),
     user: userSelector(state),
@@ -33,12 +38,14 @@ const mapStateToProps = state => {
 }
 
 const actionCreators = {
-  userPageAction: userPage.action,
-  homeAction: home.action,
-  publicTimelineAction: publicTimeline.action,
-  timelineAction: timeline.action,
-  loginPageAction: loginPage.action,
-  noticesPageAction: noticesPage.action
+  userPageAction: name => userPage.action({name}),
+  homeAction: () => home.action(),
+  publicTimelineAction: () => publicTimeline.action(),
+  timelineAction: () => timeline.action(),
+  loginPageAction: () => loginPage.action(),
+  noticesPageAction: () => noticesPage.action(),
+  openNewPostDialog,
+  closeNewPostDialog
 }
 
 const iconItemStyle = {
@@ -62,7 +69,6 @@ class App extends Component {
     this.openNewPost = this.openNewPost.bind(this)
     this.closeNewPost = this.closeNewPost.bind(this)
     this.state = {
-      newPost: false,
       sidebar: false,
       logout: false,
     }
@@ -81,11 +87,13 @@ class App extends Component {
   }
 
   openNewPost() {
-    this.setState({newPost: true})
+    const { openNewPostDialog } = this.props
+    openNewPostDialog()
   }
 
   closeNewPost() {
-    this.setState({newPost: false})
+    const { closeNewPostDialog } = this.props
+    closeNewPostDialog()
   }
 
   handleLogout() {
@@ -122,9 +130,10 @@ class App extends Component {
       loginPageAction,
       noticesPageAction,
       newPostsCount,
-      noticesCount
+      noticesCount,
+      newPost
     } = this.props
-    const { newPost, sidebar, logout } = this.state
+    const { sidebar, logout } = this.state
     return (
       <div>
         <Helmet title={
@@ -179,7 +188,7 @@ class App extends Component {
                 <Menu.Item>
                   <Menu.Header>{user.display} @{user.name}</Menu.Header>
                   <Menu.Menu>
-                    <Menu.Item onClick={() => userPageAction({name: user.name})}>
+                    <Menu.Item onClick={() => userPageAction(user.name)}>
                       View my profile
                     </Menu.Item>
                     <Menu.Item link href='/profile'>

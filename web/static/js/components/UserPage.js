@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { Card, Icon, Segment } from 'semantic-ui-react'
+import { Card, Icon, Segment, Button } from 'semantic-ui-react'
 
+import { openNewPostDialog, updatePostAddress } from '../actions.js'
 import { userSelector, userPageSelector, followingSelector } from '../selectors.js'
 import FollowButton from './FollowButton.js'
 
@@ -15,37 +16,55 @@ const mapStateToProps = state => {
   }
 }
 
+const actionCreators = {
+  openNewPostDialog, updatePostAddress
+}
+
 class UserPage extends Component {
+  constructor(props) {
+    super(props)
+    this.handleSendTo = this.handleSendTo.bind(this)
+  }
+
+  handleSendTo() {
+    const { userPage: { user }, openNewPostDialog, updatePostAddress } = this.props
+    openNewPostDialog()
+    updatePostAddress(user.name)
+  }
+
   render() {
     const { isNotMe, userPage } = this.props
     const { user, postCount, following, followers } = userPage
     if (user != null) {
       return (
         <Segment>
-          {
-            isNotMe
-              ? <FollowButton user={user} />
-              : null
-          }
           <Card>
             <Card.Content>
               <Card.Header>
-                {user.display}
+                {user.display} {isNotMe ? <FollowButton user={user} /> : null}
               </Card.Header>
               <Card.Meta>
                 @{user.name} {postCount} Posts
               </Card.Meta>
-              <Card.Content extra>
-                <span>
-                  <Icon name='user' />
-                  {following} Following
-                </span>
-                <span>
-                  <Icon name='user' />
-                  {followers} Followers
-                </span>
-              </Card.Content>
+              <Card.Description>
+              <span>
+                <Icon name='user' />
+                {following} Following
+              </span>
+              <span>
+                <Icon name='user' />
+                {followers} Followers
+              </span>
+              </Card.Description>
             </Card.Content>
+            {isNotMe ? (
+              <Card.Content extra>
+                <Button primary onClick={this.handleSendTo}>
+                  <Icon name='send' />
+                  Send to
+                </Button>
+              </Card.Content>
+            ) : null}
           </Card>
         </Segment>
       )
@@ -58,4 +77,4 @@ class UserPage extends Component {
   }
 }
 
-export default connect(mapStateToProps)(UserPage)
+export default connect(mapStateToProps, actionCreators)(UserPage)

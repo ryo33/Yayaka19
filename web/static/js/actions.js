@@ -11,6 +11,8 @@ export const openNoticesPage = createAction('open notices')
 export const addNotices = createAction('add notices', notices => notices)
 
 // New post page
+export const openNewPostDialog = createAction('open new post dialog')
+export const closeNewPostDialog = createAction('close new post dialog')
 export const updatePostAddress = createAction('update post address', address => address)
 export const submitPost = createAction('submit post',
   (text, address, post) => ({text, address, post}))
