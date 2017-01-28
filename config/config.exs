@@ -21,6 +21,8 @@ config :share,
   title: "Share",
   description: "We enjoy reading stray posts.",
   url: "https://sha.herokuapp.com",
+  admin: [name: "Ryo33",
+           url: "https://twitter.com/ryo33music"],
   source: [url: "https://github.com/ryo33/share",
            title: "https://github.com/ryo33/share"]
 
