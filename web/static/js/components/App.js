@@ -18,11 +18,13 @@ import LoginPage from './LoginPage.js'
 import ErrorPage from './ErrorPage.js'
 import NoticesPage from './NoticesPage.js'
 import {
-  pageSelector, userSelector, noticesCountSelctor
+  timelineSelector, pageSelector, userSelector, noticesCountSelctor
 } from '../selectors.js'
 
 const mapStateToProps = state => {
+  const { newPosts } = timelineSelector(state)
   return {
+    newPostsCount: newPosts.length,
     page: pageSelector(state),
     user: userSelector(state),
     noticesCount: noticesCountSelctor(state)
@@ -35,6 +37,18 @@ const actionCreators = {
   timelineAction: timeline.action,
   loginPageAction: loginPage.action,
   noticesPageAction: noticesPage.action
+}
+
+const iconItemStyle = {
+  padding: '0.9em'
+}
+
+const iconStyle = {
+  margin: '0px'
+}
+
+const labelStyle = {
+  marginLeft: '0.4em'
 }
 
 class App extends Component {
@@ -104,6 +118,7 @@ class App extends Component {
       newPostAction,
       loginPageAction,
       noticesPageAction,
+      newPostsCount,
       noticesCount
     } = this.props
     const { newPost, sidebar, logout } = this.state
@@ -114,33 +129,42 @@ class App extends Component {
         } />
         <Menu>
           <Container>
-            <Menu.Item active={name == publicTimeline.name} onClick={publicTimelineAction}>
-              <Icon name='world' size='large' />
+            <Menu.Item style={iconItemStyle} active={name == publicTimeline.name} onClick={publicTimelineAction}>
+              <Icon style={iconStyle} size='large' name='world' />
             </Menu.Item>
             {signedIn ? (
-              <Menu.Item active={name == timeline.name} onClick={timelineAction}>
-                <Icon name='home' size='large' />
+              <Menu.Item style={iconItemStyle} active={name == timeline.name} onClick={timelineAction}>
+                <Icon style={iconStyle} size='large' name='home' />
+                { newPostsCount >= 1 ? (
+                  <Label size='tiny' circular style={labelStyle} color='blue'>
+                    {newPostsCount}
+                  </Label>
+                ) : null }
               </Menu.Item>
             ) : null}
             {signedIn ? (
-              <Menu.Item active={name == noticesPage.name} onClick={noticesPageAction}>
-                <Icon name='alarm' size='large' />
-                { noticesCount >= 1 ? <Label color='red'>{noticesCount}</Label> : null }
+              <Menu.Item style={iconItemStyle} active={name == noticesPage.name} onClick={noticesPageAction}>
+                <Icon style={iconStyle} size='large' name='alarm' />
+                { noticesCount >= 1 ? (
+                  <Label size='tiny' circular style={labelStyle} color='red'>
+                    {noticesCount}
+                  </Label>
+                ) : null }
               </Menu.Item>
             ) : null }
             {signedIn ? (
-              <Menu.Item active={newPost} onClick={newPost ? this.closeNewPost : this.openNewPost}>
-                <Icon color='blue' name='write' size='large' />
+              <Menu.Item style={iconItemStyle} active={newPost} onClick={newPost ? this.closeNewPost : this.openNewPost}>
+                <Icon style={iconStyle} size='large' color='blue' name='write' />
               </Menu.Item>
             ) : null}
             <Menu.Menu position='right'>
               { !signedIn ? (
-                <Menu.Item>
+                <Menu.Item style={iconItemStyle}>
                   <Button primary onClick={loginPageAction}>Sign in</Button>
                 </Menu.Item>
               ) : null }
-              <Menu.Item onClick={this.toggleSidebar}>
-                <Icon name='caret down' size='large' />
+              <Menu.Item style={iconItemStyle} onClick={this.toggleSidebar}>
+                <Icon style={iconStyle} size='large' name='caret down' />
               </Menu.Item>
             </Menu.Menu>
           </Container>
