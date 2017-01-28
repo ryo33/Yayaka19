@@ -68,4 +68,23 @@ defmodule Share.AuthController do
     |> Guardian.Plug.sign_in(user)
     |> redirect(to: "/p")
   end
+
+  def dev_login(conn, %{"id" => id}) do
+    :dev = Mix.env
+    provider = "share"
+    query = from u in User,
+      where: u.provider == ^provider and u.provided_id == ^id,
+      select: u
+    user = case Repo.one(query) do
+      nil ->
+        changeset = User.changeset(%User{})
+        conn
+        |> put_session(:auth, %{provider: provider, id: id})
+        |> render(Share.UserView, "new.html", changeset: changeset)
+      user ->
+        conn
+        |> put_flash(:info, "Logged In")
+        |> login(user)
+    end
+  end
 end

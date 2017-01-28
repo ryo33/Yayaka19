@@ -57,8 +57,17 @@ defmodule Share.Web do
     end
   end
 
+  defmacro only_dev(do: block) do
+    if Mix.env == :dev do
+      block
+    else
+      quote do: ()
+    end
+  end
+
   def router do
     quote do
+      import Share.Web, only: [only_dev: 1]
       use Phoenix.Router
     end
   end

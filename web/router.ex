@@ -24,6 +24,10 @@ defmodule Share.Router do
     get "/profile", UserController, :edit
     put "/profile", UserController, :update
 
+    only_dev do
+      get "/login/:id", AuthController, :dev_login
+    end
+
     get "/login", PageController, :index
     post "/auth/login", AuthController, :login
     get "/logout", AuthController, :delete
