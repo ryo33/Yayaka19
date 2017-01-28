@@ -3,10 +3,11 @@ import { connect } from 'react-redux'
 import Helmet from "react-helmet"
 
 import {
-  Icon, Menu, Label, Sidebar, Segment, Container, Confirm, Button
+  Icon, Menu, Label, Sidebar, Segment, Container,
+  Confirm, Button, Header
 } from 'semantic-ui-react'
 
-import { signedIn, source } from '../global.js'
+import { signedIn, source, admin } from '../global.js'
 import {
   home, publicTimeline, timeline, userPage, loginPage, noticesPage
 } from '../pages.js'
@@ -32,6 +33,7 @@ const mapStateToProps = state => {
 }
 
 const actionCreators = {
+  userPageAction: userPage.action,
   homeAction: home.action,
   publicTimelineAction: publicTimeline.action,
   timelineAction: timeline.action,
@@ -112,6 +114,7 @@ class App extends Component {
     const {
       page: { name },
       user,
+      userPageAction,
       homeAction,
       publicTimelineAction,
       timelineAction,
@@ -172,19 +175,31 @@ class App extends Component {
           <Sidebar.Pushable as={React.div}>
             <Sidebar onClick={this.toggleSidebar}
               as={Menu} animation='overlay' width='thin' direction='top' visible={sidebar} vertical>
-              <Menu.Item link href='/profile'>
-                Edit your profile
+              {user ? (
+                <Menu.Item>
+                  <Menu.Header>{user.display} @{user.name}</Menu.Header>
+                  <Menu.Menu>
+                    <Menu.Item onClick={() => userPageAction({name: user.name})}>
+                      View my profile
+                    </Menu.Item>
+                    <Menu.Item link href='/profile'>
+                      Edit my profile
+                    </Menu.Item>
+                  </Menu.Menu>
+                </Menu.Item>
+              ) : null}
+              <Menu.Item link href={admin.url} target="_blank">
+                <Menu.Header>Contact admin ({admin.name})</Menu.Header>
+                <p>Any bug reports, questions, and suggestions are welcome. Thanks!</p>
               </Menu.Item>
               <Menu.Item link href={source.url} target="_blank">
-                Source Code
+                Source code
               </Menu.Item>
-              {
-                signedIn
-                  ? <Menu.Item name='Sign out' onClick={this.openLogoutDialog}>
-                    Sign out
-                  </Menu.Item>
-                  : null
-              }
+              {signedIn ? (
+                <Menu.Item onClick={this.openLogoutDialog}>
+                  Sign out
+                </Menu.Item>
+              ) : null}
               <Confirm
                 open={logout}
                 content='Are you sure you want to sign out?'

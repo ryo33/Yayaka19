@@ -8,17 +8,17 @@ window.userID = "<%= @user_id %>"
 <style>
 #sign-in-with-google {
   display: block;
-  width: 382px;
-  height: 92px;
+  width: 191px;
+  height: 46px;
   background-size: cover;
   background-repeat: no-repeat;
-  background-image: url("<%= static_path(@conn, "/images/btn_google_signin_light_normal_web@2x.png") %>");
+  background-image: url("<%= static_path(@conn, "/images/btn_google_signin_dark_normal_web.png") %>");
 }
 #sign-in-with-google:hover {
-  background-image: url("<%= static_path(@conn, "/images/btn_google_signin_light_focus_web@2x.png") %>");
+  background-image: url("<%= static_path(@conn, "/images/btn_google_signin_dark_focus_web.png") %>");
 }
 #sign-in-with-google:active {
-  background-image: url("<%= static_path(@conn, "/images/btn_google_signin_light_pressed_web@2x.png") %>");
+  background-image: url("<%= static_path(@conn, "/images/btn_google_signin_dark_pressed_web.png") %>");
 }
 </style>
 <div id="root"></div>
