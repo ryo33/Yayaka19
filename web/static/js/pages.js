@@ -1,5 +1,5 @@
 import { createPages, CHANGE_PAGE } from 'redux-pages'
-import { createReplacer, createMiddleware, composeMiddleware } from 'redux-middlewares'
+import { createReplacer, createAsyncHook, composeMiddleware } from 'redux-middlewares'
 
 import { signedIn } from './global.js'
 import {
@@ -47,32 +47,29 @@ const homeHook = createReplacer(
   }
 )
 
-const publicTimelineHook = createMiddleware(
+const publicTimelineHook = createAsyncHook(
   ({ action }) => publicTimeline.check(action),
   ({ getState }) => {
     const state = getState()
     return pageSelector(state).name != publicTimeline.name
   },
-  ({ dispatch, nextDispatch, action }) => {
+  ({ dispatch, action }) => {
     dispatch(requestPublicTimeline())
-    nextDispatch(action)
   }
 )
 
-const userPageHook = createMiddleware(
+const userPageHook = createAsyncHook(
   ({ action }) => userPage.check(action),
-  ({ dispatch, nextDispatch, action }) => {
+  ({ dispatch, action }) => {
     dispatch(requestUser(action.payload.params.name))
-    nextDispatch(action)
   }
 )
 
-const noticesPageLeaveHook = createMiddleware(
+const noticesPageLeaveHook = createAsyncHook(
   CHANGE_PAGE,
   ({ getState }) => pageSelector(getState()).name == noticesPage.name,
   ({ action }) => !noticesPage.check(action),
-  ({ dispatch, nextDispatch, action }) => {
-    nextDispatch(action)
+  ({ dispatch, action }) => {
     dispatch(openNoticesPage())
   }
 )
