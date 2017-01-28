@@ -44,20 +44,11 @@ class FollowButton extends Component {
     }
     if (following.includes(targetUser.id)) {
       return (
-        <Button primary onClick={this.unfollow}>
-          <Button.Content>
-            Following
-          </Button.Content>
-        </Button>
+        <Button size='mini' icon='user' color='blue' onClick={this.unfollow} />
       )
     } else {
       return (
-        <Button onClick={this.follow}>
-          <Button.Content>
-            <Icon name='add user' />
-            Follow
-          </Button.Content>
-        </Button>
+        <Button size='mini' icon='add user' onClick={this.follow} />
       )
     }
   }

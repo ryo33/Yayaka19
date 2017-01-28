@@ -49,6 +49,7 @@ const Timeline = ({
       </Segment>
     ) : null }
     <PostList
+      followButton={false}
       posts={posts}
       onClickUser={userPageAction}
     />

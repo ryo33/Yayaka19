@@ -124,6 +124,9 @@ class Post extends Component {
             <Comment.Metadata>
               <span>@{post.user.name}</span>
               <Time time={post.inserted_at} />
+              {followButton ? (
+                <FollowButton user={post.user} />
+              ) : null}
             </Comment.Metadata>
             <Comment.Text>
               <PostAddresses addresses={post.post_addresses} />
