@@ -4,7 +4,7 @@ import Helmet from "react-helmet"
 
 import {
   Icon, Menu, Label, Sidebar, Segment, Container,
-  Confirm, Button, Header
+  Confirm, Button, Header, Message
 } from 'semantic-ui-react'
 
 import { signedIn, source, admin } from '../global.js'
@@ -20,10 +20,12 @@ import ErrorPage from './ErrorPage.js'
 import NoticesPage from './NoticesPage.js'
 import {
   timelineSelector, pageSelector, userSelector,
-  noticesCountSelctor, newPostPageSelector
+  noticesCountSelctor, newPostPageSelector,
+  errorSelector
 } from '../selectors.js'
 import {
-  openNewPostDialog, closeNewPostDialog
+  openNewPostDialog, closeNewPostDialog,
+  hideError
 } from '../actions.js'
 
 const mapStateToProps = state => {
@@ -33,7 +35,8 @@ const mapStateToProps = state => {
     newPostsCount: newPosts.length,
     page: pageSelector(state),
     user: userSelector(state),
-    noticesCount: noticesCountSelctor(state)
+    noticesCount: noticesCountSelctor(state),
+    error: errorSelector(state)
   }
 }
 
@@ -45,7 +48,8 @@ const actionCreators = {
   loginPageAction: () => loginPage.action(),
   noticesPageAction: () => noticesPage.action(),
   openNewPostDialog,
-  closeNewPostDialog
+  closeNewPostDialog,
+  hideError
 }
 
 const iconItemStyle = {
@@ -68,6 +72,7 @@ class App extends Component {
     this.closeLogoutDialog = this.closeLogoutDialog.bind(this)
     this.openNewPost = this.openNewPost.bind(this)
     this.closeNewPost = this.closeNewPost.bind(this)
+    this.hideError = this.hideError.bind(this)
     this.state = {
       sidebar: false,
       logout: false,
@@ -100,6 +105,11 @@ class App extends Component {
     window.location.href = '/logout'
   }
 
+  hideError() {
+    const { hideError } = this.props
+    hideError()
+  }
+
   renderPage() {
     const { page } = this.props
     switch (page.name) {
@@ -118,9 +128,14 @@ class App extends Component {
     }
   }
 
+  reload() {
+    window.location.reload(true)
+  }
+
   render() {
     const {
       page: { name },
+      error,
       user,
       userPageAction,
       homeAction,
@@ -181,48 +196,57 @@ class App extends Component {
             </Menu.Menu>
           </Container>
         </Menu>
-          <Sidebar.Pushable as={React.div}>
-            <Sidebar onClick={this.toggleSidebar}
-              as={Menu} animation='overlay' width='thin' direction='top' visible={sidebar} vertical>
-              {user ? (
-                <Menu.Item>
-                  <Menu.Header>{user.display} @{user.name}</Menu.Header>
-                  <Menu.Menu>
-                    <Menu.Item onClick={() => userPageAction(user.name)}>
-                      View my profile
-                    </Menu.Item>
-                    <Menu.Item link href='/profile'>
-                      Edit my profile
-                    </Menu.Item>
-                  </Menu.Menu>
-                </Menu.Item>
-              ) : null}
-              <Menu.Item link href={admin.url} target="_blank">
-                <Menu.Header>Contact admin ({admin.name})</Menu.Header>
-                <p>Any bug reports, questions, and suggestions are welcome. Thanks!</p>
+        <Sidebar.Pushable as={React.div}>
+          <Sidebar onClick={this.toggleSidebar}
+            as={Menu} animation='overlay' width='thin' direction='top' visible={sidebar} vertical>
+            {user ? (
+              <Menu.Item>
+                <Menu.Header>{user.display} @{user.name}</Menu.Header>
+                <Menu.Menu>
+                  <Menu.Item onClick={() => userPageAction(user.name)}>
+                    View my profile
+                  </Menu.Item>
+                  <Menu.Item link href='/profile'>
+                    Edit my profile
+                  </Menu.Item>
+                </Menu.Menu>
               </Menu.Item>
-              <Menu.Item link href={source.url} target="_blank">
-                Source code
+            ) : null}
+            <Menu.Item link href={admin.url} target="_blank">
+              <Menu.Header>Contact admin ({admin.name})</Menu.Header>
+              <p>Any bug reports, questions, and suggestions are welcome. Thanks!</p>
+            </Menu.Item>
+            <Menu.Item link href={source.url} target="_blank">
+              Source code
+            </Menu.Item>
+            {signedIn ? (
+              <Menu.Item onClick={this.openLogoutDialog}>
+                Sign out
               </Menu.Item>
-              {signedIn ? (
-                <Menu.Item onClick={this.openLogoutDialog}>
-                  Sign out
-                </Menu.Item>
+            ) : null}
+            <Confirm
+              open={logout}
+              content='Are you sure you want to sign out?'
+              onCancel={this.closeLogoutDialog}
+              onConfirm={this.handleLogout}
+            />
+          </Sidebar>
+          <Sidebar.Pusher>
+            <Container>
+              {error ? (
+                <Message
+                  negative
+                  onDismiss={this.hideError}
+                >
+                  <Message.Header>{error}</Message.Header>
+                  <Button onClick={this.reload}>Reload</Button>
+                </Message>
               ) : null}
-              <Confirm
-                open={logout}
-                content='Are you sure you want to sign out?'
-                onCancel={this.closeLogoutDialog}
-                onConfirm={this.handleLogout}
-              />
-            </Sidebar>
-            <Sidebar.Pusher>
-              <Container>
-                {newPost ? <NewPost /> : null}
-                {this.renderPage()}
-              </Container>
-            </Sidebar.Pusher>
-          </Sidebar.Pushable>
+              {newPost ? <NewPost /> : null}
+              {this.renderPage()}
+            </Container>
+          </Sidebar.Pusher>
+        </Sidebar.Pushable>
       </div>
     )
   }

@@ -12,7 +12,9 @@ import reducer from './reducers/index.js'
 import { pageSelector } from './selectors.js'
 import middleware from './middlewares.js'
 import {
-  addFavs, updateTimeline, setUser, setFollowing, updateNoticed, updateNotices
+  addFavs, updateTimeline, setUser,
+  setFollowing, updateNoticed, updateNotices,
+  showError
 } from './actions.js'
 import { joinChannel, joinUserChannel } from './socket.js'
 import { watchUserChannel } from './userChannel.js'
@@ -54,7 +56,10 @@ const respCallback = () => {
   // Apply the current path
   pages.handleNavigation(store, history.location.pathname)
 }
-joinChannel(respCallback)
+const errorCallback = () => {
+  store.dispatch(showError('Failed to connect to the server.'))
+}
+joinChannel(respCallback, errorCallback)
 
 // Listen for changes
 history.listen((location, action) => {
