@@ -5,7 +5,8 @@ import { createPagesReducer } from 'redux-pages'
 import { errorPage } from '../pages.js'
 import {
   setUser, setFollowing, follow, unfollow,
-  addFavs, fav, unfav
+  addFavs, fav, unfav,
+  showError, hideError
 } from '../actions.js'
 
 import notices from './notices.js'
@@ -32,7 +33,13 @@ const favs = createReducer({
   [unfav]: (state, unfavID) => state.filter(id => id !== unfavID),
 }, [])
 
+const error = createReducer({
+  [showError]: (state, payload) => payload,
+  [hideError]: () => null
+}, null)
+
 export default combineReducers({
+  error,
   notices,
   page,
   user,

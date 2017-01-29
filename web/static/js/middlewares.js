@@ -10,7 +10,8 @@ import {
   requestFav, requestUnfav, fav, unfav,
   requestPublicTimeline, updatePublicTimeline,
   requestTimeline, updateTimeline, addFavs,
-  openNoticesPage, updateNoticed
+  openNoticesPage, updateNoticed,
+  showError
 } from './actions.js'
 import { pageSelector } from './selectors.js'
 import { compareNotices } from './utils.js'
@@ -26,7 +27,11 @@ const submitPostMiddleware = createAsyncHook(
   ({ dispatch, action }) => {
     const { text, address, post } = action.payload
     const payload = {post: {text, post_id: post}, address}
-    pushMessage(userChannel, 'new_post', payload).then(() => {})
+    pushMessage(userChannel, 'new_post', payload)
+      .then(() => {})
+      .catch(() => {
+        dispatch(showError('Failed to submit.'))
+      })
   }
 )
 
@@ -50,6 +55,8 @@ const requestFollowMiddleware = createAsyncHook(
     pushMessage(userChannel, 'follow', {id})
       .then(resp => {
         dispatch(follow(id))
+      }).catch(() => {
+        dispatch(showError('Failed to follow.'))
       })
   }
 )
@@ -61,6 +68,8 @@ const requestUnfollowMiddleware = createAsyncHook(
     pushMessage(userChannel, 'unfollow', {id})
       .then(resp => {
         dispatch(unfollow(id))
+      }).catch(() => {
+        dispatch(showError('Failed to unfollow.'))
       })
   }
 )
@@ -71,6 +80,9 @@ const requestFavMiddleware = createAsyncHook(
     const id = action.payload
       pushMessage(userChannel, 'fav', {id})
         .then(resp => { dispatch(fav(id)) })
+        .catch(() => {
+          dispatch(showError('Failed to fav.'))
+        })
   }
 )
 
@@ -80,6 +92,9 @@ const requestUnfavMiddleware = createAsyncHook(
     const id = action.payload
     pushMessage(userChannel, 'unfav', {id})
       .then(resp => { dispatch(unfav(id)) })
+      .catch(() => {
+        dispatch(showError('Failed to unfav.'))
+      })
   }
 )
 
@@ -91,6 +106,8 @@ const requestPublicTimelineMiddleware = createAsyncHook(
       .then(({ posts, favs }) => {
         dispatch(addFavs(favs))
         dispatch(updatePublicTimeline({posts}))
+      }).catch(() => {
+        dispatch(showError('Failed to fetch the public timeline.'))
       })
   }
 )
@@ -103,6 +120,8 @@ const requestTimelineMiddleware = createAsyncHook(
       .then(({ posts, favs }) => {
         dispatch(addFavs(favs))
         dispatch(updateTimeline(posts))
+      }).catch(() => {
+        dispatch(showError('Failed to fetch the timeline.'))
       })
   }
 )
@@ -110,19 +129,17 @@ const requestTimelineMiddleware = createAsyncHook(
 const openNoticesPageMiddleware = createAsyncHook(
   openNoticesPage.getType(),
   ({ dispatch, action, getState }) => {
-    setTimeout(() => {
-      const { notices: { noticed, favs, follows, addresses, replies }} = getState()
-      const ns = [favs, follows, addresses, replies]
-        .filter(n => n.length != 0)
-        .map(n => n[0])
-      if (ns.length != 0) {
-        const max = ns.sort(compareNotices)[0].inserted_at
-        if (max != noticed) {
-          pushMessage(userChannel, 'open_notices', {noticed: max})
-            .then(({noticed}) => dispatch(updateNoticed(noticed)))
-        }
+    const { notices: { noticed, favs, follows, addresses, replies }} = getState()
+    const ns = [favs, follows, addresses, replies]
+      .filter(n => n.length != 0)
+      .map(n => n[0])
+    if (ns.length != 0) {
+      const max = ns.sort(compareNotices)[0].inserted_at
+      if (max != noticed) {
+        pushMessage(userChannel, 'open_notices', {noticed: max})
+          .then(({noticed}) => dispatch(updateNoticed(noticed)))
       }
-    }, 0)
+    }
   }
 )
 

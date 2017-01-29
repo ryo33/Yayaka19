@@ -4,6 +4,7 @@ export const pageSelector = ({ page }) => page
 export const userSelector = ({ user }) => user
 export const followingSelector = ({ following }) => following
 export const favsSelector = ({ favs }) => favs
+export const errorSelector = ({ error }) => error
 
 // New post page
 export const newPostPageSelector = ({ newPostPage }) => newPostPage

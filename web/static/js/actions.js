@@ -4,7 +4,11 @@ export const setUser = createAction('set user', user => user)
 export const setFollowing = createAction('set following', following => following)
 export const addFavs = createAction('add favs', favs => favs)
 
-// Notices
+// Error
+export const showError = createAction('show error', message => message)
+export const hideError = createAction('hide error')
+
+// Notices page
 export const updateNoticed = createAction('update noticed', noticed => noticed)
 export const updateNotices = createAction('update notices', notices => notices)
 export const openNoticesPage = createAction('open notices')
@@ -35,6 +39,7 @@ export const updateTimeline = createAction('update timeline', data => data)
 export const addNewPosts = createAction('add new posts', posts => posts)
 export const loadNewPosts = createAction('load new posts')
 
+// Fav
 export const fav = createAction('fav', id => id)
 export const unfav = createAction('unfav', id => id)
 export const requestFav = createAction('request fav', id => id)
