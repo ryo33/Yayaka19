@@ -5,7 +5,7 @@ import { Segment, Header, Button, Rail, Icon } from 'semantic-ui-react'
 
 import { loadNewPosts, requestTimeline } from '../actions.js'
 import { timelineSelector, userSelector } from '../selectors.js'
-import { userPage } from '../pages.js'
+import { userPage, publicTimeline } from '../pages.js'
 
 import PostList from './PostList.js'
 
@@ -20,12 +20,14 @@ const mapStateToProps = state => {
 
 const actionCreators = {
   userPageAction: name => userPage.action({name}),
+  publicTimelineAction: () => publicTimeline.action(),
   loadNewPosts,
   requestTimeline
 }
 
 const Timeline = ({
-  posts, newPosts, userPageAction, loadNewPosts, myNewPostsCount, requestTimeline
+  posts, newPosts, publicTimelineAction, userPageAction,
+  loadNewPosts, myNewPostsCount, requestTimeline
 }) => (
   <div>
     <Segment vertical>
@@ -35,7 +37,7 @@ const Timeline = ({
         </Button>
       </Rail>
     </Segment>
-    { newPosts.length != 0 ? (
+    {newPosts.length != 0 ? (
       <Segment vertical>
         <Button fluid basic color='blue' onClick={loadNewPosts}>
           {newPosts.length} new posts { myNewPostsCount != 0 ? (
@@ -47,7 +49,14 @@ const Timeline = ({
           ) : null }
         </Button>
       </Segment>
-    ) : null }
+    ) : null}
+    {posts.length == 0 ? (
+      <Segment vertical>
+        <Button primary onClick={publicTimelineAction}>
+          Go public timeline and follow users
+        </Button>
+      </Segment>
+    ) : null}
     <PostList
       followButton={false}
       posts={posts}

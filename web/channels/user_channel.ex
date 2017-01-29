@@ -169,10 +169,8 @@ defmodule Share.UserChannel do
     users = [user.id | Repo.all(query)]
     query = Post
             |> where([p], p.user_id in ^users)
-            |> limit(50)
-            |> Post.random()
-    query = subquery(query)
             |> order_by([p], [desc: p.id])
+            |> limit(50)
             |> Post.preload()
     posts = Repo.all(query)
     post_ids = posts |> Enum.map(&(&1.id))
