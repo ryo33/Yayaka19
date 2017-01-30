@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { Grid, Header, Segment, Button, Form } from 'semantic-ui-react'
+import { Grid, Header, Segment, Button, Form, Label, Icon } from 'semantic-ui-react'
 
 import { submitPost, updatePostAddress } from '../actions.js'
 import { newPostPageSelector, userSelector } from '../selectors.js'
@@ -23,27 +23,23 @@ class NewPost extends Component {
   constructor(props) {
     super(props)
     this.handleChangeText = this.handleChangeText.bind(this)
-    this.handleChangeAddress = this.handleChangeAddress.bind(this)
     this.handleKeyDown = this.handleKeyDown.bind(this)
     this.submit = this.submit.bind(this)
-    this.toggleAddress = this.toggleAddress.bind(this)
+    this.handleRemoveAddress = this.handleRemoveAddress.bind(this)
     this.state = {
       text: '',
       addressEnabled: false
     }
   }
 
-  toggleAddress() {
+  handleRemoveAddress() {
     const { updatePostAddress } = this.props
-    const { addressEnabled } = this.state
-    this.setState({addressEnabled: !addressEnabled})
-    if (addressEnabled) {
-      updatePostAddress('')
-    }
+    updatePostAddress('')
   }
 
   reset() {
-    this.setState({text: '', addressEnabled: false})
+    this.setState({text: ''})
+    updatePostAddress('')
   }
 
   submit(e) {
@@ -67,11 +63,6 @@ class NewPost extends Component {
     this.setState({text: event.target.value})
   }
 
-  handleChangeAddress(event) {
-    const { updatePostAddress } = this.props
-    updatePostAddress(event.target.value)
-  }
-
   handleKeyDown(event) {
     if (event.keyCode === 13 && (event.ctrlKey || event.metaKey) && !(event.ctrlKey && event.metaKey)) {
       this.submit(event)
@@ -87,20 +78,14 @@ class NewPost extends Component {
         <Segment>
           <Header>New Post</Header>
           <Form onSubmit={this.submit}>
-            <Form.TextArea name='text' value={text} rows='6' label='Text' placeholder={'What\'s in your head?'}
+            {address.length != 0 ? (
+              <Label>
+                <Icon name='send' /> {address} <Icon name='delete' onClick={this.handleRemoveAddress} />
+              </Label>
+            ) : null}
+            <Form.TextArea name='text' value={text} rows='6' placeholder={'What\'s in your head?'}
               onChange={this.handleChangeText} onKeyDown={this.handleKeyDown} autoFocus />
-            { post ? (
-              <Form.Button disabled={text.length == 0} primary>Submit</Form.Button>
-            ) : (
-              <Form.Group inline>
-                <Form.Button disabled={text.length == 0} primary>Submit</Form.Button>
-                <Form.Checkbox name='sendto' checked={addressEnabled} onChange={this.toggleAddress}
-                  label='@' />
-                <Form.Input name='address' value={address} onChange={this.handleChangeAddress}
-                  disabled={!addressEnabled} inline placeholder='Name' />
-              </Form.Group>
-            ) }
-
+            <Form.Button disabled={text.length == 0} primary>Submit</Form.Button>
           </Form>
         </Segment>
       </Segment.Group>
