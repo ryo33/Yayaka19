@@ -24,6 +24,7 @@ class NewPost extends Component {
     super(props)
     this.handleChangeText = this.handleChangeText.bind(this)
     this.handleChangeAddress = this.handleChangeAddress.bind(this)
+    this.handleKeyDown = this.handleKeyDown.bind(this)
     this.submit = this.submit.bind(this)
     this.toggleAddress = this.toggleAddress.bind(this)
     this.state = {
@@ -71,6 +72,12 @@ class NewPost extends Component {
     updatePostAddress(event.target.value)
   }
 
+  handleKeyDown(event) {
+    if (event.keyCode === 13 && (event.ctrlKey || event.metaKey) && !(event.ctrlKey && event.metaKey)) {
+      this.submit(event)
+    }
+  }
+
   render() {
     const { post, user, address, postAddresses } = this.props
     const { text } = this.state
@@ -80,8 +87,8 @@ class NewPost extends Component {
         <Segment>
           <Header>New Post</Header>
           <Form onSubmit={this.submit}>
-            <Form.TextArea name='text' value={text} onChange={this.handleChangeText}
-              label='Text' placeholder={'What\'s in your head?'} rows='6' autoFocus />
+            <Form.TextArea name='text' value={text} rows='6' label='Text' placeholder={'What\'s in your head?'}
+              onChange={this.handleChangeText} onKeyDown={this.handleKeyDown} autoFocus />
             { post ? (
               <Form.Button disabled={text.length == 0} primary>Submit</Form.Button>
             ) : (
