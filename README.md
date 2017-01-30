@@ -42,3 +42,5 @@ $ mix ecto.setup
 ```
 $ mix phoenix.start
 ```
+
+Open `http://localhost:4000` with your browser.
