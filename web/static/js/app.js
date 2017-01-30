@@ -14,7 +14,7 @@ import middleware from './middlewares.js'
 import {
   addFavs, updateTimeline, setUser,
   setFollowing, updateNoticed, updateNotices,
-  showError
+  showError, hideError
 } from './actions.js'
 import { joinChannel, joinUserChannel } from './socket.js'
 import { watchUserChannel } from './userChannel.js'
@@ -53,6 +53,7 @@ if (signedIn) {
 }
 
 const respCallback = () => {
+  store.dispatch(hideError())
   // Apply the current path
   pages.handleNavigation(store, history.location.pathname)
 }
