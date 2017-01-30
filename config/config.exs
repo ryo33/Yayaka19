@@ -24,7 +24,9 @@ config :share,
   admin: [name: "Ryo33",
            url: "https://twitter.com/ryo33music"],
   source: [url: "https://github.com/ryo33/share",
-           title: "https://github.com/ryo33/share"]
+           title: "https://github.com/ryo33/share"],
+  api: [url: "https://gist.github.com/ryo33/145e5ef24bad6f11abbb902edc6979d6",
+        title: "https://gist.github.com/ryo33/145e5ef24bad6f11abbb902edc6979d6"]
 
 # Configures Elixir's Logger
 config :logger, :console,

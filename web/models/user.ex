@@ -10,6 +10,7 @@ defmodule Share.User do
     field :name, :string
     field :display, :string
     field :noticed, :naive_datetime
+    field :secret, :string
 
     timestamps()
   end

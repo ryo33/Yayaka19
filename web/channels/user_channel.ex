@@ -77,9 +77,7 @@ defmodule Share.UserChannel do
     params = Map.put(params, "user_id", user.id)
     changeset = Post.changeset(%Post{}, params)
     post = Repo.insert!(changeset)
-    Task.start(fn ->
-      Share.PostHandler.handle_address(post, address, socket)
-    end)
+    Share.PostHandler.handle(post, address)
     {:reply, :ok, socket}
   end
 

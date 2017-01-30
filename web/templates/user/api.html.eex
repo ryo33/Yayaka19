@@ -1,0 +1,19 @@
+<h2>Secret</h2>
+
+<ul>
+  <li>
+    <strong>ID:</strong>
+    <%= @user.name %>
+  </li>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @user.display %>
+  </li>
+
+  <li>
+    <strong>Secret:</strong>
+    <%= @user.secret %>
+  </li>
+</ul>
+<a href="<%= user_path(@conn, :update_api) %>">Update secret</a>

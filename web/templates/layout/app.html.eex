@@ -27,6 +27,10 @@
       title: "<%= Application.get_env(:share, :source)[:title] %>",
       url: "<%= Application.get_env(:share, :source)[:url] %>"
     }
+    window.api = {
+      title: "<%= Application.get_env(:share, :api)[:title] %>",
+      url: "<%= Application.get_env(:share, :api)[:url] %>"
+    }
     window.admin = {
       name: "<%= Application.get_env(:share, :admin)[:name] %>",
       url: "<%= Application.get_env(:share, :admin)[:url] %>"

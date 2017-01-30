@@ -3,7 +3,7 @@ defmodule Share.PostTest do
 
   alias Share.Post
 
-  @valid_attrs %{text: "some content"}
+  @valid_attrs %{text: "some content", user_id: 1}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do
