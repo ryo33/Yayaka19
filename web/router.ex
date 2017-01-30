@@ -18,9 +18,16 @@ defmodule Share.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :api_auth do
+    plug Guardian.Plug.VerifyHeader, realm: "Bearer"
+    plug Guardian.Plug.LoadResource
+  end
+
   scope "/", Share do
     pipe_through [:browser, :browser_auth]
 
+    get "/profile/api", UserController, :api
+    get "/profile/api/update", UserController, :update_api
     get "/profile", UserController, :edit
     put "/profile", UserController, :update
 
@@ -37,5 +44,12 @@ defmodule Share.Router do
     post "/auth/create", AuthController, :create
 
     get "/*page", PageController, :index
+  end
+
+  scope "/api", Share do
+    pipe_through [:api, :api_auth]
+    put "/users/:user", APIController, :login
+    post "/users/:user/post", APIController, :post
+    delete "/users/:user", APIController, :logout
   end
 end

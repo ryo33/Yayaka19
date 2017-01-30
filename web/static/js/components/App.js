@@ -209,9 +209,15 @@ class App extends Component {
                   <Menu.Item link href='/profile'>
                     Edit my profile
                   </Menu.Item>
+                  <Menu.Item link href='/profile/api' target="_blank">
+                    View my SECRET
+                  </Menu.Item>
                 </Menu.Menu>
               </Menu.Item>
             ) : null}
+            <Menu.Item link href={api.url} target="_blank">
+              API Documentation
+            </Menu.Item>
             <Menu.Item link href={admin.url} target="_blank">
               <Menu.Header>Contact admin ({admin.name})</Menu.Header>
               <p>Any bug reports, questions, and suggestions are welcome. Thanks!</p>

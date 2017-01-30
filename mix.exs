@@ -40,13 +40,14 @@ defmodule Share.Mixfile do
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:gettext, "~> 0.11"},
      {:cowboy, "~> 1.0"},
-     {:guardian, "~> 0.13.0"},
+     {:guardian, "~> 0.14.0"},
      {:ueberauth, "~> 0.4.0"},
      {:ueberauth_google, "~> 0.4.0"},
      {:ueberauth_facebook, "~> 0.5.0"},
      {:ueberauth_github, "~> 0.4.0"},
      {:ueberauth_twitter, "~> 0.2"},
-     {:oauth, github: "tim/erlang-oauth"}]
+     {:oauth, github: "tim/erlang-oauth"},
+     {:secure_random, "~> 0.5"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
