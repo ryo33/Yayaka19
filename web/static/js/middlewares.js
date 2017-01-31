@@ -6,12 +6,13 @@ import { loginPage, home, timeline, publicTimeline } from './pages.js'
 import {
   submitPost, updatePostText,
   requestUser, setUserInfo,
+  requestPost, setPost,
   requestFollow, requestUnfollow, follow, unfollow,
   requestFav, requestUnfav, fav, unfav,
   requestPublicTimeline, updatePublicTimeline,
   requestTimeline, updateTimeline, addFavs,
   openNoticesPage, updateNoticed,
-  showError
+  showError, hideError, doPing
 } from './actions.js'
 import { pageSelector } from './selectors.js'
 import { compareNotices } from './utils.js'
@@ -42,6 +43,19 @@ const requestUserMiddleware = createAsyncHook(
     pushMessage(channel, 'user_info', {name: action.payload})
       .then(resp => {
         dispatch(setUserInfo(resp))
+      }, ({ error, timeout }) => {
+        dispatch(home.action())
+      })
+  }
+)
+
+const requestPostMiddleware = createAsyncHook(
+  requestPost.getType(),
+  ({ dispatch, action }) => {
+    setPost(null)
+    pushMessage(channel, 'post', {id: action.payload})
+      .then(({ post }) => {
+        dispatch(setPost(post))
       }, ({ error, timeout }) => {
         dispatch(home.action())
       })
@@ -143,6 +157,14 @@ const openNoticesPageMiddleware = createAsyncHook(
   }
 )
 
+const doPingMiddleware = createAsyncHook(
+  doPing.getType(),
+  ({ dispatch, action, getState }) => {
+    pushMessage(channel, 'ping')
+      .then(({noticed}) => dispatch(hideError()))
+  }
+)
+
 let signedInMiddlewares = []
 if (signedIn) {
   signedInMiddlewares = [
@@ -160,5 +182,7 @@ export default composeMiddleware(
   ...signedInMiddlewares,
   redirectLoginPageMiddleware,
   requestUserMiddleware,
-  requestPublicTimelineMiddleware
+  requestPostMiddleware,
+  requestPublicTimelineMiddleware,
+  doPingMiddleware
 )

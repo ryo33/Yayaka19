@@ -7,6 +7,7 @@ import {
   requestTimeline,
   requestPublicTimeline,
   requestUser,
+  requestPost,
   openNoticesPage
 } from './actions.js'
 import {
@@ -21,6 +22,7 @@ export const home = p('/', 'home')
 export const publicTimeline = p('/p', 'public')
 export const timeline = p('/t', 'timeline')
 export const userPage = p('/users/:name', 'user')
+export const postPage = p('/posts/:id', 'post')
 export const noticesPage = p('/n', 'notices')
 export const loginPage = p('/login', 'login')
 export const errorPage = p('/*', 'error')
@@ -65,6 +67,13 @@ const userPageHook = createAsyncHook(
   }
 )
 
+const postPageHook = createAsyncHook(
+  ({ action }) => postPage.check(action),
+  ({ dispatch, action }) => {
+    dispatch(requestPost(parseInt(action.payload.params.id, 10)))
+  }
+)
+
 const noticesPageLeaveHook = createAsyncHook(
   CHANGE_PAGE,
   ({ getState }) => pageSelector(getState()).name == noticesPage.name,
@@ -81,5 +90,6 @@ export const pagesMiddleware = composeMiddleware(
   homeHook,
   publicTimelineHook,
   userPageHook,
+  postPageHook,
   noticesPageLeaveHook
 )

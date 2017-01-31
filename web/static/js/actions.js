@@ -7,6 +7,7 @@ export const addFavs = createAction('add favs', favs => favs)
 // Error
 export const showError = createAction('show error', message => message)
 export const hideError = createAction('hide error')
+export const doPing = createAction('ping')
 
 // Notices page
 export const updateNoticed = createAction('update noticed', noticed => noticed)
@@ -28,6 +29,10 @@ export const follow = createAction('follow', id => id)
 export const unfollow = createAction('unfollow', id => id)
 export const requestFollow = createAction('request follow', id => id)
 export const requestUnfollow = createAction('request unfollow', id => id)
+
+// Post
+export const requestPost = createAction('request post', id => id)
+export const setPost = createAction('set post', post => post)
 
 // Public timeline
 export const requestPublicTimeline = createAction('request public timeline')
