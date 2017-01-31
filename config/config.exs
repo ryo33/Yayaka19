@@ -19,7 +19,7 @@ config :share, Share.Endpoint,
 
 config :share,
   title: "Share",
-  description: "We enjoy reading stray posts.",
+  description: "What's in your head?",
   url: "https://sha.herokuapp.com",
   admin: [name: "Ryo33",
            url: "https://twitter.com/ryo33music"],

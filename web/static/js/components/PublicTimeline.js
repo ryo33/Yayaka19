@@ -27,7 +27,7 @@ const PublicTimeline = ({ posts, requestPublicTimeline }) => (
           Welcome!
         </Message.Header>
         <p>
-          This is a social networking service that randomly choose posts to display on the timeline.<br />
+          This is a social networking service.<br />
           You need to login to post, follow users, use personal timeline, favorite posts, etc.
         </p>
       </Message>

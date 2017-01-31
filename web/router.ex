@@ -43,6 +43,8 @@ defmodule Share.Router do
     get "/auth/:provider/callback", AuthController, :callback
     post "/auth/create", AuthController, :create
 
+    get "/posts/:id", PageController, :post
+    get "/users/:name", PageController, :user
     get "/*page", PageController, :index
   end
 
