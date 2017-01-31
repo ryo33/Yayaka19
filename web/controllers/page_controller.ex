@@ -27,7 +27,7 @@ defmodule Share.PageController do
       nil -> render_page(conn)
       user ->
         og = %{
-          title: "#{user.display} (@#{user.name})",
+          title: "#{user.display} (@#{user.name}) on Share",
           url: get_url(conn)
         }
       render_page(conn, og)

@@ -131,12 +131,12 @@ class Post extends Component {
       <Comment.Group style={{padding: '0px'}}>
         <Comment>
           <Comment.Content>
-            <Comment.Author as={React.a} href='#' onClick={this.handleClickUser}>
+            <Comment.Author as={React.a} href={userPage.path({name: post.user.name})} onClick={this.handleClickUser}>
               {post.user.display}
             </Comment.Author>
             <Comment.Metadata>
               <span>@{post.user.name}</span>
-              <a href='#' onClick={this.handleClickTime}>
+              <a href={postPage.path({id: post.id})} onClick={this.handleClickTime}>
                 <Time time={post.inserted_at} />
               </a>
               {followButton ? (
