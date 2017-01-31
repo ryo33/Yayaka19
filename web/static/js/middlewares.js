@@ -11,7 +11,7 @@ import {
   requestPublicTimeline, updatePublicTimeline,
   requestTimeline, updateTimeline, addFavs,
   openNoticesPage, updateNoticed,
-  showError
+  showError, hideError, doPing
 } from './actions.js'
 import { pageSelector } from './selectors.js'
 import { compareNotices } from './utils.js'
@@ -143,6 +143,14 @@ const openNoticesPageMiddleware = createAsyncHook(
   }
 )
 
+const doPingMiddleware = createAsyncHook(
+  doPing.getType(),
+  ({ dispatch, action, getState }) => {
+    pushMessage(channel, 'ping')
+      .then(({noticed}) => dispatch(hideError()))
+  }
+)
+
 let signedInMiddlewares = []
 if (signedIn) {
   signedInMiddlewares = [
@@ -160,5 +168,6 @@ export default composeMiddleware(
   ...signedInMiddlewares,
   redirectLoginPageMiddleware,
   requestUserMiddleware,
-  requestPublicTimelineMiddleware
+  requestPublicTimelineMiddleware,
+  doPingMiddleware
 )

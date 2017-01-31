@@ -45,4 +45,8 @@ defmodule Share.PageChannel do
     favs = Fav.get_favs(socket, post_ids)
     {:reply, {:ok, %{posts: posts, favs: favs}}, socket}
   end
+
+  def handle_in("ping", _params, socket) do
+    {:reply, :ok, socket}
+  end
 end

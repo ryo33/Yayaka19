@@ -25,7 +25,7 @@ import {
 } from '../selectors.js'
 import {
   openNewPostDialog, closeNewPostDialog,
-  hideError
+  hideError, doPing
 } from '../actions.js'
 
 const mapStateToProps = state => {
@@ -47,9 +47,8 @@ const actionCreators = {
   timelineAction: () => timeline.action(),
   loginPageAction: () => loginPage.action(),
   noticesPageAction: () => noticesPage.action(),
-  openNewPostDialog,
-  closeNewPostDialog,
-  hideError
+  openNewPostDialog, closeNewPostDialog,
+  hideError, doPing
 }
 
 const iconItemStyle = {
@@ -73,6 +72,7 @@ class App extends Component {
     this.openNewPost = this.openNewPost.bind(this)
     this.closeNewPost = this.closeNewPost.bind(this)
     this.hideError = this.hideError.bind(this)
+    this.doPing = this.doPing.bind(this)
     this.state = {
       sidebar: false,
       logout: false,
@@ -130,6 +130,11 @@ class App extends Component {
 
   reload() {
     window.location.reload(true)
+  }
+
+  doPing() {
+    const { doPing } = this.props
+    doPing()
   }
 
   render() {
@@ -245,6 +250,7 @@ class App extends Component {
                   onDismiss={this.hideError}
                 >
                   <Message.Header>{error}</Message.Header>
+                  <Button onClick={this.doPing}>Ping</Button>
                   <Button onClick={this.reload}>Reload</Button>
                 </Message>
               ) : null}

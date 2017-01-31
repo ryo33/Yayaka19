@@ -7,6 +7,7 @@ export const addFavs = createAction('add favs', favs => favs)
 // Error
 export const showError = createAction('show error', message => message)
 export const hideError = createAction('hide error')
+export const doPing = createAction('ping')
 
 // Notices page
 export const updateNoticed = createAction('update noticed', noticed => noticed)
