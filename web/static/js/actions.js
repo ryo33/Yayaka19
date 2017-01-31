@@ -30,6 +30,10 @@ export const unfollow = createAction('unfollow', id => id)
 export const requestFollow = createAction('request follow', id => id)
 export const requestUnfollow = createAction('request unfollow', id => id)
 
+// Post
+export const requestPost = createAction('request post', id => id)
+export const setPost = createAction('set post', post => post)
+
 // Public timeline
 export const requestPublicTimeline = createAction('request public timeline')
 export const updatePublicTimeline = createAction('update public timeline', data => data)

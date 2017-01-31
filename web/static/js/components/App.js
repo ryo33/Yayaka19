@@ -9,12 +9,13 @@ import {
 
 import { signedIn, source, admin } from '../global.js'
 import {
-  home, publicTimeline, timeline, userPage, loginPage, noticesPage
+  home, publicTimeline, timeline, userPage, postPage, loginPage, noticesPage
 } from '../pages.js'
 import PublicTimeline from './PublicTimeline.js'
 import Timeline from './Timeline.js'
 import NewPost from './NewPost.js'
 import UserPage from './UserPage.js'
+import PostPage from './PostPage.js'
 import LoginPage from './LoginPage.js'
 import ErrorPage from './ErrorPage.js'
 import NoticesPage from './NoticesPage.js'
@@ -119,6 +120,8 @@ class App extends Component {
         return <Timeline />
       case userPage.name:
         return <UserPage params={page.params} />
+      case postPage.name:
+        return <PostPage params={page.params} />
       case noticesPage.name:
         return <NoticesPage />
       case loginPage.name:

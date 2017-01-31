@@ -12,6 +12,9 @@ export const newPostPageSelector = ({ newPostPage }) => newPostPage
 // User
 export const userPageSelector = ({ userPage }) => userPage
 
+// Post
+export const postPageSelector = ({ postPage }) => postPage
+
 // Public timeline
 export const publicTimelinePostsSelector = ({ publicTimeline }) => publicTimeline.posts
 

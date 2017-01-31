@@ -5,7 +5,6 @@ import { Segment, Message, Header, Button } from 'semantic-ui-react'
 
 import { signedIn } from '../global.js'
 import { publicTimelinePostsSelector } from '../selectors.js'
-import { userPage } from '../pages.js'
 import { requestPublicTimeline } from '../actions.js'
 
 import PostList from './PostList.js'
@@ -17,11 +16,10 @@ const mapStateToProps = state => {
 }
 
 const actionCreators = {
-  requestPublicTimeline,
-  userPageAction: name => userPage.action({name})
+  requestPublicTimeline
 }
 
-const PublicTimeline = ({ posts, userPageAction, requestPublicTimeline }) => (
+const PublicTimeline = ({ posts, requestPublicTimeline }) => (
   <div>
     { signedIn ? null : (
       <Message>
@@ -40,7 +38,6 @@ const PublicTimeline = ({ posts, userPageAction, requestPublicTimeline }) => (
     </Segment>
     <PostList
       posts={posts}
-      onClickUser={userPageAction}
     />
     <Segment vertical>
       <Button onClick={requestPublicTimeline}>Reload</Button>

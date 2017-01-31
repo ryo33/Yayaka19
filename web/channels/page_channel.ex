@@ -32,6 +32,17 @@ defmodule Share.PageChannel do
     end
   end
 
+  def handle_in("post", %{"id" => id}, socket) do
+    case Repo.get(Post, id) do
+      nil -> {:reply, :error, socket}
+      post ->
+        res = %{
+          post: Post.preload(post)
+        }
+        {:reply, {:ok, res}, socket}
+    end
+  end
+
   def handle_in("public_timeline", _params, socket) do
     query = Post
             |> limit(50)

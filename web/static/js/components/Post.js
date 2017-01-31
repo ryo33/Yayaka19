@@ -9,7 +9,7 @@ import FollowButton from './FollowButton.js'
 import UserButton from './UserButton.js'
 import NewPost from './NewPost.js'
 import { requestFav, requestUnfav, setAddressPost } from '../actions.js'
-import { userPage } from '../pages.js'
+import { userPage, postPage } from '../pages.js'
 import { userSelector, favsSelector } from '../selectors.js'
 
 const mapStateToProps = (state) => {
@@ -20,7 +20,9 @@ const mapStateToProps = (state) => {
 }
 
 const actionCreators = {
-  requestFav, requestUnfav, setAddressPost, userPageAction: userPage.action
+  requestFav, requestUnfav, setAddressPost,
+  userPageAction: name => userPage.action({name}),
+  postPageAction: id => postPage.action({id})
 }
 
 const PostAddresses = ({ addresses = [] }) => (
@@ -45,6 +47,8 @@ class Post extends Component {
     this.unfav = this.unfav.bind(this)
     this.openReply = this.openReply.bind(this)
     this.closeReply = this.closeReply.bind(this)
+    this.handleClickUser = this.handleClickUser.bind(this)
+    this.handleClickTime = this.handleClickTime.bind(this)
     this.state = {
       openReply: false
     }
@@ -68,6 +72,18 @@ class Post extends Component {
   closeReply() {
     const { setAddressPost, post } = this.props
     this.setState({openReply: false})
+  }
+
+  handleClickUser(e) {
+    e.preventDefault()
+    const { post, userPageAction } = this.props
+    userPageAction(post.user.name)
+  }
+
+  handleClickTime(e) {
+    e.preventDefault()
+    const { post, postPageAction } = this.props
+    postPageAction(post.id)
   }
 
   renderReplyButton() {
@@ -108,22 +124,21 @@ class Post extends Component {
   render() {
     const {
       list = false, favButton = true, followButton = true, replyButton = true,
-      post, onClickUser, userPageAction
+      post, userPageAction
     } = this.props
     const { openReply } = this.state
     return (
       <Comment.Group style={{padding: '0px'}}>
         <Comment>
           <Comment.Content>
-            <Comment.Author as={React.a} href='#' onClick={(e) => {
-              e.preventDefault()
-              onClickUser()
-            }}>
+            <Comment.Author as={React.a} href='#' onClick={this.handleClickUser}>
               {post.user.display}
             </Comment.Author>
             <Comment.Metadata>
               <span>@{post.user.name}</span>
-              <Time time={post.inserted_at} />
+              <a href='#' onClick={this.handleClickTime}>
+                <Time time={post.inserted_at} />
+              </a>
               {followButton ? (
                 <FollowButton user={post.user} />
               ) : null}
@@ -143,11 +158,10 @@ class Post extends Component {
               </pre>
               {post.post ? (
                 <Segment size='tiny'>
-                  <Post
+                  <ConnectedPost
                     favButton={false}
                     replyButton={false}
                     post={post.post}
-                    onClickUser={() => userPageAction({name: post.post.user.name})}
                   />
                 </Segment>
               ) : null}
@@ -182,8 +196,9 @@ Post.propTypes = {
     })),
     user: user.isRequired,
     text: React.PropTypes.string.isRequired,
-  }),
-  onClickUser: React.PropTypes.func.isRequired
+  })
 }
 
-export default connect(mapStateToProps, actionCreators)(Post)
+const ConnectedPost = connect(mapStateToProps, actionCreators)(Post)
+
+export default ConnectedPost

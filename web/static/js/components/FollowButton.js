@@ -6,12 +6,12 @@ import { Button, Icon } from 'semantic-ui-react'
 import { requestFollow, requestUnfollow } from '../actions.js'
 import { userSelector, followingSelector } from '../selectors.js'
 
-const mapStateToProps = (state, { user: targetUser }) => {
-  const user = userSelector(state)
+const mapStateToProps = (state, { user }) => {
+  const currentUser = userSelector(state)
   const following = followingSelector(state)
   return {
+    currentUser,
     user,
-    targetUser,
     following
   }
 }
@@ -28,21 +28,21 @@ class FollowButton extends Component {
   }
 
   follow() {
-    const { requestFollow, targetUser } = this.props
-    requestFollow(targetUser.id)
+    const { requestFollow, user } = this.props
+    requestFollow(user.id)
   }
 
   unfollow() {
-    const { requestUnfollow, targetUser } = this.props
-    requestUnfollow(targetUser.id)
+    const { requestUnfollow, user } = this.props
+    requestUnfollow(user.id)
   }
 
   render() {
-    const { user, following, targetUser } = this.props
-    if (user == null || user.id == targetUser.id) {
+    const { currentUser, following, user } = this.props
+    if (currentUser == null || currentUser.id == user.id) {
       return null
     }
-    if (following.includes(targetUser.id)) {
+    if (following.includes(user.id)) {
       return (
         <Button size='mini' icon='user' color='blue' onClick={this.unfollow} />
       )

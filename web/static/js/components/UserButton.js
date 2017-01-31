@@ -6,11 +6,11 @@ import { Button } from 'semantic-ui-react'
 import { userPage } from '../pages.js'
 
 const actionCreators = {
-  userPageAction: userPage.action
+  userPageAction: name => userPage.action({name})
 }
 
 const UserButton = ({ user, children, userPageAction }) => (
-  <Button size='mini' onClick={() => userPageAction({name: user.name})}>
+  <Button size='mini' onClick={() => userPageAction(user.name)}>
     {children}
   </Button>
 )

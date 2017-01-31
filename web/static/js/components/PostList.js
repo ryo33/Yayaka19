@@ -6,7 +6,7 @@ import { Comment, Segment } from 'semantic-ui-react'
 import { userSelector } from '../selectors.js'
 import Post from './Post.js'
 
-const PostList = ({ followButton = true, posts, onClickUser }) => (
+const PostList = ({ followButton = true, posts }) => (
   <div>
     {
       posts.map(post => (
@@ -15,7 +15,6 @@ const PostList = ({ followButton = true, posts, onClickUser }) => (
             list
             followButton={followButton}
             post={post}
-            onClickUser={() => onClickUser(post.user.name)}
           />
         </Segment>
       ))
@@ -32,8 +31,7 @@ PostList.propTypes = {
       display: React.PropTypes.string.isRequired
     }),
     text: React.PropTypes.string.isRequired
-  })).isRequired,
-  onClickUser: React.PropTypes.func.isRequired
+  })).isRequired
 }
 
 export default PostList

@@ -6,6 +6,7 @@ import { loginPage, home, timeline, publicTimeline } from './pages.js'
 import {
   submitPost, updatePostText,
   requestUser, setUserInfo,
+  requestPost, setPost,
   requestFollow, requestUnfollow, follow, unfollow,
   requestFav, requestUnfav, fav, unfav,
   requestPublicTimeline, updatePublicTimeline,
@@ -42,6 +43,19 @@ const requestUserMiddleware = createAsyncHook(
     pushMessage(channel, 'user_info', {name: action.payload})
       .then(resp => {
         dispatch(setUserInfo(resp))
+      }, ({ error, timeout }) => {
+        dispatch(home.action())
+      })
+  }
+)
+
+const requestPostMiddleware = createAsyncHook(
+  requestPost.getType(),
+  ({ dispatch, action }) => {
+    setPost(null)
+    pushMessage(channel, 'post', {id: action.payload})
+      .then(({ post }) => {
+        dispatch(setPost(post))
       }, ({ error, timeout }) => {
         dispatch(home.action())
       })
@@ -168,6 +182,7 @@ export default composeMiddleware(
   ...signedInMiddlewares,
   redirectLoginPageMiddleware,
   requestUserMiddleware,
+  requestPostMiddleware,
   requestPublicTimelineMiddleware,
   doPingMiddleware
 )

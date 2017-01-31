@@ -27,7 +27,7 @@ const mapStateToProps = ({ notices: { favs, follows, addresses, replies }}) => {
 }
 
 const actionCreators = {
-  userPageAction: userPage.action
+  userPageAction: name => userPage.action({name})
 }
 
 const FavNotice = ({ fav: { user, post, inserted_at }, userPageAction }) => (
@@ -37,7 +37,7 @@ const FavNotice = ({ fav: { user, post, inserted_at }, userPageAction }) => (
     </Feed.Label>
     <Feed.Content>
       <Feed.Summary>
-        <Feed.User onClick={() => userPageAction({name: user.name})}>
+        <Feed.User onClick={() => userPageAction(user.name)}>
           {user.display}
         </Feed.User> (@{user.name}) favorited
         <Feed.Date>
@@ -50,7 +50,6 @@ const FavNotice = ({ fav: { user, post, inserted_at }, userPageAction }) => (
             favButton={false}
             replyButton={false}
             post={post}
-            onClickUser={() => {}}
           />
         </Segment>
       </Feed.Extra>
@@ -65,7 +64,7 @@ const FollowNotice = ({ follow: { user, inserted_at }, userPageAction}) => (
     </Feed.Label>
     <Feed.Content>
       <Feed.Summary>
-        <Feed.User onClick={() => userPageAction({name: user.name})}>
+        <Feed.User onClick={() => userPageAction(user.name)}>
           {user.display}
         </Feed.User> (@{user.name}) followed you <FollowButton user={user} />
         <Feed.Date>
@@ -83,7 +82,7 @@ const AddressNotice = ({ address, userPageAction }) => (
     </Feed.Label>
     <Feed.Content>
       <Feed.Summary>
-        <Feed.User onClick={() => userPageAction({name: address.user.name})}>
+        <Feed.User onClick={() => userPageAction(address.user.name)}>
           {address.user.display}
         </Feed.User> (@{address.user.name}) addressed you
         <Feed.Date>
@@ -94,7 +93,6 @@ const AddressNotice = ({ address, userPageAction }) => (
         <Segment>
           <Post
             post={address}
-            onClickUser={() => userPageAction({name: address.user.name})}
           />
         </Segment>
       </Feed.Extra>
@@ -109,7 +107,7 @@ const ReplyNotice = ({ reply: { post, inserted_at }, userPageAction }) => (
     </Feed.Label>
     <Feed.Content>
       <Feed.Summary>
-        <Feed.User onClick={() => userPageAction({name: post.user.name})}>
+        <Feed.User onClick={() => userPageAction(post.user.name)}>
           {post.user.display}
         </Feed.User> (@{post.user.name}) replied to you
         <Feed.Date>
@@ -120,7 +118,6 @@ const ReplyNotice = ({ reply: { post, inserted_at }, userPageAction }) => (
         <Segment>
           <Post
             post={post}
-            onClickUser={() => userPageAction({name: post.user.name})}
           />
         </Segment>
       </Feed.Extra>

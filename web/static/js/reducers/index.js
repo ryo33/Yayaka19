@@ -12,6 +12,7 @@ import {
 import notices from './notices.js'
 import newPostPage from './newPostPage.js'
 import userPage from './userPage.js'
+import postPage from './postPage.js'
 import publicTimeline from './publicTimeline.js'
 import timeline from './timeline.js'
 
@@ -47,6 +48,7 @@ export default combineReducers({
   favs,
   newPostPage,
   userPage,
+  postPage,
   publicTimeline,
   timeline
 })
