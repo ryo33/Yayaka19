@@ -38,6 +38,11 @@ defmodule Share.UserChannel do
     follows = Repo.all(Follow.preload(query))
               |> Enum.map(fn follow -> %{id: follow.id, user: follow.user, inserted_at: follow.inserted_at} end)
 
+    query = from follow in Follow,
+      where: follow.target_user_id == ^user.id,
+      select: follow.user_id
+    followers = Repo.all(query)
+
     query = from post in Post,
       join: address in PostAddress,
       on: post.id == address.post_id,
@@ -59,6 +64,7 @@ defmodule Share.UserChannel do
       user: user,
       timeline: timeline,
       following: following,
+      followers: followers,
       noticed: user.noticed,
       notices: %{
         favs: favs,
@@ -172,7 +178,19 @@ defmodule Share.UserChannel do
     {:reply, {:ok, timeline}, socket}
   end
 
-  def get_timeline(user, socket) do
+  def handle_in("online_post", params, socket) do
+    user = socket.assigns.user
+    user = Repo.get!(User, user.id)
+    %{"text" => text} = params
+    post = %{
+      text: text, user: user, id: UUID.uuid4(),
+      inserted_at: NaiveDateTime.utc_now()
+    }
+    Share.OnlinePostHandler.handle(post, user)
+    {:reply, :ok, socket}
+  end
+
+  defp get_timeline(user, socket) do
     query = from f in Follow,
       select: f.target_user_id,
       where: f.user_id == ^user.id

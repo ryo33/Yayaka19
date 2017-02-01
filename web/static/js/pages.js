@@ -21,6 +21,7 @@ const p = pages.addPage.bind(pages)
 export const home           = p('/', 'home')
 export const publicTimeline = p('/p', 'public')
 export const timeline       = p('/t', 'timeline')
+export const onlinePosts         = p('/o', 'online')
 export const userPage       = p('/users/:name', 'user')
 export const userFormPage   = p('/users/:name/edit', 'userForm')
 export const postPage       = p('/posts/:id', 'post')
@@ -63,6 +64,11 @@ const publicTimelineHook = createAsyncHook(
   ({ dispatch, action }) => {
     dispatch(requestPublicTimeline())
   }
+)
+
+const onlinePostsHook = createAsyncHook(
+  ({ action }) => onlinePosts.check(action),
+  ({ dispatch }) => showOnlinePosts()
 )
 
 const userPageHook = createAsyncHook(

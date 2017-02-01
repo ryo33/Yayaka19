@@ -32,6 +32,20 @@ class NewPost extends Component {
     }
   }
 
+  componentWillMount() {
+    const { top, text } = this.props
+    if (top) {
+      this.setState({text})
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { top, text } = this.props
+    if (top && text !== nextProps.text) {
+      this.setState({text: nextProps.text})
+    }
+  }
+
   handleRemoveAddress() {
     const { updatePostAddress } = this.props
     updatePostAddress('')

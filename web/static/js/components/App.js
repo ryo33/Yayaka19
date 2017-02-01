@@ -9,11 +9,13 @@ import {
 
 import { signedIn, source, admin } from '../global.js'
 import {
-  home, publicTimeline, timeline, userPage, userFormPage,
+  home, publicTimeline, timeline, onlinePosts,
+  userPage, userFormPage,
   postPage, loginPage, noticesPage
 } from '../pages.js'
 import PublicTimeline from './PublicTimeline.js'
 import Timeline from './Timeline.js'
+import OnlinePosts from './OnlinePosts.js'
 import NewPost from './NewPost.js'
 import UserPage from './UserPage.js'
 import UserForm from './UserForm.js'
@@ -22,7 +24,8 @@ import LoginPage from './LoginPage.js'
 import ErrorPage from './ErrorPage.js'
 import NoticesPage from './NoticesPage.js'
 import {
-  timelineSelector, pageSelector, userSelector,
+  pageSelector, userSelector,
+  timelineSelector, onlinePostsSelector,
   noticesCountSelctor, newPostPageSelector,
   errorSelector
 } from '../selectors.js'
@@ -36,6 +39,7 @@ const mapStateToProps = state => {
   return {
     newPost: newPostPageSelector(state).open,
     newPostsCount: newPosts.length,
+    onlinePostsCount: onlinePostsSelector(state).count,
     page: pageSelector(state),
     user: userSelector(state),
     noticesCount: noticesCountSelctor(state),
@@ -47,6 +51,7 @@ const actionCreators = {
   homeAction: () => home.action(),
   publicTimelineAction: () => publicTimeline.action(),
   timelineAction: () => timeline.action(),
+  onlinePostsAction: () => onlinePosts.action(),
   userPageAction: name => userPage.action({name}),
   userFormPageAction: name => userFormPage.action({name}),
   loginPageAction: () => loginPage.action(),
@@ -121,6 +126,8 @@ class App extends Component {
         return <PublicTimeline />
       case timeline.name:
         return <Timeline />
+      case onlinePosts.name:
+        return <OnlinePosts />
       case userPage.name:
         return <UserPage params={page.params} />
       case userFormPage.name:
@@ -155,10 +162,12 @@ class App extends Component {
       homeAction,
       publicTimelineAction,
       timelineAction,
+      onlinePostsAction,
       newPostAction,
       loginPageAction,
       noticesPageAction,
       newPostsCount,
+      onlinePostsCount,
       noticesCount,
       newPost
     } = this.props
@@ -189,6 +198,16 @@ class App extends Component {
                 { noticesCount >= 1 ? (
                   <Label size='tiny' circular style={labelStyle} color='red'>
                     {noticesCount}
+                  </Label>
+                ) : null }
+              </Menu.Item>
+            ) : null }
+            {signedIn ? (
+              <Menu.Item style={iconItemStyle} active={name == onlinePosts.name} onClick={onlinePostsAction}>
+                <Icon style={iconStyle} size='large' name='bar' />
+                { onlinePostsCount >= 1 ? (
+                  <Label size='tiny' circular style={labelStyle} color='blue'>
+                    {onlinePostsCount}
                   </Label>
                 ) : null }
               </Menu.Item>
@@ -263,7 +282,7 @@ class App extends Component {
                   <Button onClick={this.reload}>Reload</Button>
                 </Message>
               ) : null}
-              {newPost ? <NewPost /> : null}
+              {newPost ? <NewPost top /> : null}
               {this.renderPage()}
             </Container>
           </Sidebar.Pusher>
