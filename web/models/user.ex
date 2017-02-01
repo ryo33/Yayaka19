@@ -15,7 +15,7 @@ defmodule Share.User do
     timestamps()
   end
 
-  @fields [:name, :display, :provider, :provided_id]
+  @fields [:name, :display]
 
   @doc """
   Builds a changeset based on the `struct` and `params`.
