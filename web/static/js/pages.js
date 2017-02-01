@@ -18,18 +18,23 @@ import {
 export const pages = createPages()
 const p = pages.addPage.bind(pages)
 
-export const home = p('/', 'home')
+export const home           = p('/', 'home')
 export const publicTimeline = p('/p', 'public')
-export const timeline = p('/t', 'timeline')
-export const userPage = p('/users/:name', 'user')
-export const postPage = p('/posts/:id', 'post')
-export const noticesPage = p('/n', 'notices')
-export const loginPage = p('/login', 'login')
-export const errorPage = p('/*', 'error')
+export const timeline       = p('/t', 'timeline')
+export const userPage       = p('/users/:name', 'user')
+export const userFormPage   = p('/users/:name/edit', 'userForm')
+export const postPage       = p('/posts/:id', 'post')
+export const noticesPage    = p('/n', 'notices')
+export const loginPage      = p('/login', 'login')
+export const errorPage      = p('/*', 'error')
 
 const onlySignedInMiddleware = createReplacer(
-  ({ action }) => timeline.check(action) || noticesPage.check(action),
   () => signedIn === false,
+  ({ action }) => {
+    return timeline.check(action)
+      || noticesPage.check(action)
+      || userFormPage.check(action)
+  },
   () => loginPage.action()
 )
 

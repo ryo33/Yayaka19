@@ -2,8 +2,9 @@ import { createAsyncHook, createReplacer, composeMiddleware } from 'redux-middle
 
 import { signedIn } from './global.js'
 import { pushMessage, channel, userChannel } from './socket.js'
-import { loginPage, home, timeline, publicTimeline } from './pages.js'
+import { loginPage, home, timeline, publicTimeline, userPage } from './pages.js'
 import {
+  editUser, setUser,
   submitPost, updatePostText,
   requestUser, setUserInfo,
   requestPost, setPost,
@@ -157,11 +158,25 @@ const openNoticesPageMiddleware = createAsyncHook(
   }
 )
 
+const editUserMiddleware = createAsyncHook(
+  editUser.getType(),
+  ({ dispatch, action }) => {
+    const user = action.payload
+    pushMessage(userChannel, 'edit', {user})
+      .then(({ user }) => {
+        dispatch(setUser(user))
+        dispatch(userPage.action({name: user.name}))
+      }).catch(({ user }) => {
+        dispatch(userPage.action({name: user.name}))
+      })
+  }
+)
+
 const doPingMiddleware = createAsyncHook(
   doPing.getType(),
-  ({ dispatch, action, getState }) => {
+  () => {
     pushMessage(channel, 'ping')
-      .then(({noticed}) => dispatch(hideError()))
+      .then(() => {})
   }
 )
 
@@ -184,5 +199,6 @@ export default composeMiddleware(
   requestUserMiddleware,
   requestPostMiddleware,
   requestPublicTimelineMiddleware,
+  editUserMiddleware,
   doPingMiddleware
 )
