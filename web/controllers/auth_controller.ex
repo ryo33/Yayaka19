@@ -46,12 +46,8 @@ defmodule Share.AuthController do
   def create(conn, %{"user" => params}) do
     %{provider: provider, id: id} = conn |> get_session(:auth)
     %{"name" => name, "display" => display} = params
-    changeset = User.changeset(%User{}, %{
-      name: name,
-      display: display,
-      provider: provider,
-      provided_id: id,
-    })
+    changeset = User.changeset(%User{}, %{name: name, display: display})
+                |> Ecto.Changeset.change(%{provider: provider, provided_id: id})
     case Repo.insert(changeset) do
       {:ok, user} ->
         conn
