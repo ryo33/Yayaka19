@@ -2,7 +2,9 @@ import { createAsyncHook, createReplacer, composeMiddleware } from 'redux-middle
 
 import { signedIn } from './global.js'
 import { pushMessage, channel, userChannel } from './socket.js'
-import { loginPage, home, timeline, publicTimeline, userPage } from './pages.js'
+import {
+  loginPage, home, timeline, publicTimeline, userPage
+} from './pages.js'
 import {
   editUser, setUser,
   submitOnlinePost,
@@ -14,7 +16,8 @@ import {
   requestPublicTimeline, updatePublicTimeline,
   requestTimeline, updateTimeline, addFavs,
   openNoticesPage, updateNoticed,
-  showError, hideError, doPing
+  showError, hideError, doPing,
+  closeNewPostDialog
 } from './actions.js'
 import { pageSelector } from './selectors.js'
 import { compareNotices } from './utils.js'
@@ -27,7 +30,12 @@ const redirectLoginPageMiddleware = createReplacer(
 
 const submitPostMiddleware = createAsyncHook(
   submitPost.getType(),
-  ({ dispatch, action }) => {
+  ({ dispatch, getState, action }) => {
+    const state = getState()
+    const page =  pageSelector(state)
+    if (page.name !== timeline.name && page.name !== publicTimeline.name) {
+      dispatch(closeNewPostDialog())
+    }
     const { text, address, post } = action.payload
     const payload = {post: {text, post_id: post}, address}
     pushMessage(userChannel, 'new_post', payload)

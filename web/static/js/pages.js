@@ -9,7 +9,8 @@ import {
   requestUser,
   requestPost,
   openNoticesPage,
-  showOnlinePosts
+  showOnlinePosts,
+  closeNewPostDialog
 } from './actions.js'
 import {
   pageSelector,
@@ -43,6 +44,14 @@ const onlySignedInMiddleware = createReplacer(
 const errorPageHook = createReplacer(
   ({ action }) => errorPage.check(action),
   () => home.action()
+)
+
+const closeNewPostDialogMiddleware = createAsyncHook(
+  CHANGE_PAGE,
+  ({ action }) => {
+    return !publicTimeline.check(action) && !timeline.check(action)
+  },
+  ({ dispatch }) => { dispatch(closeNewPostDialog()) }
 )
 
 const homeHook = createReplacer(
@@ -99,6 +108,7 @@ const noticesPageLeaveHook = createAsyncHook(
 export const pagesMiddleware = composeMiddleware(
   onlySignedInMiddleware,
   errorPageHook,
+  closeNewPostDialogMiddleware,
   homeHook,
   publicTimelineHook,
   onlinePostsHook,
