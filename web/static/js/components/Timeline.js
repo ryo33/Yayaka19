@@ -39,7 +39,9 @@ const Timeline = ({
     {newPosts.length != 0 ? (
       <Segment vertical>
         <Button fluid basic color='blue' onClick={loadNewPosts}>
-          {newPosts.length} new posts { myNewPostsCount != 0 ? (
+          {newPosts.length} new post{
+            newPosts.length == 1 ? '' : 's'
+          } { myNewPostsCount != 0 ? (
             `(${myNewPostsCount} of them ${
               myNewPostsCount == 1 ? 'is' : 'are'
             } your post${

@@ -145,13 +145,7 @@ class Post extends Component {
             </Comment.Metadata>
             <Comment.Text>
               <PostAddresses addresses={post.post_addresses} />
-              <pre style={{
-                marginBottom: '0px',
-                overflow: 'auto',
-                wordWrap: 'normal',
-                whiteSpace: 'pre-wrap',
-                fontSize: '1.1em'
-              }}>
+              <pre>
                 <Linkify properties={{target: '_blank'}}>
                   {post.text}
                 </Linkify>

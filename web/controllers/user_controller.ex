@@ -44,7 +44,7 @@ defmodule Share.UserController do
       {:ok, user} ->
         conn
         |> put_flash(:info, "User updated successfully.")
-        |> redirect(to: "/")
+        |> redirect(to: "/users/#{user.name}")
       {:error, changeset} ->
         render(conn, "edit.html", user: user, changeset: changeset)
     end

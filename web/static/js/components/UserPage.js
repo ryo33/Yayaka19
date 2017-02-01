@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import Linkify from 'react-linkify'
 
 import { Card, Icon, Segment, Button } from 'semantic-ui-react'
 
@@ -47,22 +48,31 @@ class UserPage extends Component {
                 @{user.name} {postCount} Posts
               </Card.Meta>
               <Card.Description>
-              <span>
-                <Icon name='user' />
-                {following} Following
-              </span>
-              <span>
-                <Icon name='user' />
-                {followers} Followers
-              </span>
+                <span>
+                  <Icon name='user' />
+                  {following} Following
+                </span>
+                <span>
+                  <Icon name='user' />
+                  {followers} Followers
+                </span>
+                {isNotMe ? (
+                  <div>
+                    <Button primary onClick={this.handleSendTo}>
+                      <Icon name='send' />
+                      Send to
+                    </Button>
+                  </div>
+                ) : null}
               </Card.Description>
             </Card.Content>
-            {isNotMe ? (
-              <Card.Content extra>
-                <Button primary onClick={this.handleSendTo}>
-                  <Icon name='send' />
-                  Send to
-                </Button>
+            {user.bio && user.bio.length >= 1 ? (
+              <Card.Content>
+                <pre>
+                  <Linkify properties={{target: '_blank'}}>
+                    {user.bio}
+                  </Linkify>
+                </pre>
               </Card.Content>
             ) : null}
           </Card>

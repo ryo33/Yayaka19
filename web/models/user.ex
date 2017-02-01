@@ -1,7 +1,7 @@
 defmodule Share.User do
   use Share.Web, :model
   @derive {Poison.Encoder, only: [
-    :name, :display, :id,
+    :name, :display, :bio, :id,
   ]}
 
   schema "users" do
@@ -9,13 +9,15 @@ defmodule Share.User do
     field :provided_id, :string
     field :name, :string
     field :display, :string
+    field :bio, :string
     field :noticed, :naive_datetime
     field :secret, :string
 
     timestamps()
   end
 
-  @fields [:name, :display]
+  @required_fields [:name, :display]
+  @fields [:bio] ++ @required_fields
 
   @doc """
   Builds a changeset based on the `struct` and `params`.
@@ -23,11 +25,10 @@ defmodule Share.User do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, @fields)
-    |> validate_required(@fields)
+    |> validate_required(@required_fields)
     |> validate_length(:name, min: 1, max: 32)
     |> validate_length(:display, min: 1, max: 32)
-    |> validate_length(:provider, min: 3)
-    |> validate_length(:provided_id, min: 1)
+    |> validate_length(:bio, min: 0, max: 2048)
     |> unique_constraint(:name)
     |> unique_constraint(:provided_id)
   end
