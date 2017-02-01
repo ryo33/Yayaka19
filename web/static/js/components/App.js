@@ -172,10 +172,11 @@ class App extends Component {
       newPost
     } = this.props
     const { sidebar, logout } = this.state
+    const titleNotices = newPostsCount + onlinePostsCount + noticesCount
     return (
       <div>
         <Helmet title={
-          noticesCount == 0 ? 'Share' : `(${noticesCount}) Share`
+          titleNotices == 0 ? 'Share' : `(${titleNotices}) Share`
         } />
         <Menu>
           <Container>
