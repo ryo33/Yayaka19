@@ -70,6 +70,18 @@ defmodule Share.UserChannel do
     {:ok, res, socket}
   end
 
+  def handle_in("edit", %{"user" => params}, socket) do
+    user = socket.assigns.user
+    user = Repo.get!(User, user.id)
+    changeset = User.changeset(user, params)
+    case Repo.update(changeset) do
+      {:ok, user} ->
+        {:reply, {:ok, %{user: user}}, socket}
+      {:error, changeset} ->
+        {:reply, {:error, %{user: user}}, socket}
+    end
+  end
+
   def handle_in("new_post", params, socket) do
     %{"post" => params, "address" => address} = params
     user = socket.assigns.user

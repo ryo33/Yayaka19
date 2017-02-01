@@ -9,12 +9,14 @@ import {
 
 import { signedIn, source, admin } from '../global.js'
 import {
-  home, publicTimeline, timeline, userPage, postPage, loginPage, noticesPage
+  home, publicTimeline, timeline, userPage, userFormPage,
+  postPage, loginPage, noticesPage
 } from '../pages.js'
 import PublicTimeline from './PublicTimeline.js'
 import Timeline from './Timeline.js'
 import NewPost from './NewPost.js'
 import UserPage from './UserPage.js'
+import UserForm from './UserForm.js'
 import PostPage from './PostPage.js'
 import LoginPage from './LoginPage.js'
 import ErrorPage from './ErrorPage.js'
@@ -42,10 +44,11 @@ const mapStateToProps = state => {
 }
 
 const actionCreators = {
-  userPageAction: name => userPage.action({name}),
   homeAction: () => home.action(),
   publicTimelineAction: () => publicTimeline.action(),
   timelineAction: () => timeline.action(),
+  userPageAction: name => userPage.action({name}),
+  userFormPageAction: name => userFormPage.action({name}),
   loginPageAction: () => loginPage.action(),
   noticesPageAction: () => noticesPage.action(),
   openNewPostDialog, closeNewPostDialog,
@@ -120,6 +123,8 @@ class App extends Component {
         return <Timeline />
       case userPage.name:
         return <UserPage params={page.params} />
+      case userFormPage.name:
+        return <UserForm params={page.params} />
       case postPage.name:
         return <PostPage params={page.params} />
       case noticesPage.name:
@@ -146,6 +151,7 @@ class App extends Component {
       error,
       user,
       userPageAction,
+      userFormPageAction,
       homeAction,
       publicTimelineAction,
       timelineAction,
@@ -214,7 +220,7 @@ class App extends Component {
                   <Menu.Item onClick={() => userPageAction(user.name)}>
                     View my profile
                   </Menu.Item>
-                  <Menu.Item link href='/profile'>
+                  <Menu.Item onClick={() => userFormPageAction(user.name)}>
                     Edit my profile
                   </Menu.Item>
                   <Menu.Item link href='/profile/api' target="_blank">

@@ -4,6 +4,7 @@ import Linkify from 'react-linkify'
 
 import { Card, Icon, Segment, Button } from 'semantic-ui-react'
 
+import { userFormPage } from '../pages.js'
 import { openNewPostDialog, updatePostAddress } from '../actions.js'
 import { userSelector, userPageSelector, followingSelector } from '../selectors.js'
 import FollowButton from './FollowButton.js'
@@ -18,19 +19,26 @@ const mapStateToProps = state => {
 }
 
 const actionCreators = {
-  openNewPostDialog, updatePostAddress
+  openNewPostDialog, updatePostAddress,
+  userFormPageAction: name => userFormPage.action({name})
 }
 
 class UserPage extends Component {
   constructor(props) {
     super(props)
     this.handleSendTo = this.handleSendTo.bind(this)
+    this.handleClickEdit = this.handleClickEdit.bind(this)
   }
 
   handleSendTo() {
     const { userPage: { user }, openNewPostDialog, updatePostAddress } = this.props
     openNewPostDialog()
     updatePostAddress(user.name)
+  }
+
+  handleClickEdit() {
+    const { params, userFormPageAction } = this.props
+    userFormPageAction(params.name)
   }
 
   render() {
@@ -42,7 +50,14 @@ class UserPage extends Component {
           <Card>
             <Card.Content>
               <Card.Header>
-                {user.display} {isNotMe ? <FollowButton user={user} /> : null}
+                {user.display} {isNotMe ? (
+                  <FollowButton user={user} />
+                ) : (
+                  <Button onClick={this.handleClickEdit}>
+                    <Icon name='edit' />
+                    Edit
+                  </Button>
+                )}
               </Card.Header>
               <Card.Meta>
                 @{user.name} {postCount} Posts
