@@ -124,13 +124,14 @@ class Post extends Component {
   render() {
     const {
       list = false, favButton = true, followButton = true, replyButton = true, postLink = true,
-      attributeIcon, actions = [], post, userPageAction
+      attributeIcon, prefix, post, userPageAction
     } = this.props
     const { openReply } = this.state
     return (
-      <Comment.Group style={{padding: '0px'}}>
+      <Comment.Group style={{padding: '0px', maxWidth: 'initial'}}>
         <Comment>
           <Comment.Content>
+            {prefix}
             <Comment.Author as={React.a} href={userPage.path({name: post.user.name})} onClick={this.handleClickUser}>
               {post.user.display}
             </Comment.Author>
@@ -170,7 +171,6 @@ class Post extends Component {
             <Comment.Actions>
               {replyButton ? this.renderReplyButton() : null}
               {favButton ? this.renderFavButton() : null}
-              {actions}
             </Comment.Actions>
             { openReply ? (
               <NewPost
@@ -190,7 +190,7 @@ const user = React.PropTypes.shape({
   display: React.PropTypes.string.isRequired
 })
 Post.propTypes = {
-  actions: React.PropTypes.node,
+  prefix: React.PropTypes.node,
   attributeIcon: React.PropTypes.string,
   followButton: React.PropTypes.bool,
   favButton: React.PropTypes.bool,
