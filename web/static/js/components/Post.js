@@ -123,8 +123,8 @@ class Post extends Component {
 
   render() {
     const {
-      list = false, favButton = true, followButton = true, replyButton = true,
-      post, userPageAction
+      list = false, favButton = true, followButton = true, replyButton = true, postLink = true,
+      attributeIcon, actions = [], post, userPageAction
     } = this.props
     const { openReply } = this.state
     return (
@@ -136,11 +136,18 @@ class Post extends Component {
             </Comment.Author>
             <Comment.Metadata>
               <span>@{post.user.name}</span>
-              <a href={postPage.path({id: post.id})} onClick={this.handleClickTime}>
+              {postLink ? (
+                <a href={postPage.path({id: post.id})} onClick={this.handleClickTime}>
+                  <Time time={post.inserted_at} />
+                </a>
+              ) : (
                 <Time time={post.inserted_at} />
-              </a>
+              )}
               {followButton ? (
                 <FollowButton user={post.user} />
+              ) : null}
+              {attributeIcon ? (
+                <Icon name={attributeIcon} color='blue' size='large' />
               ) : null}
             </Comment.Metadata>
             <Comment.Text>
@@ -163,6 +170,7 @@ class Post extends Component {
             <Comment.Actions>
               {replyButton ? this.renderReplyButton() : null}
               {favButton ? this.renderFavButton() : null}
+              {actions}
             </Comment.Actions>
             { openReply ? (
               <NewPost
@@ -182,8 +190,11 @@ const user = React.PropTypes.shape({
   display: React.PropTypes.string.isRequired
 })
 Post.propTypes = {
+  actions: React.PropTypes.node,
+  attributeIcon: React.PropTypes.string,
   followButton: React.PropTypes.bool,
   favButton: React.PropTypes.bool,
+  replyButton: React.PropTypes.bool,
   post: React.PropTypes.shape({
     post_addresses: React.PropTypes.arrayOf(React.PropTypes.shape({
       user

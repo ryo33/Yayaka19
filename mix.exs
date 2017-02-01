@@ -4,7 +4,7 @@ defmodule Share.Mixfile do
   def project do
     [app: :share,
      version: "0.0.1",
-     elixir: "~> 1.2",
+     elixir: "~> 1.4",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
@@ -47,7 +47,8 @@ defmodule Share.Mixfile do
      {:ueberauth_github, "~> 0.4.0"},
      {:ueberauth_twitter, "~> 0.2"},
      {:oauth, github: "tim/erlang-oauth"},
-     {:secure_random, "~> 0.5"}]
+     {:secure_random, "~> 0.5"},
+     {:uuid, "~> 1.1"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

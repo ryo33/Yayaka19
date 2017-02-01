@@ -13,7 +13,7 @@ import { pageSelector } from './selectors.js'
 import middleware from './middlewares.js'
 import {
   addFavs, updateTimeline, setUser,
-  setFollowing, updateNoticed, updateNotices,
+  setFollowing, setFollowers, updateNoticed, updateNotices,
   showError, hideError, doPing
 } from './actions.js'
 import { joinChannel, joinUserChannel } from './socket.js'
@@ -38,7 +38,7 @@ const store = createStore(
 )
 
 // Socket
-const userChannelCallback = ({ user, noticed, following, notices, timeline }) => {
+const userChannelCallback = ({ user, noticed, following, followers, notices, timeline }) => {
   const { favs, posts } = timeline
   store.dispatch(setUser(user))
   store.dispatch(addFavs(favs))
@@ -46,6 +46,7 @@ const userChannelCallback = ({ user, noticed, following, notices, timeline }) =>
   store.dispatch(updateNoticed(noticed))
   store.dispatch(updateNotices(notices))
   store.dispatch(setFollowing(following))
+  store.dispatch(setFollowers(followers))
 }
 if (signedIn) {
   joinUserChannel(userChannelCallback)

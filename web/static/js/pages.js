@@ -8,7 +8,8 @@ import {
   requestPublicTimeline,
   requestUser,
   requestPost,
-  openNoticesPage
+  openNoticesPage,
+  showOnlinePosts
 } from './actions.js'
 import {
   pageSelector,
@@ -21,6 +22,7 @@ const p = pages.addPage.bind(pages)
 export const home           = p('/', 'home')
 export const publicTimeline = p('/p', 'public')
 export const timeline       = p('/t', 'timeline')
+export const onlinePosts         = p('/o', 'online')
 export const userPage       = p('/users/:name', 'user')
 export const userFormPage   = p('/users/:name/edit', 'userForm')
 export const postPage       = p('/posts/:id', 'post')
@@ -65,6 +67,11 @@ const publicTimelineHook = createAsyncHook(
   }
 )
 
+const onlinePostsHook = createAsyncHook(
+  ({ action }) => onlinePosts.check(action),
+  ({ dispatch }) => dispatch(showOnlinePosts())
+)
+
 const userPageHook = createAsyncHook(
   ({ action }) => userPage.check(action),
   ({ dispatch, action }) => {
@@ -94,6 +101,7 @@ export const pagesMiddleware = composeMiddleware(
   errorPageHook,
   homeHook,
   publicTimelineHook,
+  onlinePostsHook,
   userPageHook,
   postPageHook,
   noticesPageLeaveHook
