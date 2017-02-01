@@ -4,7 +4,8 @@ import { createPagesReducer } from 'redux-pages'
 
 import { errorPage } from '../pages.js'
 import {
-  setUser, setFollowing, follow, unfollow,
+  setUser, setFollowing, setFollowers,
+  follow, unfollow,
   addFavs, fav, unfav,
   showError, hideError
 } from '../actions.js'
@@ -15,6 +16,7 @@ import userPage from './userPage.js'
 import postPage from './postPage.js'
 import publicTimeline from './publicTimeline.js'
 import timeline from './timeline.js'
+import onlinePosts from './onlinePosts.js'
 
 const page = createPagesReducer(errorPage.name, {})
 
@@ -26,6 +28,10 @@ const following = createReducer({
   [setFollowing]: (state, payload) => payload,
   [follow]: (state, id) => [id, ...state],
   [unfollow]: (state, unfollowID) => state.filter(id => id !== unfollowID),
+}, [])
+
+const followers = createReducer({
+  [setFollowers]: (state, payload) => payload
 }, [])
 
 const favs = createReducer({
@@ -45,10 +51,12 @@ export default combineReducers({
   page,
   user,
   following,
+  followers,
   favs,
   newPostPage,
   userPage,
   postPage,
   publicTimeline,
-  timeline
+  timeline,
+  onlinePosts
 })

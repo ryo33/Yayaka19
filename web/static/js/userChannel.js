@@ -1,7 +1,11 @@
 import { userChannel } from './socket.js'
 
-import { addNotices, addNewPosts, loadNewPosts } from './actions.js'
-import { timelineSelector, userSelector } from './selectors.js'
+import { onlinePosts } from './pages.js'
+import {
+  addNotices, addNewPosts, loadNewPosts,
+  addOnlinePosts, showOnlinePosts
+} from './actions.js'
+import { pageSelector, timelineSelector, userSelector } from './selectors.js'
 
 export const watchUserChannel = (store) => {
   userChannel.on('add_notices', payload => {
@@ -17,5 +21,11 @@ export const watchUserChannel = (store) => {
     } else {
       store.dispatch(addNewPosts(posts))
     }
+  })
+  userChannel.on('add_online_posts', ({posts}) => {
+    const state = store.getState()
+    const page = pageSelector(state)
+    const count = page.name !== onlinePosts.name ? posts.length : 0
+    store.dispatch(addOnlinePosts(posts, count))
   })
 }

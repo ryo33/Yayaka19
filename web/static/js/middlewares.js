@@ -5,6 +5,7 @@ import { pushMessage, channel, userChannel } from './socket.js'
 import { loginPage, home, timeline, publicTimeline, userPage } from './pages.js'
 import {
   editUser, setUser,
+  submitOnlinePost,
   submitPost, updatePostText,
   requestUser, setUserInfo,
   requestPost, setPost,
@@ -180,6 +181,15 @@ const doPingMiddleware = createAsyncHook(
   }
 )
 
+const submitOnlinePostMiddleware = createAsyncHook(
+  submitOnlinePost.getType(),
+  ({ action }) => {
+    const { text } = action.payload
+    pushMessage(userChannel, 'online_post', {text})
+      .then(() => {/* TODO */})
+  }
+)
+
 let signedInMiddlewares = []
 if (signedIn) {
   signedInMiddlewares = [
@@ -200,5 +210,6 @@ export default composeMiddleware(
   requestPostMiddleware,
   requestPublicTimelineMiddleware,
   editUserMiddleware,
+  submitOnlinePostMiddleware,
   doPingMiddleware
 )

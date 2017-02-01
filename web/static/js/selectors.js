@@ -3,6 +3,7 @@ export const infoSelector = ({ info }) => info
 export const pageSelector = ({ page }) => page
 export const userSelector = ({ user }) => user
 export const followingSelector = ({ following }) => following
+export const followersSelector = ({ followers }) => followers
 export const favsSelector = ({ favs }) => favs
 export const errorSelector = ({ error }) => error
 
@@ -14,6 +15,9 @@ export const userPageSelector = ({ userPage }) => userPage
 
 // Post
 export const postPageSelector = ({ postPage }) => postPage
+
+// Online
+export const onlinePostsSelector = ({ onlinePosts }) => onlinePosts
 
 // Public timeline
 export const publicTimelinePostsSelector = ({ publicTimeline }) => publicTimeline.posts

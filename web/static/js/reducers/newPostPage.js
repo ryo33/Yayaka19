@@ -2,9 +2,15 @@ import { combineReducers } from 'redux'
 import { createReducer } from 'redux-act'
 
 import {
-  updatePostAddress, openNewPostDialog, closeNewPostDialog,
+  updatePostText, updatePostAddress, openNewPostDialog, closeNewPostDialog,
   submitPost
 } from '../actions.js'
+
+const text = createReducer({
+  [updatePostText]: (state, payload) => payload,
+  [submitPost]: () => '',
+  [closeNewPostDialog]: () => ''
+}, '')
 
 const address = createReducer({
   [updatePostAddress]: (state, payload) => payload,
@@ -23,5 +29,5 @@ const open = createReducer({
 }, false)
 
 export default combineReducers({
-  open, address, postAddresses
+  open, text, address, postAddresses
 })
