@@ -8,7 +8,8 @@ import {
   requestPublicTimeline,
   requestUser,
   requestPost,
-  openNoticesPage
+  openNoticesPage,
+  showOnlinePosts
 } from './actions.js'
 import {
   pageSelector,
@@ -68,7 +69,7 @@ const publicTimelineHook = createAsyncHook(
 
 const onlinePostsHook = createAsyncHook(
   ({ action }) => onlinePosts.check(action),
-  ({ dispatch }) => showOnlinePosts()
+  ({ dispatch }) => dispatch(showOnlinePosts())
 )
 
 const userPageHook = createAsyncHook(
@@ -100,6 +101,7 @@ export const pagesMiddleware = composeMiddleware(
   errorPageHook,
   homeHook,
   publicTimelineHook,
+  onlinePostsHook,
   userPageHook,
   postPageHook,
   noticesPageLeaveHook
