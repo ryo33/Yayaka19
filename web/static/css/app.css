@@ -5,9 +5,9 @@ input {
   font-size: 16px !important;
 }
 pre {
-  margin-bottom: '0px';
-  overflow: 'auto';
-  word-wrap: 'normal';
-  white-space: 'pre-wrap';
-  font-size: '1.1em';
+  margin-bottom: 0px;
+  overflow: auto;
+  word-wrap: normal;
+  white-space: pre-wrap;
+  font-size: 1.1em;
 }
