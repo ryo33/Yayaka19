@@ -14,7 +14,7 @@ import middleware from './middlewares.js'
 import {
   addFavs, updateTimeline, setUser,
   setFollowing, updateNoticed, updateNotices,
-  showError, hideError
+  showError, hideError, doPing
 } from './actions.js'
 import { joinChannel, joinUserChannel } from './socket.js'
 import { watchUserChannel } from './userChannel.js'
@@ -52,15 +52,23 @@ if (signedIn) {
   watchUserChannel(store)
 }
 
+let pingTimer = null
 const respCallback = () => {
   store.dispatch(hideError())
-  // Apply the current path
-  pages.handleNavigation(store, history.location.pathname)
+  if (pingTimer) {
+    clearInterval(pingTimer)
+  }
+  pingTimer = setInterval(() => {
+    store.dispatch(doPing())
+  }, 30000)
 }
 const errorCallback = () => {
   store.dispatch(showError('Failed to connect to the server.'))
 }
 joinChannel(respCallback, errorCallback)
+
+// Apply the current path
+pages.handleNavigation(store, history.location.pathname)
 
 // Listen for changes
 history.listen((location, action) => {
