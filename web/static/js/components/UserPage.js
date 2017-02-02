@@ -13,6 +13,7 @@ const mapStateToProps = state => {
   const user = userSelector(state)
   const userPage = userPageSelector(state)
   return {
+    isMe: user && userPage.user.id === user.id,
     isNotMe: user && userPage.user && userPage.user.id !== user.id,
     userPage
   }
@@ -42,7 +43,7 @@ class UserPage extends Component {
   }
 
   render() {
-    const { isNotMe, userPage } = this.props
+    const { isMe, isNotMe, userPage } = this.props
     const { user, postCount, following, followers } = userPage
     if (user != null) {
       return (
@@ -52,12 +53,13 @@ class UserPage extends Component {
               <Card.Header>
                 {user.display} {isNotMe ? (
                   <FollowButton user={user} />
-                ) : (
+                ) : null}
+                {isMe ? (
                   <Button onClick={this.handleClickEdit}>
                     <Icon name='edit' />
                     Edit
                   </Button>
-                )}
+                ) : null}
               </Card.Header>
               <Card.Meta>
                 @{user.name} {postCount} Posts
