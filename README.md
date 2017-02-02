@@ -40,7 +40,7 @@ $ mix ecto.setup
 ### Start dev server
 
 ```
-$ mix phoenix.start
+$ mix phoenix.server
 ```
 
 Open `http://localhost:4000` with your browser.
