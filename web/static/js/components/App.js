@@ -243,14 +243,19 @@ class App extends Component {
                   <Menu.Item onClick={() => userFormPageAction(user.name)}>
                     Edit my profile
                   </Menu.Item>
-                  <Menu.Item link href='/profile/api' target="_blank">
-                    View my SECRET
-                  </Menu.Item>
                 </Menu.Menu>
               </Menu.Item>
             ) : null}
-            <Menu.Item link href={api.url} target="_blank">
-              API Documentation
+            <Menu.Item>
+              <Menu.Header>API</Menu.Header>
+              <Menu.Menu>
+                <Menu.Item link href={api.url} target="_blank">
+                  API Documentation
+                </Menu.Item>
+                <Menu.Item link href='/profile/api' target="_blank">
+                  View my SECRET
+                </Menu.Item>
+              </Menu.Menu>
             </Menu.Item>
             <Menu.Item link href={admin.url} target="_blank">
               <Menu.Header>Contact admin ({admin.name})</Menu.Header>
