@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { Grid, Header, Segment, Button, Form, Label, Icon } from 'semantic-ui-react'
+import { Header, Segment, Button, Form, Label, Icon } from 'semantic-ui-react'
 
 import { submitPost, updatePostAddress } from '../actions.js'
 import { newPostPageSelector, userSelector } from '../selectors.js'
@@ -99,7 +99,10 @@ class NewPost extends Component {
             ) : null}
             <Form.TextArea name='text' value={text} rows='6' placeholder={'What\'s in your head?'}
               onChange={this.handleChangeText} onKeyDown={this.handleKeyDown} autoFocus />
-            <Form.Button disabled={text.length == 0} primary>Submit</Form.Button>
+            <Form.Group inline style={{marginBottom: "0px"}}>
+              <Form.Button disabled={text.length == 0} primary>Submit</Form.Button>
+              <Label size='large'>{user.display} @{user.name}</Label>
+            </Form.Group>
           </Form>
         </Segment>
       </Segment.Group>

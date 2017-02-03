@@ -4,6 +4,7 @@ import { createPagesReducer } from 'redux-pages'
 
 import { errorPage } from '../pages.js'
 import {
+  initializeUser,
   setUser, setFollowing, setFollowers,
   follow, unfollow,
   addFavs, fav, unfav,
@@ -21,23 +22,31 @@ import onlinePosts from './onlinePosts.js'
 const page = createPagesReducer(errorPage.name, {})
 
 const user = createReducer({
-  [setUser]: (state, payload) => payload
-}, null)
+  [setUser]: (state, payload) => payload,
+  [initializeUser]: (state, { user }) => user
+}, {})
+
+const users = createReducer({
+  [initializeUser]: (state, { users }) => users
+}, [])
 
 const following = createReducer({
   [setFollowing]: (state, payload) => payload,
   [follow]: (state, id) => [id, ...state],
   [unfollow]: (state, unfollowID) => state.filter(id => id !== unfollowID),
+  [initializeUser]: (state, { following }) => following
 }, [])
 
 const followers = createReducer({
-  [setFollowers]: (state, payload) => payload
+  [setFollowers]: (state, payload) => payload,
+  [initializeUser]: (state, { followers }) => followers
 }, [])
 
 const favs = createReducer({
   [addFavs]: (state, payload) => [...new Set(state.concat(payload))],
   [fav]: (state, id) => [id, ...state],
   [unfav]: (state, unfavID) => state.filter(id => id !== unfavID),
+  [initializeUser]: (state, { timeline: { favs }}) => favs
 }, [])
 
 const error = createReducer({
@@ -50,6 +59,7 @@ export default combineReducers({
   notices,
   page,
   user,
+  users,
   following,
   followers,
   favs,

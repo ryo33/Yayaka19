@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import Helmet from "react-helmet"
+import Helmet from 'react-helmet'
 
 import {
   Icon, Menu, Label, Sidebar, Segment, Container,
@@ -11,7 +11,8 @@ import { signedIn, source, admin } from '../global.js'
 import {
   home, publicTimeline, timeline, onlinePosts,
   userPage, userFormPage,
-  postPage, loginPage, noticesPage
+  postPage, loginPage, noticesPage,
+  apiURL, logoutURL, newAccountURL, getSwitchUserURL
 } from '../pages.js'
 import PublicTimeline from './PublicTimeline.js'
 import Timeline from './Timeline.js'
@@ -24,7 +25,7 @@ import LoginPage from './LoginPage.js'
 import ErrorPage from './ErrorPage.js'
 import NoticesPage from './NoticesPage.js'
 import {
-  pageSelector, userSelector,
+  pageSelector, userSelector, usersSelector,
   timelineSelector, onlinePostsSelector,
   noticesCountSelctor, newPostPageSelector,
   errorSelector
@@ -42,6 +43,7 @@ const mapStateToProps = state => {
     onlinePostsCount: onlinePostsSelector(state).count,
     page: pageSelector(state),
     user: userSelector(state),
+    users: usersSelector(state),
     noticesCount: noticesCountSelctor(state),
     error: errorSelector(state)
   }
@@ -111,12 +113,16 @@ class App extends Component {
   }
 
   handleLogout() {
-    window.location.href = '/logout'
+    window.location.href = logoutURL
   }
 
   hideError() {
     const { hideError } = this.props
     hideError()
+  }
+
+  handleSwitchUser(name) {
+    window.location.href = getSwitchUserURL(name)
   }
 
   renderPage() {
@@ -154,9 +160,7 @@ class App extends Component {
 
   render() {
     const {
-      page: { name },
-      error,
-      user,
+      page: { name }, error, user, users,
       userPageAction,
       userFormPageAction,
       homeAction,
@@ -247,21 +251,34 @@ class App extends Component {
               </Menu.Item>
             ) : null}
             <Menu.Item>
+              <Menu.Header>Accounts</Menu.Header>
+              <Menu.Menu>
+                {users.map(user => (
+                  <Menu.Item key={user.id} onClick={() => this.handleSwitchUser(user.name)}>
+                    {user.display} @{user.name}
+                  </Menu.Item>
+                ))}
+                <Menu.Item link href={newAccountURL}>
+                  Create a new account
+                </Menu.Item>
+              </Menu.Menu>
+            </Menu.Item>
+            <Menu.Item>
               <Menu.Header>API</Menu.Header>
               <Menu.Menu>
-                <Menu.Item link href={api.url} target="_blank">
+                <Menu.Item link href={api.url} target='_blank'>
                   API Documentation
                 </Menu.Item>
-                <Menu.Item link href='/profile/api' target="_blank">
+                <Menu.Item link href={apiURL} target='_blank'>
                   View my SECRET
                 </Menu.Item>
               </Menu.Menu>
             </Menu.Item>
-            <Menu.Item link href={admin.url} target="_blank">
+            <Menu.Item link href={admin.url} target='_blank'>
               <Menu.Header>Contact admin ({admin.name})</Menu.Header>
               <p>Any bug reports, questions, and suggestions are welcome. Thanks!</p>
             </Menu.Item>
-            <Menu.Item link href={source.url} target="_blank">
+            <Menu.Item link href={source.url} target='_blank'>
               Source code
             </Menu.Item>
             {signedIn ? (

@@ -12,6 +12,7 @@ import reducer from './reducers/index.js'
 import { pageSelector } from './selectors.js'
 import middleware from './middlewares.js'
 import {
+  initializeUser,
   addFavs, updateTimeline, setUser,
   setFollowing, setFollowers, updateNoticed, updateNotices,
   showError, hideError, doPing
@@ -38,15 +39,8 @@ const store = createStore(
 )
 
 // Socket
-const userChannelCallback = ({ user, noticed, following, followers, notices, timeline }) => {
-  const { favs, posts } = timeline
-  store.dispatch(setUser(user))
-  store.dispatch(addFavs(favs))
-  store.dispatch(updateTimeline(posts))
-  store.dispatch(updateNoticed(noticed))
-  store.dispatch(updateNotices(notices))
-  store.dispatch(setFollowing(following))
-  store.dispatch(setFollowers(followers))
+const userChannelCallback = ({ userParams }) => {
+  store.dispatch(initializeUser(userParams))
 }
 if (signedIn) {
   joinUserChannel(userChannelCallback)

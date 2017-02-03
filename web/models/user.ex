@@ -7,6 +7,7 @@ defmodule Share.User do
   schema "users" do
     field :provider, :string
     field :provided_id, :string
+    field :num, :integer
     field :name, :string
     field :display, :string
     field :bio, :string
@@ -30,6 +31,5 @@ defmodule Share.User do
     |> validate_length(:display, min: 1, max: 32)
     |> validate_length(:bio, min: 0, max: 2048)
     |> unique_constraint(:name)
-    |> unique_constraint(:provided_id)
   end
 end
