@@ -8,7 +8,7 @@ import Time from './Time.js'
 import FollowButton from './FollowButton.js'
 import UserButton from './UserButton.js'
 import NewPost from './NewPost.js'
-import { requestFav, requestUnfav, setAddressPost } from '../actions.js'
+import { requestFav, requestUnfav, setAddressPost, sendToOnline } from '../actions.js'
 import { userPage, postPage } from '../pages.js'
 import { userSelector, favsSelector } from '../selectors.js'
 
@@ -20,7 +20,7 @@ const mapStateToProps = (state) => {
 }
 
 const actionCreators = {
-  requestFav, requestUnfav, setAddressPost,
+  requestFav, requestUnfav, setAddressPost, sendToOnline,
   userPageAction: name => userPage.action({name}),
   postPageAction: id => postPage.action({id})
 }
@@ -51,6 +51,7 @@ class Post extends Component {
     this.closeQuote = this.closeQuote.bind(this)
     this.handleClickUser = this.handleClickUser.bind(this)
     this.handleClickTime = this.handleClickTime.bind(this)
+    this.handleSendToOnline = this.handleSendToOnline.bind(this)
     this.state = {
       openReply: false,
       openQuote: false
@@ -93,6 +94,11 @@ class Post extends Component {
     e.preventDefault()
     const { post, postPageAction } = this.props
     postPageAction(post.id)
+  }
+
+  handleSendToOnline() {
+    const { post, sendToOnline } = this.props
+    sendToOnline(post.id)
   }
 
   renderReplyButton() {
@@ -146,6 +152,15 @@ class Post extends Component {
         </Comment.Action>
       )
     }
+  }
+
+  renderSendToOnlineButton() {
+    const { post } = this.props
+    return (
+      <Comment.Action onClick={this.handleSendToOnline}>
+        <Icon name='bar' size='large' />
+      </Comment.Action>
+    )
   }
 
   renderChildPost(post, actions, size) {
@@ -209,11 +224,14 @@ class Post extends Component {
               ) : null}
               {quote ? this.renderChildPost(post, quote, size) : null}
             </Comment.Text>
-            <Comment.Actions>
-              {actions && !quote ? this.renderReplyButton() : null}
-              {actions && !quote ? this.renderFavButton() : null}
-              {actions && !quote ? this.renderQuoteButton() : null}
-            </Comment.Actions>
+            {actions && !quote ? (
+              <Comment.Actions>
+                {this.renderReplyButton()}
+                {this.renderFavButton()}
+                {this.renderQuoteButton()}
+                {this.renderSendToOnlineButton()}
+              </Comment.Actions>
+            ): null}
             { openReply ? (
               <NewPost
                 rows={3}

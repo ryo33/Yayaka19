@@ -17,7 +17,8 @@ import {
   requestTimeline, updateTimeline, addFavs,
   openNoticesPage, updateNoticed,
   showError, hideError, doPing,
-  closeNewPostDialog
+  closeNewPostDialog,
+  sendToOnline
 } from './actions.js'
 import { pageSelector } from './selectors.js'
 import { compareNotices } from './utils.js'
@@ -198,6 +199,15 @@ const submitOnlinePostMiddleware = createAsyncHook(
   }
 )
 
+const sendToOnlineMiddleware = createAsyncHook(
+  sendToOnline.getType(),
+  ({ action }) => {
+    const id = action.payload
+    pushMessage(userChannel, 'send_to_online', {post_id: id})
+      .then(() => {/* TODO */})
+  }
+)
+
 let signedInMiddlewares = []
 if (signedIn) {
   signedInMiddlewares = [
@@ -207,7 +217,10 @@ if (signedIn) {
     requestFavMiddleware,
     requestUnfavMiddleware,
     requestTimelineMiddleware,
-    openNoticesPageMiddleware
+    openNoticesPageMiddleware,
+    editUserMiddleware,
+    submitOnlinePostMiddleware,
+    sendToOnlineMiddleware
   ]
 }
 
@@ -217,7 +230,5 @@ export default composeMiddleware(
   requestUserMiddleware,
   requestPostMiddleware,
   requestPublicTimelineMiddleware,
-  editUserMiddleware,
-  submitOnlinePostMiddleware,
   doPingMiddleware
 )
