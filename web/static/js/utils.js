@@ -7,3 +7,8 @@ export const compareNotices = (a, b) => {
     return 0
   }
 }
+
+export const getTweetURL = link => {
+  const url = encodeURIComponent(window.location.origin + link)
+  return `https://twitter.com/intent/tweet?url=${url}`
+}

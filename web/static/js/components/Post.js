@@ -11,6 +11,7 @@ import NewPost from './NewPost.js'
 import { requestFav, requestUnfav, setAddressPost, sendToOnline } from '../actions.js'
 import { userPage, postPage } from '../pages.js'
 import { userSelector, favsSelector } from '../selectors.js'
+import { getTweetURL } from '../utils.js'
 
 const mapStateToProps = (state) => {
   const favs = favsSelector(state)
@@ -154,16 +155,8 @@ class Post extends Component {
     }
   }
 
-  renderSendToOnlineButton() {
+  renderChildPost(actions, size) {
     const { post } = this.props
-    return (
-      <Comment.Action onClick={this.handleSendToOnline}>
-        <Icon name='bar' size='large' />
-      </Comment.Action>
-    )
-  }
-
-  renderChildPost(post, actions, size) {
     return (
       <Segment size={size}>
         <ConnectedPost
@@ -187,7 +180,7 @@ class Post extends Component {
       <Comment.Group style={{padding: '0px', maxWidth: 'initial'}}>
         <Comment>
           <Comment.Content>
-            {reply ? this.renderChildPost(post, quote, size) : null}
+            {reply ? this.renderChildPost(quote, size) : null}
             {prefix}
             <Comment.Author as={React.a} href={userPage.path({name: post.user.name})} onClick={this.handleClickUser}>
               {post.user.display}
@@ -222,14 +215,19 @@ class Post extends Component {
                   </Linkify>
                 </pre>
               ) : null}
-              {quote ? this.renderChildPost(post, quote, size) : null}
+              {quote ? this.renderChildPost(quote, size) : null}
             </Comment.Text>
-            {actions && !quote ? (
+            {actions && post.text ? (
               <Comment.Actions>
                 {this.renderReplyButton()}
                 {this.renderFavButton()}
                 {this.renderQuoteButton()}
-                {this.renderSendToOnlineButton()}
+                <Comment.Action onClick={this.handleSendToOnline}>
+                  <Icon name='bar' size='large' />
+                </Comment.Action>
+                <Comment.Action as='a' href={getTweetURL(postPage.path({id: post.id}))} target='_blank'>
+                  <Icon name='twitter' size='large' />
+                </Comment.Action>
               </Comment.Actions>
             ): null}
             { openReply ? (

@@ -71,7 +71,7 @@ class OnlinePosts extends Component {
     return (
       <div>
         <Segment vertical>
-          <Header>Online</Header>
+          <Header>Online Bar</Header>
         </Segment>
         <Segment vertical>
           <Form onSubmit={this.submit}>
@@ -95,7 +95,7 @@ class OnlinePosts extends Component {
             followButton={false}
             actions={false}
             attributeIcon={followers.includes(post.user.id) ? 'exchange' : null}
-            prefix={post.inOnlinePost && post.user.name == user.name ? (
+            prefix={post.isOnlinePost && post.user.name == user.name ? (
               <Button icon='clone' size='mini' onClick={() => this.handleClickWrite(post)} />
             ) : null}
             post={post}
