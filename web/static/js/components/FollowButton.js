@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { Button, Icon } from 'semantic-ui-react'
+import { Button, Icon, Popup } from 'semantic-ui-react'
 
 import { requestFollow, requestUnfollow } from '../actions.js'
 import { userSelector, followingSelector } from '../selectors.js'
@@ -44,7 +44,13 @@ class FollowButton extends Component {
     }
     if (following.includes(user.id)) {
       return (
-        <Button size='mini' icon='user' color='blue' onClick={this.unfollow} />
+        <Popup
+          trigger={<Button size='mini' icon='user' color='blue' />}
+          flowing
+          hoverable
+        >
+          <Button color='red' onClick={this.unfollow}><Icon name='remove user' />Unfollow</Button>
+        </Popup>
       )
     } else {
       return (
