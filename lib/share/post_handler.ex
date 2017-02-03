@@ -21,9 +21,7 @@ defmodule Share.PostHandler do
               params = %{user_id: user.id, post_id: post.id}
               changeset = PostAddress.changeset(%PostAddress{}, params)
               Repo.insert!(changeset)
-              post = get_post(post)
-              Share.Notice.add_address_notice(post)
-              post
+              get_post(post)
           end
         else
           post
@@ -42,12 +40,16 @@ defmodule Share.PostHandler do
             end)
           end)
         end)
-        spawn(fn -> if not is_nil(post.post_id) do
-          query = from p in Post, where: p.id == ^post.post_id
-          case Repo.aggregate(query, :count, :id) do
-            1 ->
-              Share.Notice.add_reply_notice(post)
-            _ -> ()
+        spawn(fn -> if length(post.post_addresses) >= 1 do
+          if is_nil(post.post_id) do
+            Share.Notice.add_address_notice(post)
+          else
+            query = from p in Post, where: p.id == ^post.post_id
+            case Repo.aggregate(query, :count, :id) do
+              1 ->
+                Share.Notice.add_reply_notice(post)
+              _ -> ()
+            end
           end
         end end)
         spawn(fn ->

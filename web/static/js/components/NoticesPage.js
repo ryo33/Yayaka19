@@ -47,8 +47,7 @@ const FavNotice = ({ fav: { user, post, inserted_at }, userPageAction }) => (
       <Feed.Extra text>
         <Segment>
           <Post
-            favButton={false}
-            replyButton={false}
+            actions={false}
             post={post}
           />
         </Segment>

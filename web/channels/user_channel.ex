@@ -30,14 +30,20 @@ defmodule Share.UserChannel do
   end
 
   def handle_in("new_post", params, socket) do
-    %{"post" => params, "address" => address} = params
     user = socket.assigns.user
-    true = user != nil
+    user = Repo.get!(User, user.id)
+    %{"post" => params, "address" => address} = params
     params = Map.put(params, "user_id", user.id)
-    changeset = Post.changeset(%Post{}, params)
-    post = Repo.insert!(changeset)
-    Share.PostHandler.handle(post, address)
-    {:reply, :ok, socket}
+    text = Map.get(params, "text")
+    post_id = Map.get(params, "post_id")
+    if is_nil(post_id) and text == "" do
+      {:reply, :error, socket}
+    else
+      changeset = Post.changeset(%Post{}, params)
+      post = Repo.insert!(changeset)
+      Share.PostHandler.handle(post, address)
+      {:reply, :ok, socket}
+    end
   end
 
   def handle_in("fav", %{"id" => id}, socket) do
@@ -188,18 +194,19 @@ defmodule Share.UserChannel do
       join: address in PostAddress,
       on: post.id == address.post_id,
       where: address.user_id == ^user.id,
+      where: is_nil(post.post_id),
       order_by: [desc: :id],
       limit: 50
     addresses = Repo.all(Post.preload(query))
 
     query = from post in Post,
-      join: target in Post,
-      on: post.post_id == target.id,
-      where: target.user_id == ^user.id,
+      join: address in PostAddress,
+      on: post.id == address.post_id,
+      where: address.user_id == ^user.id,
+      where: not is_nil(post.post_id),
       order_by: [desc: :id],
       limit: 50
     replies = Repo.all(Post.preload(query))
-              |> Enum.map(fn reply -> %{id: reply.id, post: reply, inserted_at: reply.inserted_at} end)
 
     %{
       user: user,
