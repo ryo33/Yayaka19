@@ -48,6 +48,8 @@ class FollowButton extends Component {
           trigger={<Button size='mini' icon='user' color='blue' />}
           flowing
           hoverable
+          on='click'
+          hideOnScroll
         >
           <Button color='red' onClick={this.unfollow}><Icon name='remove user' />Unfollow</Button>
         </Popup>
