@@ -28,17 +28,16 @@ defmodule Share.Router do
 
     get "/profile/api", UserController, :api
     get "/profile/api/update", UserController, :update_api
-    get "/profile", UserController, :edit
-    put "/profile", UserController, :update
 
     only_dev do
       get "/login/:id", AuthController, :dev_login
     end
 
     get "/login", PageController, :index
-    post "/auth/login", AuthController, :login
     get "/logout", AuthController, :delete
 
+    get "/new", AuthController, :new
+    get "/switch/:name", AuthController, :switch
     get "/auth/:provider", AuthController, :request
     get "/auth/:provider/callback", AuthController, :callback
     post "/auth/create", AuthController, :create

@@ -31,6 +31,11 @@ export const noticesPage    = p('/n', 'notices')
 export const loginPage      = p('/login', 'login')
 export const errorPage      = p('/*', 'error')
 
+export const apiURL = 'profile/api'
+export const logoutURL = '/logout'
+export const newAccountURL = '/new'
+export const getSwitchUserURL = name => `/switch/${name}`
+
 const onlySignedInMiddleware = createReplacer(
   () => signedIn === false,
   ({ action }) => {

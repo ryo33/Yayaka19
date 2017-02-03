@@ -14,7 +14,7 @@ const mapStateToProps = state => {
   const user = userSelector(state)
   const myNewPostsCount = newPosts.filter(posts => posts.user.id == user.id).length
   return {
-    posts, newPosts, myNewPostsCount
+    user, posts, newPosts, myNewPostsCount
   }
 }
 
@@ -25,12 +25,12 @@ const actionCreators = {
 }
 
 const Timeline = ({
-  posts, newPosts, publicTimelineAction,
+  user, posts, newPosts, publicTimelineAction,
   loadNewPosts, myNewPostsCount, requestTimeline
 }) => (
   <div>
     <Segment vertical>
-      <Header>Timeline</Header>
+      <Header>{user.display}'s Timeline</Header>
       <Rail internal position='right'>
         <Button floated='right' icon='refresh' onClick={requestTimeline}>
         </Button>

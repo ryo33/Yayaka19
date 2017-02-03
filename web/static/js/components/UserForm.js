@@ -43,7 +43,7 @@ class UserForm extends Component {
 
   componentWillMount() {
     const { user, params, userPageAction } = this.props
-    if (user == null || user.name !== params.name) {
+    if (user.name !== params.name) {
       userPageAction(params.name)
     } else {
       this.setState({

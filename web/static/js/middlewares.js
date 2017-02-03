@@ -6,7 +6,7 @@ import {
   loginPage, home, timeline, publicTimeline, userPage
 } from './pages.js'
 import {
-  editUser, setUser,
+  editUser, setUser, initializeUser,
   submitOnlinePost,
   submitPost, updatePostText,
   requestUser, setUserInfo,
