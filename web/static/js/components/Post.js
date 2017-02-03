@@ -224,7 +224,7 @@ class Post extends Component {
               ) : null}
               {quote ? this.renderChildPost(post, quote, size) : null}
             </Comment.Text>
-            {actions && !quote ? (
+            {actions && post.text ? (
               <Comment.Actions>
                 {this.renderReplyButton()}
                 {this.renderFavButton()}
