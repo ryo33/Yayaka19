@@ -2,10 +2,13 @@ import { combineReducers } from 'redux'
 import { createReducer } from 'redux-act'
 import concatenateReducers from 'redux-concatenate-reducers'
 
-import { updateTimeline, addNewPosts, loadNewPosts } from '../actions.js'
+import {
+  initializeUser, updateTimeline, addNewPosts, loadNewPosts
+} from '../actions.js'
 
 const postsReducer = createReducer({
-  [updateTimeline]: ({posts: state}, posts) => ({posts})
+  [updateTimeline]: ({posts: state}, posts) => ({posts}),
+  [initializeUser]: (state, { timeline: { posts }}) => ({posts})
 }, {posts: []})
 
 const newPostsReducer = createReducer({

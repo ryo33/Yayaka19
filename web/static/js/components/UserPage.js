@@ -13,8 +13,8 @@ const mapStateToProps = state => {
   const user = userSelector(state)
   const userPage = userPageSelector(state)
   return {
-    isMe: user && userPage.user.id === user.id,
-    isNotMe: user && userPage.user && userPage.user.id !== user.id,
+    isMe: userPage.user && userPage.user.id === user.id,
+    isNotMe: userPage.user && userPage.user.id !== user.id,
     userPage
   }
 }

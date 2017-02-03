@@ -2,6 +2,7 @@ export const infoSelector = ({ info }) => info
 
 export const pageSelector = ({ page }) => page
 export const userSelector = ({ user }) => user
+export const usersSelector = ({ users }) => users
 export const followingSelector = ({ following }) => following
 export const followersSelector = ({ followers }) => followers
 export const favsSelector = ({ favs }) => favs

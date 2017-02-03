@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { Form, Segment, Header, Button } from 'semantic-ui-react'
+import { Form, Segment, Header, Button, Label } from 'semantic-ui-react'
 
 import { submitOnlinePost, openNewPostDialog, updatePostText } from '../actions.js'
 import { onlinePostsSelector, userSelector, followersSelector } from '../selectors.js'
@@ -77,7 +77,10 @@ class OnlinePosts extends Component {
           <Form onSubmit={this.submit}>
             <Form.TextArea name='text' value={text} rows='3' placeholder={'What\'s in your head?'}
               onChange={this.handleChangeText} onKeyDown={this.handleKeyDown} autoFocus />
-            <Form.Button disabled={text.length == 0} primary>Submit</Form.Button>
+            <Form.Group inline style={{marginBottom: "0px"}}>
+              <Form.Button disabled={text.length == 0} primary>Submit</Form.Button>
+              <Label size='large'>{user.display} @{user.name}</Label>
+            </Form.Group>
           </Form>
         </Segment>
         {posts.length == 0 ? (

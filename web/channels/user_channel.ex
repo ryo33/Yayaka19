@@ -13,67 +13,8 @@ defmodule Share.UserChannel do
     user = socket.assigns.user
     true = name == user.name
 
-    user = Repo.get!(User, user.id)
-
-    timeline = get_timeline(user, socket)
-
-    query = from f in Follow,
-      select: f.target_user_id,
-      where: f.user_id == ^user.id
-    following = Repo.all(query)
-
-    query = from fav in Fav,
-      join: post in Post,
-      on: post.id == fav.post_id,
-      where: post.user_id == ^user.id,
-      order_by: [desc: :id],
-      limit: 50
-    favs = Repo.all(Fav.preload(query))
-           |> Enum.map(fn fav -> %{id: fav.id, user: fav.user, post: fav.post, inserted_at: fav.inserted_at} end)
-
-    query = from follow in Follow,
-      where: follow.target_user_id == ^user.id,
-      order_by: [desc: :id],
-      limit: 50
-    follows = Repo.all(Follow.preload(query))
-              |> Enum.map(fn follow -> %{id: follow.id, user: follow.user, inserted_at: follow.inserted_at} end)
-
-    query = from follow in Follow,
-      where: follow.target_user_id == ^user.id,
-      select: follow.user_id
-    followers = Repo.all(query)
-
-    query = from post in Post,
-      join: address in PostAddress,
-      on: post.id == address.post_id,
-      where: address.user_id == ^user.id,
-      order_by: [desc: :id],
-      limit: 50
-    addresses = Repo.all(Post.preload(query))
-
-    query = from post in Post,
-      join: target in Post,
-      on: post.post_id == target.id,
-      where: target.user_id == ^user.id,
-      order_by: [desc: :id],
-      limit: 50
-    replies = Repo.all(Post.preload(query))
-              |> Enum.map(fn reply -> %{id: reply.id, post: reply, inserted_at: reply.inserted_at} end)
-
-    res = %{
-      user: user,
-      timeline: timeline,
-      following: following,
-      followers: followers,
-      noticed: user.noticed,
-      notices: %{
-        favs: favs,
-        follows: follows,
-        addresses: addresses,
-        replies: replies
-      }
-    }
-    {:ok, res, socket}
+    user_params = get_user_params(user, socket)
+    {:ok, %{"userParams" => user_params}, socket}
   end
 
   def handle_in("edit", %{"user" => params}, socket) do
@@ -204,5 +145,75 @@ defmodule Share.UserChannel do
     post_ids = posts |> Enum.map(&(&1.id))
     favs = Fav.get_favs(socket, post_ids)
     %{posts: posts, favs: favs}
+  end
+
+  defp get_user_params(user, socket) do
+    user = Repo.get!(User, user.id)
+
+    query = from u in User,
+      where: u.provider == ^user.provider,
+      where: u.provided_id == ^user.provided_id,
+      where: u.id != ^user.id
+    users = Repo.all(query)
+
+    timeline = get_timeline(user, socket)
+
+    query = from f in Follow,
+      select: f.target_user_id,
+      where: f.user_id == ^user.id
+    following = Repo.all(query)
+
+    query = from fav in Fav,
+      join: post in Post,
+      on: post.id == fav.post_id,
+      where: post.user_id == ^user.id,
+      order_by: [desc: :id],
+      limit: 50
+    favs = Repo.all(Fav.preload(query))
+           |> Enum.map(fn fav -> %{id: fav.id, user: fav.user, post: fav.post, inserted_at: fav.inserted_at} end)
+
+    query = from follow in Follow,
+      where: follow.target_user_id == ^user.id,
+      order_by: [desc: :id],
+      limit: 50
+    follows = Repo.all(Follow.preload(query))
+              |> Enum.map(fn follow -> %{id: follow.id, user: follow.user, inserted_at: follow.inserted_at} end)
+
+    query = from follow in Follow,
+      where: follow.target_user_id == ^user.id,
+      select: follow.user_id
+    followers = Repo.all(query)
+
+    query = from post in Post,
+      join: address in PostAddress,
+      on: post.id == address.post_id,
+      where: address.user_id == ^user.id,
+      order_by: [desc: :id],
+      limit: 50
+    addresses = Repo.all(Post.preload(query))
+
+    query = from post in Post,
+      join: target in Post,
+      on: post.post_id == target.id,
+      where: target.user_id == ^user.id,
+      order_by: [desc: :id],
+      limit: 50
+    replies = Repo.all(Post.preload(query))
+              |> Enum.map(fn reply -> %{id: reply.id, post: reply, inserted_at: reply.inserted_at} end)
+
+    %{
+      user: user,
+      users: users,
+      timeline: timeline,
+      following: following,
+      followers: followers,
+      noticed: user.noticed,
+      notices: %{
+        favs: favs,
+        follows: follows,
+        addresses: addresses,
+        replies: replies
+      }
+    }
   end
 end

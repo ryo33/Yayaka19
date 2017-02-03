@@ -5,6 +5,10 @@ defmodule Share.AuthController do
   alias Ueberauth.Strategy.Helpers
   alias Share.User
 
+  plug Guardian.Plug.EnsureAuthenticated, %{handler: __MODULE__} when action in [
+    :new, :switch
+  ]
+
   @providers [:google, :github, :facebook, :twitter]
 
   def request(conn, _params) do
@@ -29,7 +33,7 @@ defmodule Share.AuthController do
     provider = to_string(provider)
     query = from u in User,
       where: u.provider == ^provider and u.provided_id == ^id,
-      select: u
+      where: u.num == 0
     user = case Repo.one(query) do
       nil ->
         changeset = User.changeset(%User{})
@@ -43,11 +47,28 @@ defmodule Share.AuthController do
     end
   end
 
+  def new(conn, _params) do
+    user = Guardian.Plug.current_resource(conn)
+    changeset = User.changeset(%User{})
+    conn
+    |> put_session(:auth, %{provider: user.provider, id: user.provided_id})
+    |> render(Share.UserView, "new.html", changeset: changeset)
+  end
+
   def create(conn, %{"user" => params}) do
-    %{provider: provider, id: id} = conn |> get_session(:auth)
+    %{provider: provider, id: id} = get_session(conn, :auth)
     %{"name" => name, "display" => display} = params
     changeset = User.changeset(%User{}, %{name: name, display: display})
                 |> Ecto.Changeset.change(%{provider: provider, provided_id: id})
+    query = from u in User,
+      where: u.provider == ^provider and u.provided_id == ^id,
+      order_by: [desc: u.num], limit: 1
+    changeset = case Repo.one(query) do
+      nil -> changeset
+      user ->
+        changeset
+        |> Ecto.Changeset.change(%{num: user.num + 1})
+    end
     case Repo.insert(changeset) do
       {:ok, user} ->
         conn
@@ -59,10 +80,26 @@ defmodule Share.AuthController do
     end
   end
 
+  def switch(conn, %{"name" => name}) do
+    user = Guardian.Plug.current_resource(conn)
+    query = from u in User,
+      where: u.provider == ^user.provider,
+      where: u.provided_id == ^user.provided_id,
+      where: u.name == ^name
+    case Repo.one(query) do
+      nil ->
+        conn
+        |> redirect(to: "/t")
+      user ->
+        conn
+        |> login(user)
+    end
+  end
+
   defp login(conn, user) do
     conn
     |> Guardian.Plug.sign_in(user)
-    |> redirect(to: "/p")
+    |> redirect(to: "/t")
   end
 
   def dev_login(conn, %{"id" => id}) do
@@ -70,7 +107,7 @@ defmodule Share.AuthController do
     provider = "share"
     query = from u in User,
       where: u.provider == ^provider and u.provided_id == ^id,
-      select: u
+      where: u.num == 0
     user = case Repo.one(query) do
       nil ->
         changeset = User.changeset(%User{})
