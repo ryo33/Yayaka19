@@ -30,7 +30,7 @@ PostList.propTypes = {
       name: React.PropTypes.string.isRequired,
       display: React.PropTypes.string.isRequired
     }),
-    text: React.PropTypes.string.isRequired
+    text: React.PropTypes.string
   })).isRequired
 }
 

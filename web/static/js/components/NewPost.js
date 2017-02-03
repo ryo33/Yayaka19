@@ -58,14 +58,13 @@ class NewPost extends Component {
 
   submit(e) {
     e.preventDefault()
-    const { post, address, submitPost, onSubmitHandler } = this.props
+    const { top, post, address, reply, allowEmpty = false, submitPost, onSubmitHandler } = this.props
     const { text } = this.state
-    if (text.length >= 1) {
-      if (post) {
-        submitPost(text, '', post.id)
-      } else {
-        submitPost(text, address, null)
-      }
+    if (allowEmpty || text.length >= 1) {
+      const replyAddress = reply ? reply.user.name : ''
+      const finalAddress = top ? address : replyAddress
+      const postID = post ? post.id : null
+      submitPost(text, finalAddress, postID)
       this.reset()
       if (onSubmitHandler) {
         onSubmitHandler()
@@ -84,7 +83,7 @@ class NewPost extends Component {
   }
 
   render() {
-    const { post, user, address, postAddresses } = this.props
+    const { post, user, address, postAddresses, allowEmpty = false, rows = 6 } = this.props
     const { text } = this.state
     const { addressEnabled } = this.state
     return (
@@ -97,10 +96,10 @@ class NewPost extends Component {
                 <Icon name='send' /> {address} <Icon name='delete' onClick={this.handleRemoveAddress} />
               </Label>
             ) : null}
-            <Form.TextArea name='text' value={text} rows='6' placeholder={'What\'s in your head?'}
+            <Form.TextArea name='text' value={text} rows={rows} placeholder={'What\'s in your head?'}
               onChange={this.handleChangeText} onKeyDown={this.handleKeyDown} autoFocus />
             <Form.Group inline style={{marginBottom: "0px"}}>
-              <Form.Button disabled={text.length == 0} primary>Submit</Form.Button>
+              <Form.Button disabled={!allowEmpty && text.length == 0} primary>Submit</Form.Button>
               <Label size='large'>{user.display} @{user.name}</Label>
             </Form.Group>
           </Form>
@@ -110,4 +109,15 @@ class NewPost extends Component {
   }
 }
 
-export default connect(mapStateToProps, actionCreators)(NewPost)
+const component = connect(mapStateToProps, actionCreators)(NewPost)
+
+component.PropTypes = {
+  onSubmitHandler: React.PropTypes.func,
+  post: React.PropTypes.object,
+  reply: React.PropTypes.object,
+  allowEmpty: React.PropTypes.bool,
+  top: React.PropTypes.bool,
+  rows: React.PropTypes.integer
+}
+
+export default component

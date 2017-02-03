@@ -27,8 +27,8 @@ defmodule Share.Post do
     timestamps()
   end
 
-  @required_fields ~w(text user_id)a
-  @optional_fields ~w(post_id)a
+  @required_fields ~w(user_id)a
+  @optional_fields ~w(text post_id)a
   @fields @required_fields ++ @optional_fields
 
   @doc """
@@ -38,7 +38,7 @@ defmodule Share.Post do
     struct
     |> cast(params, @fields)
     |> validate_required(@required_fields)
-    |> validate_length(:text, min: 1)
+    |> validate_length(:text, min: 0)
   end
 
   def random(query) do

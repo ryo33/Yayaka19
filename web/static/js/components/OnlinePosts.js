@@ -93,8 +93,7 @@ class OnlinePosts extends Component {
             key={post.id}
             postLink={false}
             followButton={false}
-            favButton={false}
-            replyButton={false}
+            actions={false}
             attributeIcon={followers.includes(post.user.id) ? 'exchange' : null}
             prefix={post.user.name == user.name ? (
               <Button icon='clone' size='mini' onClick={() => this.handleClickWrite(post)} />

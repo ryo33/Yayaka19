@@ -47,10 +47,13 @@ class Post extends Component {
     this.unfav = this.unfav.bind(this)
     this.openReply = this.openReply.bind(this)
     this.closeReply = this.closeReply.bind(this)
+    this.openQuote = this.openQuote.bind(this)
+    this.closeQuote = this.closeQuote.bind(this)
     this.handleClickUser = this.handleClickUser.bind(this)
     this.handleClickTime = this.handleClickTime.bind(this)
     this.state = {
-      openReply: false
+      openReply: false,
+      openQuote: false
     }
   }
 
@@ -65,13 +68,19 @@ class Post extends Component {
   }
 
   openReply() {
-    const { setAddressPost, post } = this.props
-    this.setState({openReply: true})
+    this.setState({openReply: true, openQuote: false})
   }
 
   closeReply() {
-    const { setAddressPost, post } = this.props
     this.setState({openReply: false})
+  }
+
+  openQuote() {
+    this.setState({openQuote: true, openReply: false})
+  }
+
+  closeQuote() {
+    this.setState({openQuote: false})
   }
 
   handleClickUser(e) {
@@ -121,16 +130,49 @@ class Post extends Component {
     }
   }
 
+  renderQuoteButton() {
+    const { post } = this.props
+    const { openQuote } = this.state
+    if (openQuote) {
+      return (
+        <Comment.Action onClick={this.closeQuote}>
+          <Icon name='quote right' size='large' color='blue' />
+        </Comment.Action>
+      )
+    } else {
+      return (
+        <Comment.Action onClick={this.openQuote}>
+          <Icon name='quote right' size='large' />
+        </Comment.Action>
+      )
+    }
+  }
+
+  renderChildPost(post, actions, size) {
+    return (
+      <Segment size={size}>
+        <ConnectedPost
+          actions={actions}
+          post={post.post}
+        />
+      </Segment>
+    )
+  }
+
   render() {
     const {
-      list = false, favButton = true, followButton = true, replyButton = true, postLink = true,
+      list = false, followButton = true, actions = true, postLink = true,
       attributeIcon, prefix, post, userPageAction
     } = this.props
-    const { openReply } = this.state
+    const { openReply, openQuote } = this.state
+    const reply = post.post && post.post_addresses.length >= 1
+    const quote = post.post && post.post_addresses.length == 0
+    const size = quote ? null : 'tiny'
     return (
       <Comment.Group style={{padding: '0px', maxWidth: 'initial'}}>
         <Comment>
           <Comment.Content>
+            {reply ? this.renderChildPost(post, quote, size) : null}
             {prefix}
             <Comment.Author as={React.a} href={userPage.path({name: post.user.name})} onClick={this.handleClickUser}>
               {post.user.display}
@@ -144,6 +186,9 @@ class Post extends Component {
               ) : (
                 <Time time={post.inserted_at} />
               )}
+              {quote ? (
+                <Icon name='quote right' size='big' />
+              ) : null}
               {followButton ? (
                 <FollowButton user={post.user} />
               ) : null}
@@ -152,30 +197,37 @@ class Post extends Component {
               ) : null}
             </Comment.Metadata>
             <Comment.Text>
-              <PostAddresses addresses={post.post_addresses} />
-              <pre>
-                <Linkify properties={{target: '_blank'}}>
-                  {post.text}
-                </Linkify>
-              </pre>
-              {post.post ? (
-                <Segment size='tiny'>
-                  <ConnectedPost
-                    favButton={false}
-                    replyButton={false}
-                    post={post.post}
-                  />
-                </Segment>
+              {!reply ? (
+                <PostAddresses addresses={post.post_addresses} />
               ) : null}
+              {post.text ? (
+                <pre>
+                  <Linkify properties={{target: '_blank'}}>
+                    {post.text}
+                  </Linkify>
+                </pre>
+              ) : null}
+              {quote ? this.renderChildPost(post, quote, size) : null}
             </Comment.Text>
             <Comment.Actions>
-              {replyButton ? this.renderReplyButton() : null}
-              {favButton ? this.renderFavButton() : null}
+              {actions && !quote ? this.renderReplyButton() : null}
+              {actions && !quote ? this.renderFavButton() : null}
+              {actions && !quote ? this.renderQuoteButton() : null}
             </Comment.Actions>
             { openReply ? (
               <NewPost
+                rows={3}
+                reply={post}
                 post={post}
                 onSubmitHandler={this.closeReply}
+              />
+            ) : null }
+            { openQuote ? (
+              <NewPost
+                rows={3}
+                post={post}
+                allowEmpty
+                onSubmitHandler={this.closeQuote}
               />
             ) : null }
           </Comment.Content>
@@ -189,21 +241,21 @@ const user = React.PropTypes.shape({
   name: React.PropTypes.string.isRequired,
   display: React.PropTypes.string.isRequired
 })
-Post.propTypes = {
+
+const ConnectedPost = connect(mapStateToProps, actionCreators)(Post)
+
+ConnectedPost.propTypes = {
   prefix: React.PropTypes.node,
   attributeIcon: React.PropTypes.string,
   followButton: React.PropTypes.bool,
-  favButton: React.PropTypes.bool,
-  replyButton: React.PropTypes.bool,
+  actions: React.PropTypes.bool,
   post: React.PropTypes.shape({
     post_addresses: React.PropTypes.arrayOf(React.PropTypes.shape({
       user
     })),
     user: user.isRequired,
-    text: React.PropTypes.string.isRequired,
+    text: React.PropTypes.string,
   })
 }
-
-const ConnectedPost = connect(mapStateToProps, actionCreators)(Post)
 
 export default ConnectedPost
