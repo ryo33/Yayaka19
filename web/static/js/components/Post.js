@@ -8,7 +8,7 @@ import Time from './Time.js'
 import FollowButton from './FollowButton.js'
 import UserButton from './UserButton.js'
 import NewPost from './NewPost.js'
-import { requestFav, requestUnfav, setAddressPost, sendToOnline } from '../actions.js'
+import { requestFav, requestUnfav, setAddressPost, sendToOnline, submitPost } from '../actions.js'
 import { userPage, postPage } from '../pages.js'
 import { userSelector, favsSelector } from '../selectors.js'
 import { getTweetURL } from '../utils.js'
@@ -23,7 +23,8 @@ const mapStateToProps = (state) => {
 const actionCreators = {
   requestFav, requestUnfav, setAddressPost, sendToOnline,
   userPageAction: name => userPage.action({name}),
-  postPageAction: id => postPage.action({id})
+  postPageAction: id => postPage.action({id}),
+  submitPost
 }
 
 const PostAddresses = ({ addresses = [] }) => (
@@ -53,6 +54,7 @@ class Post extends Component {
     this.handleClickUser = this.handleClickUser.bind(this)
     this.handleClickTime = this.handleClickTime.bind(this)
     this.handleSendToOnline = this.handleSendToOnline.bind(this)
+    this.handleEmptyQuote = this.handleEmptyQuote.bind(this)
     this.state = {
       openReply: false,
       openQuote: false
@@ -100,6 +102,11 @@ class Post extends Component {
   handleSendToOnline() {
     const { post, sendToOnline } = this.props
     sendToOnline(post.id)
+  }
+
+  handleEmptyQuote() {
+    const { post, submitPost } = this.props
+    submitPost('', '', post.id)
   }
 
   renderReplyButton() {
@@ -223,6 +230,9 @@ class Post extends Component {
                 {this.renderReplyButton()}
                 {this.renderFavButton()}
                 {this.renderQuoteButton()}
+                <Comment.Action onClick={this.handleEmptyQuote}>
+                  <Icon name='retweet' size='large' />
+                </Comment.Action>
                 <Comment.Action onClick={this.handleSendToOnline}>
                   <Icon name='bar' size='large' />
                 </Comment.Action>
