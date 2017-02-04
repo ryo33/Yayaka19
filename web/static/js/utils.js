@@ -12,6 +12,6 @@ export const compareNotices = (a, b) => {
 
 export const getTweetURL = post => {
   const url = encodeURIComponent(window.location.origin + postPage.path({id: post.id}))
-  const text = encodeURIComponent(`${post.text} by ${post.user.display}@${post.user.name}`)
+  const text = encodeURIComponent(`${post.text} by ${post.user.display} (${post.user.name})`)
   return `https://twitter.com/intent/tweet?url=${url}&text=${text}`
 }
