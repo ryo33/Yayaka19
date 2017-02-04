@@ -176,6 +176,7 @@ class Post extends Component {
     const reply = post.post && post.post_addresses.length >= 1
     const quote = post.post && post.post_addresses.length == 0
     const size = quote ? null : 'tiny'
+    const userDisplay = post.user_display || post.user.display
     return (
       <Comment.Group style={{padding: '0px', maxWidth: 'initial'}}>
         <Comment>
@@ -183,7 +184,7 @@ class Post extends Component {
             {reply ? this.renderChildPost(quote, size) : null}
             {prefix}
             <Comment.Author as={React.a} href={userPage.path({name: post.user.name})} onClick={this.handleClickUser}>
-              {post.user.display}
+              {userDisplay}
             </Comment.Author>
             <Comment.Metadata>
               <span>@{post.user.name}</span>

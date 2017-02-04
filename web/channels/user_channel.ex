@@ -33,7 +33,9 @@ defmodule Share.UserChannel do
     user = socket.assigns.user
     user = Repo.get!(User, user.id)
     %{"post" => params, "address" => address} = params
-    params = Map.put(params, "user_id", user.id)
+    params = params
+             |> Map.put("user_id", user.id)
+             |> Map.put("user_display", user.display)
     text = Map.get(params, "text")
     post_id = Map.get(params, "post_id")
     if is_nil(post_id) and text == "" do

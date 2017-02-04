@@ -9,7 +9,7 @@ defmodule Share.Post do
       end
       |> Map.from_struct
       |> Enum.filter(fn {key, _} -> Enum.member?([
-        :id, :text, :user, :post, :post_addresses, :inserted_at
+        :id, :text, :user_display, :user, :post, :post_addresses, :inserted_at
       ], key) end)
       |> Enum.into(%{})
       |> Poison.encode!(options)
@@ -19,6 +19,7 @@ defmodule Share.Post do
   schema "posts" do
     field :text, :string
     field :views, :integer, default: 0
+    field :user_display, :string
     belongs_to :user, Share.User
     belongs_to :post, Share.Post
 
@@ -28,7 +29,7 @@ defmodule Share.Post do
   end
 
   @required_fields ~w(user_id)a
-  @optional_fields ~w(text post_id)a
+  @optional_fields ~w(text post_id user_display)a
   @fields @required_fields ++ @optional_fields
 
   @doc """
