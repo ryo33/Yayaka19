@@ -226,7 +226,7 @@ class Post extends Component {
                 <Comment.Action onClick={this.handleSendToOnline}>
                   <Icon name='bar' size='large' />
                 </Comment.Action>
-                <Comment.Action as='a' href={getTweetURL(postPage.path({id: post.id}))} target='_blank'>
+                <Comment.Action as='a' href={getTweetURL(post)} target='_blank'>
                   <Icon name='twitter' size='large' />
                 </Comment.Action>
               </Comment.Actions>
