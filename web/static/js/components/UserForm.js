@@ -68,7 +68,7 @@ class UserForm extends Component {
         <Header>Edit Your Profile</Header>
         <Form onSubmit={this.submit}>
           <Form.Input label='Name' name='display' value={display}
-            placeholder={'Name'} onChange={this.handleChangeDisplay} />
+            placeholder={'Name'} onChange={this.handleChangeDisplay} autoFocus />
           <Form.TextArea label='Bio' name='bio' value={bio} rows='6'
             placeholder={'Bio'} onChange={this.handleChangeBio} />
           <Form.Button disabled={!valid} primary>Submit</Form.Button>
