@@ -49,7 +49,7 @@ Open `http://localhost:4000` with your browser.
 ### DB migration
 
 Sometimes after you import changes from upstream, you get many errors related the database.
-Don't be panic, you just run following command.
+Don't be panic, you just run following command before start the development server.
 
 ```
 $ mix ecto.migrate
