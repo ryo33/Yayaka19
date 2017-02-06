@@ -8,7 +8,8 @@ import {
   setUser, setFollowing, setFollowers,
   follow, unfollow,
   addFavs, fav, unfav,
-  showError, hideError
+  showError, hideError,
+  setWindowFocused
 } from '../actions.js'
 
 import notices from './notices.js'
@@ -54,6 +55,10 @@ const error = createReducer({
   [hideError]: () => null
 }, null)
 
+const windowFocused = createReducer({
+  [setWindowFocused]: (state, payload) => payload
+}, true)
+
 export default combineReducers({
   error,
   notices,
@@ -68,5 +73,6 @@ export default combineReducers({
   postPage,
   publicTimeline,
   timeline,
-  onlinePosts
+  onlinePosts,
+  windowFocused
 })

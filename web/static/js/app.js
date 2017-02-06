@@ -15,7 +15,7 @@ import {
   initializeUser,
   addFavs, updateTimeline, setUser,
   setFollowing, setFollowers, updateNoticed, updateNotices,
-  showError, hideError, doPing
+  showError, hideError, doPing, setWindowFocused
 } from './actions.js'
 import { joinChannel, joinUserChannel } from './socket.js'
 import { watchUserChannel } from './userChannel.js'
@@ -69,6 +69,9 @@ pages.handleNavigation(store, history.location.pathname)
 history.listen((location, action) => {
   pages.handleNavigation(store, location.pathname)
 })
+
+window.onfocus = () => store.dispatch(setWindowFocused(true))
+window.onblur = () => store.dispatch(setWindowFocused(false))
 
 render(
   <Provider store={store}>
