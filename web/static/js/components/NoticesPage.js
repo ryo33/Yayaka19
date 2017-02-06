@@ -99,7 +99,7 @@ const AddressNotice = ({ address, userPageAction }) => (
   </Feed.Event>
 )
 
-const ReplyNotice = ({ reply: { post, inserted_at }, userPageAction }) => (
+const ReplyNotice = ({ reply: post, userPageAction }) => (
   <Feed.Event>
     <Feed.Label>
       <Icon name='comment' />
@@ -110,7 +110,7 @@ const ReplyNotice = ({ reply: { post, inserted_at }, userPageAction }) => (
           {post.user.display}
         </Feed.User> (@{post.user.name}) replied to you
         <Feed.Date>
-          <Time time={inserted_at} />
+          <Time time={post.inserted_at} />
         </Feed.Date>
       </Feed.Summary>
       <Feed.Extra text>
