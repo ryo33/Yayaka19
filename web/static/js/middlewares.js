@@ -3,11 +3,11 @@ import { createAsyncHook, createReplacer, composeMiddleware } from 'redux-middle
 import { signedIn } from './global.js'
 import { pushMessage, channel, userChannel } from './socket.js'
 import {
-  loginPage, home, timeline, publicTimeline, userPage
+  loginPage, home, timeline, publicTimeline, userPage, onlinePosts
 } from './pages.js'
 import {
   editUser, setUser, initializeUser,
-  submitOnlinePost,
+  submitOnlinePost, showOnlinePosts,
   submitPost, updatePostText,
   requestUser, setUserInfo,
   requestPost, setPost,
@@ -18,7 +18,8 @@ import {
   openNoticesPage, updateNoticed,
   showError, hideError, doPing,
   closeNewPostDialog,
-  sendToOnline
+  sendToOnline,
+  setWindowFocused
 } from './actions.js'
 import { pageSelector } from './selectors.js'
 import { compareNotices } from './utils.js'
@@ -208,6 +209,16 @@ const sendToOnlineMiddleware = createAsyncHook(
   }
 )
 
+const onFocusMiddleware = createAsyncHook(
+  setWindowFocused.getType(),
+  ({ action }) => action.payload === true,
+  ({ dispatch, getState }) => {
+    if (pageSelector(getState()).name == onlinePosts.name) {
+      dispatch(showOnlinePosts())
+    }
+  }
+)
+
 let signedInMiddlewares = []
 if (signedIn) {
   signedInMiddlewares = [
@@ -220,7 +231,8 @@ if (signedIn) {
     openNoticesPageMiddleware,
     editUserMiddleware,
     submitOnlinePostMiddleware,
-    sendToOnlineMiddleware
+    sendToOnlineMiddleware,
+    onFocusMiddleware
   ]
 }
 

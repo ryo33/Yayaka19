@@ -7,6 +7,7 @@ export const followingSelector = ({ following }) => following
 export const followersSelector = ({ followers }) => followers
 export const favsSelector = ({ favs }) => favs
 export const errorSelector = ({ error }) => error
+export const windowFocusedSelector = ({ windowFocused }) => windowFocused
 
 // New post page
 export const newPostPageSelector = ({ newPostPage }) => newPostPage
