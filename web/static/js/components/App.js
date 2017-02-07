@@ -7,7 +7,7 @@ import {
   Confirm, Button, Header, Message
 } from 'semantic-ui-react'
 
-import { signedIn, source, admin } from '../global.js'
+import { title, signedIn, source, admin } from '../global.js'
 import {
   home, publicTimeline, timeline, onlinePosts,
   userPage, userFormPage,
@@ -180,7 +180,7 @@ class App extends Component {
     return (
       <div>
         <Helmet title={
-          titleNotices == 0 ? 'Share' : `(${titleNotices}) Share`
+          titleNotices == 0 ? title : `(${titleNotices}) ${title}`
         } />
         <Menu>
           <Container>

@@ -2,6 +2,7 @@ function getGlobal(key) {
   return window[key]
 }
 
+export const title = getGlobal('title')
 export const token = getGlobal('token')
 export const signedIn = getGlobal('signedIn')
 export const userID = getGlobal('userID')

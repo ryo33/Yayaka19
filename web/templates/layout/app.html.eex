@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.css"></link>
   </head>
   <script>
+    window.title = "<%= Application.get_env(:share, :title) %>"
     window.source = {
       title: "<%= Application.get_env(:share, :source)[:title] %>",
       url: "<%= Application.get_env(:share, :source)[:url] %>"
