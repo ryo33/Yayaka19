@@ -18,7 +18,7 @@ config :share, Share.Endpoint,
            adapter: Phoenix.PubSub.PG2]
 
 config :share,
-  title: "Share",
+  title: "Yayaka19",
   description: "What's in your head?",
   url: "https://sha.herokuapp.com",
   admin: [name: "Ryo33",
