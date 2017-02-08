@@ -7,7 +7,7 @@ import {
   requestTimeline,
   requestPublicTimeline,
   requestUser,
-  requestPost,
+  requestPost, setContexts,
   openNoticesPage,
   showOnlinePosts,
   closeNewPostDialog
@@ -97,6 +97,7 @@ const postPageHook = createAsyncHook(
   ({ action }) => postPage.check(action),
   ({ dispatch, action }) => {
     dispatch(requestPost(parseInt(action.payload.params.id, 10)))
+    dispatch(setContexts(null))
   }
 )
 
