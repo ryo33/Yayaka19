@@ -10,7 +10,7 @@ import {
   submitOnlinePost, showOnlinePosts,
   submitPost, updatePostText,
   requestUser, setUserInfo,
-  requestPost, setPost,
+  requestPost, setPost, requestContexts, setContexts,
   requestFollow, requestUnfollow, follow, unfollow,
   requestFav, requestUnfav, fav, unfav,
   requestPublicTimeline, updatePublicTimeline,
@@ -66,11 +66,24 @@ const requestPostMiddleware = createAsyncHook(
   ({ dispatch, action }) => {
     setPost(null)
     pushMessage(channel, 'post', {id: action.payload})
-      .then(({ post }) => {
+      .then(({ post, favs }) => {
+        dispatch(addFavs(favs))
         dispatch(setPost(post))
       }, ({ error, timeout }) => {
         dispatch(home.action())
       })
+  }
+)
+
+const requestContextsMiddleware = createAsyncHook(
+  requestContexts.getType(),
+  ({ dispatch, action }) => {
+    setContexts(null)
+    pushMessage(channel, 'post_contexts', {id: action.payload})
+      .then(({ posts, favs }) => {
+        dispatch(addFavs(favs))
+        dispatch(setContexts(posts))
+      }, ({ error, timeout }) => {})
   }
 )
 
@@ -241,6 +254,7 @@ export default composeMiddleware(
   redirectLoginPageMiddleware,
   requestUserMiddleware,
   requestPostMiddleware,
+  requestContextsMiddleware,
   requestPublicTimelineMiddleware,
   doPingMiddleware
 )

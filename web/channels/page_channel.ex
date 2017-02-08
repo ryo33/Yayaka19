@@ -37,9 +37,19 @@ defmodule Share.PageChannel do
       nil -> {:reply, :error, socket}
       post ->
         res = %{
-          post: Post.preload(post)
+          post: Post.preload(post),
+          favs: Fav.get_favs(socket, [post.id])
         }
         {:reply, {:ok, res}, socket}
+    end
+  end
+
+  def handle_in("post_contexts", %{"id" => id}, socket) do
+    case Repo.get(Post, id) do
+      nil -> {:reply, :error, socket}
+      post ->
+        timeline = Share.UserChannel.get_timeline(post.user_id, socket, [limit: 10, less_than_id: post.id])
+        {:reply, {:ok, timeline}, socket}
     end
   end
 

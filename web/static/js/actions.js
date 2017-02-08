@@ -44,6 +44,8 @@ export const requestUnfollow = createAction('request unfollow', id => id)
 // Post
 export const requestPost = createAction('request post', id => id)
 export const setPost = createAction('set post', post => post)
+export const requestContexts = createAction('request contexts', id => id)
+export const setContexts = createAction('set contexts', contexts => contexts)
 
 // Public timeline
 export const requestPublicTimeline = createAction('request public timeline')

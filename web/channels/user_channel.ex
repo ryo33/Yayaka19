@@ -161,16 +161,24 @@ defmodule Share.UserChannel do
     {:reply, :ok, socket}
   end
 
-  defp get_timeline(user, socket) do
+  def get_timeline(user_id, socket, opts \\ []) do
+    less_than_id = Keyword.get(opts, :less_than_id)
+    limitation = Keyword.get(opts, :limit, 50)
+
     query = from f in Follow,
       select: f.target_user_id,
-      where: f.user_id == ^user.id
-    users = [user.id | Repo.all(query)]
+      where: f.user_id == ^user_id
+    users = [user_id | Repo.all(query)]
     query = Post
             |> where([p], p.user_id in ^users)
             |> order_by([p], [desc: p.id])
-            |> limit(50)
+            |> limit(^limitation)
             |> Post.preload()
+    query = if is_nil(less_than_id) do
+      query
+    else
+      where(query, [p], p.id < ^less_than_id)
+    end
     posts = Repo.all(query)
     post_ids = posts |> Enum.map(&(&1.id))
     favs = Fav.get_favs(socket, post_ids)
@@ -186,7 +194,7 @@ defmodule Share.UserChannel do
       where: u.id != ^user.id
     users = Repo.all(query)
 
-    timeline = get_timeline(user, socket)
+    timeline = get_timeline(user.id, socket)
 
     query = from f in Follow,
       select: f.target_user_id,

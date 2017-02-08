@@ -62,6 +62,8 @@ defmodule Share.PageController do
     "#{scheme}://#{host}#{path}"
   end
 
+  defp ellipsize(nil), do: ""
+
   defp ellipsize(text) do
     if String.length(text) > @max_length do
       String.slice(text, 0, @max_length - 1) <> "..."
