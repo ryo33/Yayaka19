@@ -123,7 +123,7 @@ defmodule Share.UserChannel do
 
   def handle_in("timeline", _params, socket) do
     user = socket.assigns.user
-    timeline = get_timeline(user, socket)
+    timeline = get_timeline(user.id, socket)
     {:reply, {:ok, timeline}, socket}
   end
 
