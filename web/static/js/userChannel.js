@@ -18,8 +18,7 @@ export const watchUserChannel = (store) => {
     if (posts.length == 1
       && userSelector(state).id === posts[0].user.id
       && timelineSelector(state).newPosts.length == 0) {
-      store.dispatch(addNewPosts(posts))
-      store.dispatch(loadNewPosts())
+      store.dispatch(loadNewPosts(posts))
     } else {
       store.dispatch(addNewPosts(posts))
     }

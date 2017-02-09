@@ -15,6 +15,7 @@ import {
   requestFav, requestUnfav, fav, unfav,
   requestPublicTimeline, updatePublicTimeline,
   requestTimeline, updateTimeline, addFavs,
+  requestMoreTimeline, addTimeline,
   openNoticesPage, updateNoticed,
   showError, hideError, doPing,
   closeNewPostDialog,
@@ -165,6 +166,20 @@ const requestTimelineMiddleware = createAsyncHook(
   }
 )
 
+const requestMoreTimelineMiddleware = createAsyncHook(
+  requestMoreTimeline.getType(),
+  ({ dispatch, action }) => {
+    const id = action.payload
+    pushMessage(userChannel, 'more_timeline', {id})
+      .then(({ posts, favs }) => {
+        dispatch(addFavs(favs))
+        dispatch(addTimeline(posts))
+      }).catch(() => {
+        dispatch(showError('Failed to fetch the timeline.'))
+      })
+  }
+)
+
 const openNoticesPageMiddleware = createAsyncHook(
   openNoticesPage.getType(),
   ({ dispatch, action, getState }) => {
@@ -241,6 +256,7 @@ if (signedIn) {
     requestFavMiddleware,
     requestUnfavMiddleware,
     requestTimelineMiddleware,
+    requestMoreTimelineMiddleware,
     openNoticesPageMiddleware,
     editUserMiddleware,
     submitOnlinePostMiddleware,

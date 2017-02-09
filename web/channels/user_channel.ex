@@ -9,6 +9,8 @@ defmodule Share.UserChannel do
 
   require Logger
 
+  @timeline_limit 25
+
   def join("user:" <> name, _params, socket) do
     user = socket.assigns.user
     true = name == user.name
@@ -127,6 +129,12 @@ defmodule Share.UserChannel do
     {:reply, {:ok, timeline}, socket}
   end
 
+  def handle_in("more_timeline", %{"id" => id}, socket) do
+    user = socket.assigns.user
+    timeline = get_timeline(user.id, socket, [less_than_id: id])
+    {:reply, {:ok, timeline}, socket}
+  end
+
   def handle_in("send_to_online", params, socket) do
     user = socket.assigns.user
     user = Repo.get!(User, user.id)
@@ -163,7 +171,7 @@ defmodule Share.UserChannel do
 
   def get_timeline(user_id, socket, opts \\ []) do
     less_than_id = Keyword.get(opts, :less_than_id)
-    limitation = Keyword.get(opts, :limit, 50)
+    limitation = Keyword.get(opts, :limit, @timeline_limit)
 
     query = from f in Follow,
       select: f.target_user_id,
