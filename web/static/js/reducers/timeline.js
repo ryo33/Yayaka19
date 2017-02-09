@@ -1,29 +1,28 @@
 import { combineReducers } from 'redux'
 import { createReducer } from 'redux-act'
-import concatenateReducers from 'redux-concatenate-reducers'
 
 import {
-  initializeUser, updateTimeline, addNewPosts, loadNewPosts
+  initializeUser, updateTimeline, addNewPosts, loadNewPosts,
+  requestMoreTimeline, addTimeline
 } from '../actions.js'
 
-const postsReducer = createReducer({
-  [updateTimeline]: ({posts: state}, posts) => ({posts}),
-  [initializeUser]: (state, { timeline: { posts }}) => ({posts})
-}, {posts: []})
+const posts = createReducer({
+  [updateTimeline]: (state, posts) => posts,
+  [initializeUser]: (state, { timeline: { posts }}) => posts,
+  [addTimeline]: (state, posts) => state.concat(posts),
+  [loadNewPosts]: (posts, newPosts) => newPosts.concat(posts)
+}, [])
 
-const newPostsReducer = createReducer({
-  [addNewPosts]: ({newPosts: state}, posts) => ({newPosts: posts.concat(state)})
-}, {newPosts: []})
+const newPosts = createReducer({
+  [addNewPosts]: (state, posts) => posts.concat(state),
+  [loadNewPosts]: () => []
+}, [])
 
-const loadReducer = createReducer({
-  [loadNewPosts]: ({ posts, newPosts }, payload) => ({
-    posts: newPosts.concat(posts),
-    newPosts: []
-  })
-}, {})
+const isLoadingMore = createReducer({
+  [requestMoreTimeline]: () => true,
+  [addTimeline]: () => false
+}, false)
 
-export default concatenateReducers([
-  postsReducer,
-  newPostsReducer,
-  loadReducer
-])
+export default combineReducers({
+  posts, newPosts, isLoadingMore
+})
