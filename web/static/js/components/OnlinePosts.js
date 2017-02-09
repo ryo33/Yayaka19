@@ -9,8 +9,10 @@ import Post from './Post.js'
 import { title } from '../global.js'
 import { compareInsertedAtDesc } from '../utils.js'
 
+const DEFAULT_CHANNEL = `@@/${title}/DEFAULT_CHANNEL`
+
 function isDefaultChannel(channel) {
-  return channel == null || channel === title
+  return channel == null || channel === DEFAULT_CHANNEL
 }
 
 function getChannelsFromPosts(posts) {
@@ -60,7 +62,7 @@ class OnlinePosts extends Component {
     this.handleChangeChannel = this.handleChangeChannel.bind(this)
     this.state = {
       text: '',
-      channel: title
+      channel: DEFAULT_CHANNEL
     }
   }
 
@@ -113,7 +115,7 @@ class OnlinePosts extends Component {
       .filter(c => c.name !== channel)
       .map(({ name }) => ({key: name, text: name, value: name}))
     const options = [
-      {key: title, text: 'All', value: title},
+      {key: DEFAULT_CHANNEL, text: 'All', value: DEFAULT_CHANNEL},
       ...otherChannels
     ]
     if (!isDefaultChannel(channel)) {
