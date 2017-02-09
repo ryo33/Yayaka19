@@ -62,6 +62,10 @@ const actionCreators = {
   hideError, doPing
 }
 
+const menuStyle = {
+  marginBottom: '0px'
+}
+
 const iconItemStyle = {
   padding: '0.9em'
 }
@@ -178,11 +182,11 @@ class App extends Component {
     const { sidebar, logout } = this.state
     const titleNotices = newPostsCount + onlinePostsCount + noticesCount
     return (
-      <div>
+      <div style={{height: '100%'}}>
         <Helmet title={
           titleNotices == 0 ? title : `(${titleNotices}) ${title}`
         } />
-        <Menu>
+        <Menu style={menuStyle}>
           <Container>
             <Menu.Item style={iconItemStyle} active={name == publicTimeline.name} onClick={publicTimelineAction}>
               <Icon style={iconStyle} size='large' name='world' />
@@ -236,7 +240,7 @@ class App extends Component {
         </Menu>
         <Sidebar.Pushable as={React.div}>
           <Sidebar onClick={this.toggleSidebar}
-            as={Menu} animation='overlay' width='thin' direction='top' visible={sidebar} vertical>
+            as={Menu} animation='overlay' direction='top' visible={sidebar} vertical>
             {signedIn ? (
               <Menu.Item>
                 <Menu.Header>{user.display} @{user.name}</Menu.Header>
@@ -290,12 +294,6 @@ class App extends Component {
                 Sign out
               </Menu.Item>
             ) : null}
-            <Confirm
-              open={logout}
-              content='Are you sure you want to sign out?'
-              onCancel={this.closeLogoutDialog}
-              onConfirm={this.handleLogout}
-            />
           </Sidebar>
           <Sidebar.Pusher>
             <Container>
@@ -314,6 +312,12 @@ class App extends Component {
             </Container>
           </Sidebar.Pusher>
         </Sidebar.Pushable>
+        <Confirm
+          open={logout}
+          content='Are you sure you want to sign out?'
+          onCancel={this.closeLogoutDialog}
+          onConfirm={this.handleLogout}
+        />
       </div>
     )
   }
