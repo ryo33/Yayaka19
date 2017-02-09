@@ -237,7 +237,7 @@ class App extends Component {
         <Sidebar.Pushable as={React.div}>
           <Sidebar onClick={this.toggleSidebar}
             as={Menu} animation='overlay' width='thin' direction='top' visible={sidebar} vertical>
-            {user ? (
+            {signedIn ? (
               <Menu.Item>
                 <Menu.Header>{user.display} @{user.name}</Menu.Header>
                 <Menu.Menu>
@@ -250,6 +250,7 @@ class App extends Component {
                 </Menu.Menu>
               </Menu.Item>
             ) : null}
+            {signedIn ? (
             <Menu.Item>
               <Menu.Header>Accounts</Menu.Header>
               <Menu.Menu>
@@ -263,15 +264,18 @@ class App extends Component {
                 </Menu.Item>
               </Menu.Menu>
             </Menu.Item>
+            ) : null}
             <Menu.Item>
               <Menu.Header>API</Menu.Header>
               <Menu.Menu>
                 <Menu.Item link href={api.url} target='_blank'>
                   API Documentation
                 </Menu.Item>
-                <Menu.Item link href={apiURL} target='_blank'>
-                  View my SECRET
-                </Menu.Item>
+                {user.name ? (
+                  <Menu.Item link href={apiURL} target='_blank'>
+                    View my SECRET
+                  </Menu.Item>
+                ) : null}
               </Menu.Menu>
             </Menu.Item>
             <Menu.Item link href={admin.url} target='_blank'>

@@ -22,7 +22,7 @@ export const postPageSelector = ({ postPage }) => postPage
 export const onlinePostsSelector = ({ onlinePosts }) => onlinePosts
 
 // Public timeline
-export const publicTimelinePostsSelector = ({ publicTimeline }) => publicTimeline.posts
+export const publicTimelineSelector = ({ publicTimeline }) => publicTimeline
 
 // Timeline
 export const timelineSelector = ({ timeline }) => timeline

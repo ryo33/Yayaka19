@@ -26,8 +26,11 @@ import { pageSelector } from './selectors.js'
 import { compareNotices } from './utils.js'
 
 const redirectLoginPageMiddleware = createReplacer(
-  () => !signedIn,
-  [requestFav.getType()],
+  () => !signedIn, [
+    requestFollow.getType(),
+    requestFav.getType(),
+    submitPost.getType(),
+    sendToOnline.getType()],
   () => loginPage.action()
 )
 
@@ -141,7 +144,6 @@ const requestUnfavMiddleware = createAsyncHook(
 const requestPublicTimelineMiddleware = createAsyncHook(
   requestPublicTimeline.getType(),
   ({ dispatch, action }) => {
-    dispatch(updatePublicTimeline({posts: []}))
     pushMessage(channel, 'public_timeline', {})
       .then(({ posts, favs }) => {
         dispatch(addFavs(favs))
@@ -155,7 +157,6 @@ const requestPublicTimelineMiddleware = createAsyncHook(
 const requestTimelineMiddleware = createAsyncHook(
   requestTimeline.getType(),
   ({ dispatch, action }) => {
-    dispatch(updateTimeline([]))
     pushMessage(userChannel, 'timeline', {})
       .then(({ posts, favs }) => {
         dispatch(addFavs(favs))

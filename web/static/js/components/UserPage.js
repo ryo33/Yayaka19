@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Linkify from 'react-linkify'
 
-import { Card, Icon, Segment, Button } from 'semantic-ui-react'
+import { Card, Icon, Segment, Button, Dimmer, Loader } from 'semantic-ui-react'
 
 import { userFormPage } from '../pages.js'
 import { openNewPostDialog, updatePostAddress } from '../actions.js'
@@ -47,42 +47,49 @@ class UserPage extends Component {
     const { user, postCount, following, followers } = userPage
     if (user != null) {
       return (
-        <Segment>
-          <Card>
-            <Card.Content>
-              <Card.Header>
-                {user.display} {isNotMe ? (
-                  <FollowButton user={user} />
-                ) : null}
-                {isMe ? (
-                  <Button onClick={this.handleClickEdit}>
-                    <Icon name='edit' />
-                    Edit
-                  </Button>
-                ) : null}
-              </Card.Header>
-              <Card.Meta>
-                @{user.name} {postCount} Posts
-              </Card.Meta>
-              <Card.Description>
-                <span>
-                  <Icon name='user' />
-                  {following} Following
-                </span>
-                <span>
-                  <Icon name='user' />
-                  {followers} Followers
-                </span>
-                {isNotMe ? (
-                  <div>
-                    <Button primary onClick={this.handleSendTo}>
-                      <Icon name='send' />
-                      Send to
+        <Segment.Group>
+          <Segment>
+            <Card>
+              <Card.Content>
+                <Card.Header>
+                  {user.display} {isNotMe ? (
+                    <FollowButton user={user} />
+                  ) : null} {isMe ? (
+                    <Button size='tiny' onClick={this.handleClickEdit}>
+                      <Icon name='edit' />
+                      Edit
                     </Button>
-                  </div>
-                ) : null}
-              </Card.Description>
-            </Card.Content>
+                  ) : null}
+                </Card.Header>
+                <Card.Meta>
+                  @{user.name}
+                  <span>
+                    <Icon name='write' />
+                    {postCount} Posts
+                  </span>
+                </Card.Meta>
+                <Card.Description>
+                  <p>
+                    <Icon name='user' />
+                    {following} Following
+                  </p>
+                  <p>
+                    <Icon name='user' />
+                    {followers} Followers
+                  </p>
+                  {isNotMe ? (
+                    <div>
+                      <Button primary onClick={this.handleSendTo}>
+                        <Icon name='send' />
+                        Send to
+                      </Button>
+                    </div>
+                  ) : null}
+                </Card.Description>
+              </Card.Content>
+            </Card>
+          </Segment>
+          <Segment>
             {user.bio && user.bio.length >= 1 ? (
               <Card.Content>
                 <pre>
@@ -92,13 +99,14 @@ class UserPage extends Component {
                 </pre>
               </Card.Content>
             ) : null}
-          </Card>
-        </Segment>
+          </Segment>
+        </Segment.Group>
       )
     } else {
       return (
-        <div>
-        </div>
+        <Segment>
+          <Loader active inline='centered'/>
+        </Segment>
       )
     }
   }

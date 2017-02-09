@@ -10,11 +10,14 @@ import { publicTimeline } from '../pages.js'
 import PostList from './PostList.js'
 
 const mapStateToProps = state => {
-  const { posts, newPosts, isLoadingMore } = timelineSelector(state)
+  const {
+    posts, newPosts, isLoadingTimeline, isLoadingMore
+  } = timelineSelector(state)
   const user = userSelector(state)
   const myNewPostsCount = newPosts.filter(posts => posts.user.id == user.id).length
   return {
-    user, posts, newPosts, myNewPostsCount, isLoadingMore
+    user, posts, newPosts, myNewPostsCount,
+    isLoadingTimeline, isLoadingMore
   }
 }
 
@@ -73,10 +76,14 @@ class Timeline extends Component {
 
   render() {
     const {
-      user, posts, newPosts, myNewPostsCount, isLoadingMore
+      user, posts, newPosts, myNewPostsCount,
+      isLoadingTimeline, isLoadingMore
     } = this.props
     return (
       <div>
+        <Dimmer active={isLoadingTimeline} inverted>
+          <Loader inverted />
+        </Dimmer>
         <Segment vertical>
           <Header>{user.display}'s Timeline</Header>
           <Rail internal position='right'>

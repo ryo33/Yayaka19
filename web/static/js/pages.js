@@ -6,7 +6,7 @@ import {
   requestRandomPost,
   requestTimeline,
   requestPublicTimeline,
-  requestUser,
+  requestUser, setUserInfo,
   requestPost, setContexts,
   openNoticesPage,
   showOnlinePosts,
@@ -40,6 +40,7 @@ const onlySignedInMiddleware = createReplacer(
   () => signedIn === false,
   ({ action }) => {
     return timeline.check(action)
+      || onlinePosts.check(action)
       || noticesPage.check(action)
       || userFormPage.check(action)
   },
@@ -89,6 +90,7 @@ const onlinePostsHook = createAsyncHook(
 const userPageHook = createAsyncHook(
   ({ action }) => userPage.check(action),
   ({ dispatch, action }) => {
+    dispatch(setUserInfo({}))
     dispatch(requestUser(action.payload.params.name))
   }
 )
