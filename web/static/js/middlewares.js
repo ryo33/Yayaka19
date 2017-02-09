@@ -10,6 +10,7 @@ import {
   submitOnlinePost, showOnlinePosts,
   submitPost, updatePostText,
   requestUser, setUserInfo,
+  requestUserPosts, setUserPosts,
   requestPost, setPost, requestContexts, setContexts,
   requestFollow, requestUnfollow, follow, unfollow,
   requestFav, requestUnfav, fav, unfav,
@@ -62,6 +63,18 @@ const requestUserMiddleware = createAsyncHook(
       }, ({ error, timeout }) => {
         dispatch(home.action())
       })
+  }
+)
+
+const requestUserPostsMiddleware = createAsyncHook(
+  requestUserPosts.getType(),
+  ({ dispatch, action }) => {
+    setUserPosts(null)
+    pushMessage(channel, 'user_posts', {id: action.payload})
+      .then(({ posts, favs }) => {
+        dispatch(addFavs(favs))
+        dispatch(setUserPosts(posts))
+      }, ({ error, timeout }) => {})
   }
 )
 
@@ -270,6 +283,7 @@ export default composeMiddleware(
   ...signedInMiddlewares,
   redirectLoginPageMiddleware,
   requestUserMiddleware,
+  requestUserPostsMiddleware,
   requestPostMiddleware,
   requestContextsMiddleware,
   requestPublicTimelineMiddleware,

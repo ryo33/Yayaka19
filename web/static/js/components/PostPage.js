@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { Segment, Header, Button } from 'semantic-ui-react'
+import { Segment, Header, Button, Dimmer, Loader } from 'semantic-ui-react'
 
 import { postPageSelector } from '../selectors.js'
 import { requestContexts } from '../actions.js'
@@ -42,6 +42,9 @@ class PostPage extends Component {
           </Segment>
           <Segment>
             <Header>Contexts</Header>
+            <Dimmer active={isLoadingContexts} inverted>
+              <Loader inverted />
+            </Dimmer>
             {contexts ? (
               <PostList posts={contexts} />
             ) : (

@@ -2,12 +2,13 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Linkify from 'react-linkify'
 
-import { Card, Icon, Segment, Button, Dimmer, Loader } from 'semantic-ui-react'
+import { Card, Icon, Segment, Button, Dimmer, Loader, Header } from 'semantic-ui-react'
 
 import { userFormPage } from '../pages.js'
-import { openNewPostDialog, updatePostAddress } from '../actions.js'
+import { openNewPostDialog, updatePostAddress, requestUserPosts } from '../actions.js'
 import { userSelector, userPageSelector, followingSelector } from '../selectors.js'
 import FollowButton from './FollowButton.js'
+import PostList from './PostList.js'
 
 const mapStateToProps = state => {
   const user = userSelector(state)
@@ -20,7 +21,7 @@ const mapStateToProps = state => {
 }
 
 const actionCreators = {
-  openNewPostDialog, updatePostAddress,
+  openNewPostDialog, updatePostAddress, requestUserPosts,
   userFormPageAction: name => userFormPage.action({name})
 }
 
@@ -29,6 +30,7 @@ class UserPage extends Component {
     super(props)
     this.handleSendTo = this.handleSendTo.bind(this)
     this.handleClickEdit = this.handleClickEdit.bind(this)
+    this.handleRequestPosts = this.handleRequestPosts.bind(this)
   }
 
   handleSendTo() {
@@ -42,9 +44,16 @@ class UserPage extends Component {
     userFormPageAction(params.name)
   }
 
+  handleRequestPosts() {
+    const { requestUserPosts, userPage: { user }} = this.props
+    requestUserPosts(user.id)
+  }
+
   render() {
     const { isMe, isNotMe, userPage } = this.props
-    const { user, postCount, following, followers } = userPage
+    const {
+      user, postCount, following, followers, posts, isLoadingUserPosts
+    } = userPage
     if (user != null) {
       return (
         <Segment.Group>
@@ -88,17 +97,28 @@ class UserPage extends Component {
                 </Card.Description>
               </Card.Content>
             </Card>
-          </Segment>
-          <Segment>
             {user.bio && user.bio.length >= 1 ? (
-              <Card.Content>
+              <Segment>
                 <pre>
                   <Linkify properties={{target: '_blank'}}>
                     {user.bio}
                   </Linkify>
                 </pre>
-              </Card.Content>
+              </Segment>
             ) : null}
+          </Segment>
+          <Segment>
+            <Header>Recent Posts</Header>
+            <Dimmer active={isLoadingUserPosts} inverted>
+              <Loader inverted />
+            </Dimmer>
+            {posts ? (
+              <PostList posts={posts} />
+            ) : (
+              <Button onClick={this.handleRequestPosts}>
+                Load Recent Posts
+              </Button>
+            )}
           </Segment>
         </Segment.Group>
       )

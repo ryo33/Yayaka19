@@ -8,6 +8,8 @@ defmodule Share.PageChannel do
 
   require Logger
 
+  @user_posts_limit 10
+
   def join("page", _params, socket) do
     {:ok, socket}
   end
@@ -29,6 +31,21 @@ defmodule Share.PageChannel do
           "followers" => followed_count
         }
         {:reply, {:ok, res}, socket}
+    end
+  end
+
+  def handle_in("user_posts", %{"id" => id}, socket) do
+    case Repo.get(Post, id) do
+      nil -> {:reply, :error, socket}
+      post ->
+        query = from p in Post,
+          where: p.user_id == ^id,
+          order_by: [desc: :id],
+          limit: @user_posts_limit
+        posts = Repo.all(Post.preload(query))
+        ids = Enum.map(posts, &(&1.id))
+        favs = Fav.get_favs(socket, ids)
+        {:reply, {:ok, %{posts: posts, favs: favs}}, socket}
     end
   end
 
