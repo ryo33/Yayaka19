@@ -236,8 +236,8 @@ const doPingMiddleware = createAsyncHook(
 const submitOnlinePostMiddleware = createAsyncHook(
   submitOnlinePost.getType(),
   ({ action }) => {
-    const { text } = action.payload
-    pushMessage(userChannel, 'online_post', {text})
+    const params = action.payload
+    pushMessage(userChannel, 'online_post', params)
       .then(() => {/* TODO */})
   }
 )

@@ -1,6 +1,6 @@
 import { postPage } from './pages.js'
 
-export const compareNotices = (a, b) => {
+export const compareInsertedAtDesc = (a, b) => {
   if (a.inserted_at > b.inserted_at) {
     return -1
   } else if (a.inserted_at < b.inserted_at) {
@@ -9,6 +9,8 @@ export const compareNotices = (a, b) => {
     return 0
   }
 }
+
+export const compareNotices = compareInsertedAtDesc
 
 export const getTweetURL = post => {
   const url = encodeURIComponent(window.location.origin + postPage.path({id: post.id}))
