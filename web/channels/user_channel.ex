@@ -158,8 +158,9 @@ defmodule Share.UserChannel do
   def handle_in("online_post", params, socket) do
     user = socket.assigns.user
     user = Repo.get!(User, user.id)
-    %{"text" => text} = params
+    %{"text" => text, "channel" => channel} = params
     post = %{
+      channel: channel,
       text: text, user: user, id: UUID.uuid4(),
       inserted_at: NaiveDateTime.utc_now(),
       post_addresses: [],
