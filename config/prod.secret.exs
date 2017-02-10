@@ -15,7 +15,7 @@ config :share, Share.Repo,
 config :ueberauth, Ueberauth.Strategy.Google.OAuth,
   client_id: System.get_env("GOOGLE_ID"),
   client_secret: System.get_env("GOOGLE_SECRET"),
-  redirect_uri: "https://sha.herokuapp.com/auth/google/callback"
+  redirect_uri: "https://yayaka.net/auth/google/callback"
 
 config :ueberauth, Ueberauth.Strategy.Facebook.OAuth,
   client_id: System.get_env("FACEBOOK_ID"),
