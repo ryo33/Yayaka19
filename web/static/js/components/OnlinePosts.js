@@ -3,30 +3,43 @@ import { connect } from 'react-redux'
 
 import { Form, Segment, Header, Button, Label, Dropdown, Icon } from 'semantic-ui-react'
 
-import { submitOnlinePost, openNewPostDialog, updatePostText } from '../actions.js'
+import {
+  changeOnlineChannel, showOnlinePosts, submitOnlinePost, openNewPostDialog, updatePostText
+} from '../actions.js'
 import { onlinePostsSelector, userSelector, followersSelector } from '../selectors.js'
 import Post from './Post.js'
 import { title } from '../global.js'
-import { compareInsertedAtDesc } from '../utils.js'
+import { isDefaultChannel, DEFAULT_CHANNEL } from '../utils.js'
 
-const DEFAULT_CHANNEL = `@@/${title}/DEFAULT_CHANNEL`
-
-function isDefaultChannel(channel) {
-  return channel == null || channel === DEFAULT_CHANNEL
+const channelsSorter = (a, b) => {
+  const l = a.count, r = b.count
+  if (a.count == b.count) {
+    if (isDefaultChannel(a.name)) return -1
+    if (isDefaultChannel(b.name)) return 1
+    return a.name < b.name ? -1 : 1 // ASC
+  } else {
+    return b.count - a.count // DESC
+  }
 }
-
-function getChannelsFromPosts(posts) {
+function getChannelsFromPosts(posts, channel, channels) {
   const channelsObj = {}
+  let countSum = 0
   posts.forEach(({ channel, user, inserted_at }) => {
-    if (!isDefaultChannel(channel)) {
-      if (channelsObj[channel] == null) {
-        channelsObj[channel] = inserted_at
-      }
+    if (channelsObj[channel] == null) {
+      const count = channels[channel] || 0
+      channelsObj[channel] = count
+      countSum += count
     }
-  }, {})
+  })
+  if (!isDefaultChannel(channel) && channelsObj[channel] == null) {
+    // Add current channel
+    channelsObj[channel] = 0
+  }
+  // Add default channel
+  channelsObj[DEFAULT_CHANNEL] = countSum
   return Object.keys(channelsObj).map(channel => (
-    {name: channel, inserted_at: channelsObj[channel]}
-  )).sort(compareInsertedAtDesc)
+    {name: channel, count: channelsObj[channel]}
+  )).sort(channelsSorter)
 }
 
 function filterPosts(posts, channel) {
@@ -38,16 +51,18 @@ function filterPosts(posts, channel) {
 }
 
 const mapStateToProps = state => {
-  const { posts } = onlinePostsSelector(state)
-  const channels = getChannelsFromPosts(posts)
+  const { posts, channel, channels } = onlinePostsSelector(state)
   return {
-    posts, channels,
+    posts, channel,
+    channels: getChannelsFromPosts(posts, channel, channels),
     followers: followersSelector(state),
     user: userSelector(state)
   }
 }
 
 const actionCreators = {
+  changeOnlineChannel,
+  showOnlinePosts,
   submitOnlinePost,
   openNewPostDialog,
   updatePostText
@@ -61,8 +76,7 @@ class OnlinePosts extends Component {
     this.handleKeyDown = this.handleKeyDown.bind(this)
     this.handleChangeChannel = this.handleChangeChannel.bind(this)
     this.state = {
-      text: '',
-      channel: DEFAULT_CHANNEL
+      text: ''
     }
   }
 
@@ -74,8 +88,8 @@ class OnlinePosts extends Component {
 
   submit(e) {
     e.preventDefault()
-    const { submitOnlinePost } = this.props
-    const { text, channel } = this.state
+    const { submitOnlinePost, channel } = this.props
+    const { text } = this.state
     if (text.length >= 1) {
       submitOnlinePost({text, channel})
       this.reset()
@@ -98,46 +112,83 @@ class OnlinePosts extends Component {
     openNewPostDialog()
   }
 
-  changeChannel(value) {
-    this.setState({
-      channel: value
-    })
-  }
-
   handleChangeChannel(e, { value }) {
     this.changeChannel(value)
   }
 
+  changeChannel(value) {
+    const { changeOnlineChannel } = this.props
+    changeOnlineChannel(value)
+  }
+
+  showOnlinePosts(value) {
+    const { showOnlinePosts } = this.props
+    showOnlinePosts(value)
+  }
+
   renderChannels() {
-    const { channels } = this.props
-    const { channel } = this.state
-    const otherChannels = channels
-      .filter(c => c.name !== channel)
-      .map(({ name }) => ({key: name, text: name, value: name}))
+    const { channels, channel } = this.props
+    const getText = (text, isAll) => isAll ? 'All' : `${text}`
     const options = [
-      {key: DEFAULT_CHANNEL, text: 'All', value: DEFAULT_CHANNEL},
-      ...otherChannels
+      ...channels.map(({ name, count }) => {
+        const isAll = isDefaultChannel(name)
+        const text = getText(name, isAll)
+        return {
+          key: name,
+          value: name,
+          text: text,
+          content: (
+            <span>
+              <Icon name={isAll ? 'bar' : 'hashtag'} />
+              {text} {count >= 1 ? (
+                <Label color='red' circular content={count} />
+              ) : null}
+            </span>
+          )
+        }
+      })
     ]
-    if (!isDefaultChannel(channel)) {
-      options.unshift({key: channel, text: channel, value: channel})
-    }
     return (
-      <Dropdown
-        options={options}
-        search
-        selection
-        fluid
-        allowAdditions
-        value={channel}
-        onAddItem={this.handleChangeChannel}
-        onChange={this.handleChangeChannel}
-      />
+      <span>
+        <Dropdown
+          placeholder='Choose or Add Channel'
+          options={options}
+          search
+          selection
+          allowAdditions
+          value={channel}
+          onAddItem={this.handleChangeChannel}
+          onChange={this.handleChangeChannel}
+        />
+        {!isDefaultChannel(channel) ? (
+          <Button icon='bar' color='orange' onClick={() => this.changeChannel(DEFAULT_CHANNEL)} />
+        ) : null}
+        {
+          channels
+            .filter(({ name, count }) => count >= 1)
+            .map(({ name, count }) => {
+              const isAll = isDefaultChannel(name)
+              const text = getText(name, isAll)
+              return (
+                <Label as='a' key={name} onClick={() => this.changeChannel(name)}
+                  icon={isAll ? 'bar' : 'hashtag'} content={text}
+                  detail={<Label color='red' circular content={count} />}
+                  removeIcon={<Icon name='delete' />}
+                  onRemove={(e) => {
+                    e.stopPropagation()
+                    this.showOnlinePosts(name)
+                  }}
+                />
+              )
+            })
+        }
+      </span>
     )
   }
 
   render() {
-    const { posts, user, followers } = this.props
-    const { text, channel } = this.state
+    const { posts, user, followers, channel } = this.props
+    const { text } = this.state
     const filteredPosts = filterPosts(posts, channel)
     return (
       <div>
@@ -169,14 +220,14 @@ class OnlinePosts extends Component {
             attributeIcon={followers.includes(post.user.id) ? 'exchange' : null}
             prefix={(
               <span>
-                {!isDefaultChannel(post.channel) ? (
+                {isDefaultChannel(channel) && !isDefaultChannel(post.channel) ? (
                   <Button size='mini' onClick={() => this.changeChannel(post.channel)}>
                     <Icon name='hashtag' />
                     {post.channel}
                   </Button>
                 ) : null}
                 {post.isOnlinePost && post.user.name == user.name ? (
-                  <Button icon='clone' size='mini' onClick={() => this.handleClickWrite(post)} />
+                  <Button primary icon='clone' size='mini' onClick={() => this.handleClickWrite(post)} />
                 ) : null}
               </span>
             )}

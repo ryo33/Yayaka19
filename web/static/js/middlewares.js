@@ -23,7 +23,7 @@ import {
   sendToOnline,
   setWindowFocused
 } from './actions.js'
-import { pageSelector } from './selectors.js'
+import { pageSelector, onlinePostsSelector } from './selectors.js'
 import { compareNotices } from './utils.js'
 
 const redirectLoginPageMiddleware = createReplacer(
@@ -255,8 +255,10 @@ const onFocusMiddleware = createAsyncHook(
   setWindowFocused.getType(),
   ({ action }) => action.payload === true,
   ({ dispatch, getState }) => {
-    if (pageSelector(getState()).name == onlinePosts.name) {
-      dispatch(showOnlinePosts())
+    const state = getState()
+    if (pageSelector(state).name == onlinePosts.name) {
+      const { channel } = onlinePostsSelector(state)
+      dispatch(showOnlinePosts(channel))
     }
   }
 )

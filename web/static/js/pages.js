@@ -15,6 +15,7 @@ import {
 import {
   pageSelector,
   homePostSelector,
+  onlinePostsSelector
 } from './selectors.js'
 
 export const pages = createPages()
@@ -84,7 +85,10 @@ const publicTimelineHook = createAsyncHook(
 
 const onlinePostsHook = createAsyncHook(
   ({ action }) => onlinePosts.check(action),
-  ({ dispatch }) => dispatch(showOnlinePosts())
+  ({ dispatch, getState }) => {
+    const { channel } = onlinePostsSelector(getState())
+    dispatch(showOnlinePosts(channel))
+  }
 )
 
 const userPageHook = createAsyncHook(
