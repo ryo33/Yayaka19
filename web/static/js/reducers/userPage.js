@@ -2,11 +2,12 @@ import { combineReducers } from 'redux'
 import { createReducer } from 'redux-act'
 
 import {
-  setUserInfo, requestUserPosts, setUserPosts
+  requestUser, setUserInfo, requestUserPosts, setUserPosts
 } from '../actions.js'
 
 const user = createReducer({
-  [setUserInfo]: (state, { user = null }) => user
+  [setUserInfo]: (state, { user = null }) => user,
+  [requestUser]: () => null
 }, null)
 
 const postCount = createReducer({

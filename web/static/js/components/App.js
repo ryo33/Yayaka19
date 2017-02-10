@@ -63,7 +63,7 @@ const actionCreators = {
 }
 
 const menuStyle = {
-  marginBottom: '0px'
+  marginBottom: '8px'
 }
 
 const iconItemStyle = {
@@ -82,6 +82,7 @@ class App extends Component {
   constructor(props) {
     super(props)
     this.toggleSidebar = this.toggleSidebar.bind(this)
+    this.closeSidebar = this.closeSidebar.bind(this)
     this.openLogoutDialog = this.openLogoutDialog.bind(this)
     this.closeLogoutDialog = this.closeLogoutDialog.bind(this)
     this.openNewPost = this.openNewPost.bind(this)
@@ -96,6 +97,10 @@ class App extends Component {
 
   toggleSidebar() {
     this.setState({sidebar: !this.state.sidebar})
+  }
+
+  closeSidebar() {
+    this.setState({sidebar: false})
   }
 
   openLogoutDialog() {
@@ -182,7 +187,7 @@ class App extends Component {
     const { sidebar, logout } = this.state
     const titleNotices = newPostsCount + onlinePostsCount + noticesCount
     return (
-      <div style={{height: '100%'}}>
+      <div style={{minHeight: '100%'}}>
         <Helmet title={
           titleNotices == 0 ? title : `(${titleNotices}) ${title}`
         } />
@@ -295,7 +300,7 @@ class App extends Component {
               </Menu.Item>
             ) : null}
           </Sidebar>
-          <Sidebar.Pusher>
+          <Sidebar.Pusher dimmed={sidebar} onClick={this.closeSidebar}>
             <Container>
               {error ? (
                 <Message
