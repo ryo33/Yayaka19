@@ -12,7 +12,8 @@ import {
   home, publicTimeline, timeline, onlinePosts,
   userPage, userFormPage,
   postPage, loginPage, noticesPage,
-  apiURL, logoutURL, newAccountURL, getSwitchUserURL
+  apiURL, logoutURL, newAccountURL, getSwitchUserURL,
+  passwordUpdateURL
 } from '../pages.js'
 import PublicTimeline from './PublicTimeline.js'
 import Timeline from './Timeline.js'
@@ -187,7 +188,7 @@ class App extends Component {
     const { sidebar, logout } = this.state
     const titleNotices = newPostsCount + onlinePostsCount + noticesCount
     return (
-      <div style={{height: 'auto', minHeight: '100%'}}>
+      <div>
         <Helmet title={
           titleNotices == 0 ? title : `(${titleNotices}) ${title}`
         } />
@@ -243,7 +244,7 @@ class App extends Component {
             </Menu.Menu>
           </Container>
         </Menu>
-        <Sidebar.Pushable as={React.div} style={{height: 'auto', minHeight: '100%'}}>
+        <Sidebar.Pushable as={React.div}>
           <Sidebar onClick={this.toggleSidebar}
             as={Menu} animation='overlay' direction='top' visible={sidebar} vertical>
             {signedIn ? (
@@ -255,6 +256,9 @@ class App extends Component {
                   </Menu.Item>
                   <Menu.Item onClick={() => userFormPageAction(user.name)}>
                     Edit my profile
+                  </Menu.Item>
+                  <Menu.Item link href={passwordUpdateURL}>
+                    Update my password
                   </Menu.Item>
                 </Menu.Menu>
               </Menu.Item>
@@ -300,8 +304,8 @@ class App extends Component {
               </Menu.Item>
             ) : null}
           </Sidebar>
-          <Sidebar.Pusher dimmed={sidebar} onClick={this.closeSidebar} style={{height: 'auto', minHeight: '100%'}}>
-            <Container style={{height: 'auto', minHeight: '100%'}}>
+          <Sidebar.Pusher dimmed={sidebar} onClick={this.closeSidebar}>
+            <Container>
               {error ? (
                 <Message
                   negative

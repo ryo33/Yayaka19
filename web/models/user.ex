@@ -13,6 +13,7 @@ defmodule Share.User do
     field :bio, :string
     field :noticed, :naive_datetime
     field :secret, :string
+    field :password, :string
 
     timestamps()
   end
@@ -31,5 +32,13 @@ defmodule Share.User do
     |> validate_length(:display, min: 1, max: 32)
     |> validate_length(:bio, min: 0, max: 2048)
     |> unique_constraint(:name)
+  end
+
+  def password_changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, [:password])
+    |> validate_required([:password])
+    |> validate_length(:password, min: 6, max: 255)
+    |> update_change(:password, fn p -> Comeonin.Bcrypt.hashpwsalt(p) end)
   end
 end
