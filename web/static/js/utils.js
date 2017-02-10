@@ -17,3 +17,9 @@ export const getTweetURL = post => {
   const text = encodeURIComponent(`“${post.text}” - ${post.user.display} (${post.user.name})`)
   return `https://twitter.com/intent/tweet?url=${url}&text=${text}`
 }
+
+export const DEFAULT_CHANNEL = `@@/${title}/DEFAULT_CHANNEL`
+
+export function isDefaultChannel(channel) {
+  return channel == null || channel === DEFAULT_CHANNEL
+}

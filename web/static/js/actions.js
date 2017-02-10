@@ -9,9 +9,11 @@ export const initializeUser = createAction('initialize user', params => params)
 export const setWindowFocused = createAction('set window focused', focused => focused)
 
 // Online
-export const addOnlinePosts = createAction('add online posts', (posts, count = 0) => ({ posts, count }))
-export const showOnlinePosts = createAction('show online posts')
+export const addOnlinePosts = createAction('add online posts', posts => posts)
+export const addOnlinePostsNotices = createAction('add online posts notices', notices => notices)
+export const showOnlinePosts = createAction('show online posts', channel => channel)
 export const submitOnlinePost = createAction('submit online post', post => post)
+export const changeOnlineChannel = createAction('change online channel', channel => channel)
 
 // Error
 export const showError = createAction('show error', message => message)

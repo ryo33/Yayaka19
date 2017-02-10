@@ -3,11 +3,13 @@ import { userChannel } from './socket.js'
 import { onlinePosts } from './pages.js'
 import {
   addNotices, addNewPosts, loadNewPosts,
-  addOnlinePosts, showOnlinePosts
+  addOnlinePosts, addOnlinePostsNotices
 } from './actions.js'
 import {
-  windowFocusedSelector, pageSelector, timelineSelector, userSelector
+  windowFocusedSelector, pageSelector, timelineSelector, userSelector,
+  onlinePostsSelector
 } from './selectors.js'
+import { isDefaultChannel } from './utils.js'
 
 export const watchUserChannel = (store) => {
   userChannel.on('add_notices', payload => {
@@ -26,9 +28,22 @@ export const watchUserChannel = (store) => {
   userChannel.on('add_online_posts', ({posts}) => {
     const state = store.getState()
     const page = pageSelector(state)
+    const currentChannel = onlinePostsSelector(state).channel
     const focused = windowFocusedSelector(state)
     const isActive = focused && page.name === onlinePosts.name
-    const count = isActive ? 0 : posts.length
-    store.dispatch(addOnlinePosts(posts, count))
+    store.dispatch(addOnlinePosts(posts))
+    if (!(isActive && isDefaultChannel(currentChannel))) {
+      const channels = {}
+      posts.forEach(({ channel }) => {
+        if (!isActive || channel != currentChannel) {
+          if (channels[channel] == null) {
+            channels[channel] = 1
+          } else {
+            channels[channel] += 1
+          }
+        }
+      })
+      store.dispatch(addOnlinePostsNotices(channels))
+    }
   })
 }
