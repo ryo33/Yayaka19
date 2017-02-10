@@ -19,7 +19,7 @@ defmodule Share.Mixfile do
   def application do
     [mod: {Share, []},
      applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext,
-                    :phoenix_ecto, :postgrex,
+                    :phoenix_ecto, :postgrex, :comeonin,
                     :ueberauth, :ueberauth_google, :ueberauth_facebook,
                     :ueberauth_twitter, :ueberauth_github]]
   end
@@ -48,7 +48,8 @@ defmodule Share.Mixfile do
      {:ueberauth_twitter, "~> 0.2"},
      {:oauth, github: "tim/erlang-oauth"},
      {:secure_random, "~> 0.5"},
-     {:uuid, "~> 1.1"}]
+     {:uuid, "~> 1.1"},
+     {:comeonin, "~> 3.0"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

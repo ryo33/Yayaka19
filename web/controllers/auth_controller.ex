@@ -96,6 +96,34 @@ defmodule Share.AuthController do
     end
   end
 
+  def password(conn, _params) do
+    render(conn, "password.html", name: "", password: "")
+  end
+
+  def password_login(conn, %{"user" => user}) do
+    %{"name" => name, "password" => password} = user
+    if String.length(password) == 0 do
+      conn
+      |> render("password.html", name: name, password: "")
+    else
+      query = from u in User,
+      where: u.name == ^name
+      case Repo.one(query) do
+        nil ->
+          conn
+          |> render("password.html", name: name, password: "")
+        user ->
+          if Comeonin.Bcrypt.checkpw(password, user.password) do
+            conn
+            |> login(user)
+          else
+            conn
+            |> render("password.html", name: name, password: "")
+          end
+      end
+    end
+  end
+
   defp login(conn, user) do
     conn
     |> Guardian.Plug.sign_in(user)

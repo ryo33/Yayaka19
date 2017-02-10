@@ -12,7 +12,8 @@ import {
   home, publicTimeline, timeline, onlinePosts,
   userPage, userFormPage,
   postPage, loginPage, noticesPage,
-  apiURL, logoutURL, newAccountURL, getSwitchUserURL
+  apiURL, logoutURL, newAccountURL, getSwitchUserURL,
+  passwordUpdateURL
 } from '../pages.js'
 import PublicTimeline from './PublicTimeline.js'
 import Timeline from './Timeline.js'
@@ -255,6 +256,9 @@ class App extends Component {
                   </Menu.Item>
                   <Menu.Item onClick={() => userFormPageAction(user.name)}>
                     Edit my profile
+                  </Menu.Item>
+                  <Menu.Item link href={passwordUpdateURL}>
+                    Update my password
                   </Menu.Item>
                 </Menu.Menu>
               </Menu.Item>

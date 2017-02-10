@@ -4,7 +4,7 @@ defmodule Share.UserController do
   alias Share.User
 
   plug Guardian.Plug.EnsureAuthenticated, %{handler: __MODULE__} when action in [
-    :api, :update_api
+    :api, :update_api, :password, :update_password
   ]
 
   def api(conn, _params) do
@@ -25,6 +25,24 @@ defmodule Share.UserController do
       {:error, changeset} ->
         conn
         |> redirect(to: user_path(conn, :api))
+    end
+  end
+
+  def password(conn, _params) do
+    user = Guardian.Plug.current_resource(conn)
+    changeset = User.password_changeset(user)
+    render(conn, "password.html", changeset: changeset, user: user)
+  end
+
+  def update_password(conn, %{"user" => params}) do
+    user = Guardian.Plug.current_resource(conn)
+    changeset = User.password_changeset(user, params)
+    case Repo.update(changeset) do
+      {:ok, user} ->
+        conn
+        |> redirect(to: "/")
+      {:error, changeset} ->
+        render(conn, "password.html", changeset: changeset, user: user)
     end
   end
 

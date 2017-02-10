@@ -32,6 +32,8 @@ export const noticesPage    = p('/n', 'notices')
 export const loginPage      = p('/login', 'login')
 export const errorPage      = p('/*', 'error')
 
+export const passwordUpdateURL = '/login/password/update'
+export const passwordLoginURL = '/login/password'
 export const apiURL = 'profile/api'
 export const logoutURL = '/logout'
 export const newAccountURL = '/new'

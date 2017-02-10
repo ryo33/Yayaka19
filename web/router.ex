@@ -29,12 +29,17 @@ defmodule Share.Router do
     get "/profile/api", UserController, :api
     get "/profile/api/update", UserController, :update_api
 
-    only_dev do
-      get "/login/:id", AuthController, :dev_login
-    end
-
     get "/login", PageController, :index
     get "/logout", AuthController, :delete
+
+    get "/login/password", AuthController, :password
+    post "/login/password", AuthController, :password_login
+    get "/login/password/update", UserController, :password
+    put "/login/password/update", UserController, :update_password
+
+    only_dev do
+      get "/login/dev/:id", AuthController, :dev_login
+    end
 
     get "/new", AuthController, :new
     get "/switch/:name", AuthController, :switch

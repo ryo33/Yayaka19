@@ -17,7 +17,7 @@ defmodule Share.APIControllerTest do
 
   test "login", %{user: user, jwt: jwt} do
     conn = build_conn()
-           |> put("/api/users/#{user.id}", %{"secret" => user.secret})
+           |> put("/api/users/#{user.name}", %{"secret" => user.secret})
     assert conn.status == 201
     %{"token" => token} = Poison.decode!(conn.resp_body)
 
