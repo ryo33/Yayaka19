@@ -187,7 +187,7 @@ class App extends Component {
     const { sidebar, logout } = this.state
     const titleNotices = newPostsCount + onlinePostsCount + noticesCount
     return (
-      <div style={{height: '100%'}}>
+      <div>
         <Helmet title={
           titleNotices == 0 ? title : `(${titleNotices}) ${title}`
         } />
@@ -243,7 +243,7 @@ class App extends Component {
             </Menu.Menu>
           </Container>
         </Menu>
-        <Sidebar.Pushable as={React.div} style={{height: '100%'}}>
+        <Sidebar.Pushable as={React.div}>
           <Sidebar onClick={this.toggleSidebar}
             as={Menu} animation='overlay' direction='top' visible={sidebar} vertical>
             {signedIn ? (
@@ -300,8 +300,8 @@ class App extends Component {
               </Menu.Item>
             ) : null}
           </Sidebar>
-          <Sidebar.Pusher dimmed={sidebar} onClick={this.closeSidebar} style={{height: '100%'}}>
-            <Container style={{height: '100%'}}>
+          <Sidebar.Pusher dimmed={sidebar} onClick={this.closeSidebar}>
+            <Container>
               {error ? (
                 <Message
                   negative
