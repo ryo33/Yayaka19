@@ -1,10 +1,11 @@
 import { combineReducers } from 'redux'
 import { createReducer } from 'redux-act'
 
-import { setPost, requestContexts, setContexts } from '../actions.js'
+import { requestPost, setPost, requestContexts, setContexts } from '../actions.js'
 
 const post = createReducer({
-  [setPost]: (state, post) => post
+  [setPost]: (state, post) => post,
+  [requestPost]: () => null
 }, null)
 
 const isLoadingContexts = createReducer({

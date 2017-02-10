@@ -56,7 +56,11 @@ class PostPage extends Component {
         </Segment.Group>
       )
     } else {
-      return null
+      return (
+        <Segment>
+          <Loader active inline='centered'/>
+        </Segment>
+      )
     }
   }
 }

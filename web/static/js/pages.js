@@ -6,7 +6,7 @@ import {
   requestRandomPost,
   requestTimeline,
   requestPublicTimeline,
-  requestUser, setUserInfo, setUserPosts,
+  requestUser, setUserPosts,
   requestPost, setContexts,
   openNoticesPage,
   showOnlinePosts,
@@ -90,7 +90,6 @@ const onlinePostsHook = createAsyncHook(
 const userPageHook = createAsyncHook(
   ({ action }) => userPage.check(action),
   ({ dispatch, action }) => {
-    dispatch(setUserInfo({}))
     dispatch(requestUser(action.payload.params.name))
     dispatch(setUserPosts(null))
   }
