@@ -7,6 +7,9 @@ defmodule Share.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    if Mix.env == :prod do
+      plug Share.Plugs.DomainRedirect
+    end
   end
 
   pipeline :browser_auth do
