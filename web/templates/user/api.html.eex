@@ -1,19 +1,14 @@
-<h2>Secret</h2>
+<div class="ui container">
+  <div class="ui segment">
+    <h2>Secret</h2>
 
-<ul>
-  <li>
-    <strong>ID:</strong>
-    <%= @user.name %>
-  </li>
-
-  <li>
-    <strong>Name:</strong>
-    <%= @user.display %>
-  </li>
-
-  <li>
-    <strong>Secret:</strong>
-    <%= @user.secret %>
-  </li>
-</ul>
-<a href="<%= user_path(@conn, :update_api) %>">Update secret</a>
+    <table class="ui collapsing celled table">
+      <tbody>
+        <tr><td>ID</td><td><%= @user.name %></td></tr>
+        <tr><td>Name</td><td><%= @user.display %></td></tr>
+        <tr><td>Secret</td><td><%= @user.secret %></td></tr>
+      </tbody>
+    </table>
+    <a href="<%= user_path(@conn, :update_api) %>">Update secret</a>
+  </div>
+</div>

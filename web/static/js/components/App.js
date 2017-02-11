@@ -319,6 +319,7 @@ class App extends Component {
               {newPost ? <NewPost top /> : null}
               {this.renderPage()}
             </Container>
+            <div style={{height: "600px"}}></div>
           </Sidebar.Pusher>
         </Sidebar.Pushable>
         <Confirm
