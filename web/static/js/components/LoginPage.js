@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Header, Button, Segment } from 'semantic-ui-react'
+import { Header, Button, Segment, Icon } from 'semantic-ui-react'
 import { passwordLoginURL } from '../pages.js'
 
 export default () => (
@@ -8,13 +8,22 @@ export default () => (
     <Segment>
       <Header>Sign in or Register</Header>
       <Segment vertical>
-        <Button primary size='large' href="/auth/twitter">Sign in with Twitter</Button>
+        <Button color='twitter' size='large' href="/auth/twitter">
+          <Icon name='twitter' />
+          Sign in with Twitter
+        </Button>
       </Segment>
       <Segment vertical>
-        <Button primary size='large' href="/auth/facebook">Sign in with Facebook</Button>
+        <Button color='facebook' size='large' href="/auth/facebook">
+          <Icon name='facebook' />
+          Sign in with Facebook
+        </Button>
       </Segment>
       <Segment vertical>
-        <Button primary size='large' href="/auth/github">Sign in with GitHub</Button>
+        <Button color='black' size='large' href="/auth/github">
+          <Icon name='github' />
+          Sign in with GitHub
+        </Button>
       </Segment>
       <Segment vertical>
         <a href="/auth/google" id="sign-in-with-google"></a>

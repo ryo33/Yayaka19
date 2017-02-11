@@ -102,23 +102,23 @@ defmodule Share.AuthController do
 
   def password_login(conn, %{"user" => user}) do
     %{"name" => name, "password" => password} = user
-    if String.length(password) == 0 do
+    if String.length(name) == 0 or String.length(password) == 0 do
       conn
-      |> render("password.html", name: name, password: "")
+      |> render("password.html", name: name, password: "", error: "Failed to sign in")
     else
       query = from u in User,
       where: u.name == ^name
       case Repo.one(query) do
         nil ->
           conn
-          |> render("password.html", name: name, password: "")
+          |> render("password.html", name: name, password: "", error: "Failed to sign in")
         user ->
           if Comeonin.Bcrypt.checkpw(password, user.password) do
             conn
             |> login(user)
           else
             conn
-            |> render("password.html", name: name, password: "")
+            |> render("password.html", name: name, password: "", error: "Failed to sign in")
           end
       end
     end
