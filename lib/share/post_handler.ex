@@ -11,52 +11,54 @@ defmodule Share.PostHandler do
   end
 
   def handle(post, address) do
-    spawn(fn ->
-      post = Post.preload(post)
+    if Mix.env != :test do
       spawn(fn ->
-        post = if String.length(address) >= 1 do
-          case Repo.get_by(User, name: address) do
-            nil -> ()
-            user ->
-              params = %{user_id: user.id, post_id: post.id}
-              changeset = PostAddress.changeset(%PostAddress{}, params)
-              Repo.insert!(changeset)
-              get_post(post)
-          end
-        else
-          post
-        end
+        post = Post.preload(post)
         spawn(fn ->
-          query = from f in Follow,
+          post = if String.length(address) >= 1 do
+            case Repo.get_by(User, name: address) do
+              nil -> ()
+              user ->
+                params = %{user_id: user.id, post_id: post.id}
+                changeset = PostAddress.changeset(%PostAddress{}, params)
+                Repo.insert!(changeset)
+                get_post(post)
+            end
+          else
+            post
+          end
+          spawn(fn ->
+            query = from f in Follow,
             join: user in User,
             on: user.id == f.user_id,
             where: f.target_user_id == ^post.user.id,
             select: user
-          Repo.all(query)
-          |> Enum.map(fn user ->
-            spawn(fn ->
-              topic = "user:" <> user.name
-              Share.Endpoint.broadcast! topic, "add_new_posts", %{posts: [post]}
+            Repo.all(query)
+            |> Enum.map(fn user ->
+              spawn(fn ->
+                topic = "user:" <> user.name
+                Share.Endpoint.broadcast! topic, "add_new_posts", %{posts: [post]}
+              end)
             end)
           end)
-        end)
-        spawn(fn -> if length(post.post_addresses) >= 1 do
-          if is_nil(post.post_id) do
-            Share.Notice.add_address_notice(post)
-          else
-            query = from p in Post, where: p.id == ^post.post_id
-            case Repo.aggregate(query, :count, :id) do
-              1 ->
-                Share.Notice.add_reply_notice(post)
-              _ -> ()
+          spawn(fn -> if length(post.post_addresses) >= 1 do
+            if is_nil(post.post_id) do
+              Share.Notice.add_address_notice(post)
+            else
+              query = from p in Post, where: p.id == ^post.post_id
+              case Repo.aggregate(query, :count, :id) do
+                1 ->
+                  Share.Notice.add_reply_notice(post)
+                _ -> ()
+              end
             end
-          end
-        end end)
-        spawn(fn ->
-          topic = "user:" <> post.user.name
-          Share.Endpoint.broadcast! topic, "add_new_posts", %{posts: [post]}
+          end end)
+          spawn(fn ->
+            topic = "user:" <> post.user.name
+            Share.Endpoint.broadcast! topic, "add_new_posts", %{posts: [post]}
+          end)
         end)
       end)
-    end)
+    end
   end
 end
