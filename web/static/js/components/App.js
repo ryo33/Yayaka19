@@ -176,21 +176,21 @@ class App extends Component {
               </Menu.Item>
             ) : null}
             {signedIn ? (
-              <Menu.Item style={iconItemStyle} active={name == noticesPage.name} onClick={noticesPageAction}>
-                <Icon style={iconStyle} size='large' name='alarm' />
-                { noticesCount >= 1 ? (
-                  <Label size='tiny' circular style={labelStyle} color='red'>
-                    {noticesCount}
+              <Menu.Item style={iconItemStyle} active={name == onlinePosts.name} onClick={onlinePostsAction}>
+                <Icon style={iconStyle} size='large' name='bar' />
+                { onlinePostsCount >= 1 ? (
+                  <Label size='tiny' circular style={labelStyle} color='yellow'>
+                    {onlinePostsCount}
                   </Label>
                 ) : null }
               </Menu.Item>
             ) : null }
             {signedIn ? (
-              <Menu.Item style={iconItemStyle} active={name == onlinePosts.name} onClick={onlinePostsAction}>
-                <Icon style={iconStyle} size='large' name='bar' />
-                { onlinePostsCount >= 1 ? (
-                  <Label size='tiny' circular style={labelStyle} color='blue'>
-                    {onlinePostsCount}
+              <Menu.Item style={iconItemStyle} active={name == noticesPage.name} onClick={noticesPageAction}>
+                <Icon style={iconStyle} size='large' name='alarm' />
+                { noticesCount >= 1 ? (
+                  <Label size='tiny' circular style={labelStyle} color='red'>
+                    {noticesCount}
                   </Label>
                 ) : null }
               </Menu.Item>
