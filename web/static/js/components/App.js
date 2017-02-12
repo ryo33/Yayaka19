@@ -219,7 +219,7 @@ class App extends Component {
             ) : null }
             {signedIn ? (
               <Menu.Item style={iconItemStyle} active={name == noticesPage.name} onClick={noticesPageAction}>
-                <Icon style={iconStyle} size='large' name='alarm' />
+                <Icon style={iconStyle} size='large' color='red' name='alarm outline' />
                 { noticesCount >= 1 ? (
                   <Label size='tiny' circular style={labelStyle} color='red'>
                     {noticesCount}
