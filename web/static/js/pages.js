@@ -109,10 +109,8 @@ const postPageHook = createAsyncHook(
   }
 )
 
-const noticesPageLeaveHook = createAsyncHook(
-  CHANGE_PAGE,
-  ({ getState }) => pageSelector(getState()).name == noticesPage.name,
-  ({ action }) => !noticesPage.check(action),
+const noticesPageHook = createAsyncHook(
+  ({ action }) => noticesPage.check(action),
   ({ dispatch, action }) => {
     dispatch(openNoticesPage())
   }
@@ -128,5 +126,5 @@ export const pagesMiddleware = composeMiddleware(
   onlinePostsHook,
   userPageHook,
   postPageHook,
-  noticesPageLeaveHook
+  noticesPageHook
 )
