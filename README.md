@@ -1,15 +1,10 @@
 # Share
 
-sha.herokuapp.com is a social networking service where users post texts.
+[Yayaka.net](https://yayaka.net) is a progressive experimental social networking service where users post texts.
+You need to login to post, follow users, use timeline, and more.
 
-As the first big feature, posts displayed on the timeline are randomly chosen.
-This feature make it difficult to completely follow posts on the timeline.
-If you want someone to certainly read a post, you should reply.
-
-Second, all posts don't have unique URLs.
-It is impossible to bookmark and share posts.
-
-You need to login to post, follow users, use personal timeline, and favorite posts.
+## Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Development
 

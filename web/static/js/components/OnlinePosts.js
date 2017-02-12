@@ -25,10 +25,12 @@ function getChannelsFromPosts(posts, channel, channels) {
   const channelsObj = {}
   let countSum = 0
   posts.forEach(({ channel, user, inserted_at }) => {
-    if (channelsObj[channel] == null) {
-      const count = channels[channel] || 0
-      channelsObj[channel] = count
-      countSum += count
+    if (channel != null) {
+      if (channelsObj[channel] == null) {
+        const count = channels[channel] || 0
+        channelsObj[channel] = count
+        countSum += count
+      }
     }
   })
   if (!isDefaultChannel(channel) && channelsObj[channel] == null) {
