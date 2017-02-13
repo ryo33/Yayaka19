@@ -80,7 +80,7 @@ class Timeline extends Component {
       isLoadingTimeline, isLoadingMore
     } = this.props
     return (
-      <div>
+      <Dimmer.Dimmable>
         <Dimmer active={isLoadingTimeline} inverted>
           <Loader inverted />
         </Dimmer>
@@ -126,7 +126,7 @@ class Timeline extends Component {
             </Button>
           </Segment>
         </PostList>
-      </div>
+      </Dimmer.Dimmable>
     )
   }
 }
