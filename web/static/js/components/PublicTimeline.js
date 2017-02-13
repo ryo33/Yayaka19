@@ -39,7 +39,7 @@ class PublicTimeline extends Component {
       posts, requestPublicTimeline, user, isLoadingPublicTimeline
     } = this.props
     return (
-      <div>
+      <Dimmer.Dimmable>
         <Dimmer active={isLoadingPublicTimeline} inverted>
           <Loader inverted />
         </Dimmer>
@@ -56,7 +56,7 @@ class PublicTimeline extends Component {
         )}
         <Segment vertical>
           <Header>Public Timeline</Header>
-          <Button primary onClick={requestPublicTimeline}>Reload</Button>
+          <Button primary onClick={requestPublicTimeline}>Shuffle</Button>
           <Label size='large'>{user.display} @{user.name}</Label>
         </Segment>
         <PostList
@@ -65,7 +65,7 @@ class PublicTimeline extends Component {
         <Segment vertical>
           <Button onClick={requestPublicTimeline}>Reload</Button>
         </Segment>
-      </div>
+      </Dimmer.Dimmable>
     )
   }
 }
