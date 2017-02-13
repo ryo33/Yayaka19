@@ -214,6 +214,7 @@ defmodule Share.UserChannel do
       join: post in Post,
       on: post.id == fav.post_id,
       where: post.user_id == ^user.id,
+      where: fav.user_id != ^user.id,
       order_by: [desc: :id],
       limit: 50
     favs = Repo.all(Fav.preload(query))
@@ -235,6 +236,7 @@ defmodule Share.UserChannel do
       join: address in PostAddress,
       on: post.id == address.post_id,
       where: address.user_id == ^user.id,
+      where: post.user_id != ^user.id,
       where: is_nil(post.post_id),
       order_by: [desc: :id],
       limit: 50
@@ -244,6 +246,7 @@ defmodule Share.UserChannel do
       join: address in PostAddress,
       on: post.id == address.post_id,
       where: address.user_id == ^user.id,
+      where: post.user_id != ^user.id,
       where: not is_nil(post.post_id),
       order_by: [desc: :id],
       limit: 50
