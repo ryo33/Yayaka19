@@ -38,6 +38,7 @@
       name: "<%= Application.get_env(:share, :admin)[:name] %>",
       url: "<%= Application.get_env(:share, :admin)[:url] %>"
     }
+    window.hashtag = "<%= Application.get_env(:share, :hashtag) %>"
   </script>
   <body>
     <%= render @view_module, @view_template, assigns %>
