@@ -2,7 +2,7 @@ import { combineReducers } from 'redux'
 import { createReducer } from 'redux-act'
 
 import {
-  requestUser, setUserInfo, requestUserPosts, setUserPosts
+  requestUser, setUserInfo
 } from '../actions.js'
 
 const user = createReducer({
@@ -22,13 +22,8 @@ const followers = createReducer({
   [setUserInfo]: (state, { followers = 0 }) => followers
 }, 0)
 
-const isLoadingUserPosts = createReducer({
-  [requestUserPosts]: () => true,
-  [setUserPosts]: () => false
-}, false)
-
 const posts = createReducer({
-  [setUserPosts]: (state, posts) => posts
+  [setUserInfo]: (state, { posts = [] }) => posts
 }, null)
 
 export default combineReducers({
@@ -36,6 +31,5 @@ export default combineReducers({
   postCount,
   following,
   followers,
-  isLoadingUserPosts,
   posts
 })

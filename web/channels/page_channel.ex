@@ -24,28 +24,22 @@ defmodule Share.PageChannel do
         follow_count = Repo.aggregate(query, :count, :id)
         query = from f in Follow, where: f.target_user_id == ^user.id
         followed_count = Repo.aggregate(query, :count, :id)
-        res = %{
-          "user" => user,
-          "postCount" => post_count,
-          "following" => follow_count,
-          "followers" => followed_count
-        }
-        {:reply, {:ok, res}, socket}
-    end
-  end
-
-  def handle_in("user_posts", %{"id" => id}, socket) do
-    case Repo.get(Post, id) do
-      nil -> {:reply, :error, socket}
-      post ->
         query = from p in Post,
-          where: p.user_id == ^id,
+          where: p.user_id == ^user.id,
           order_by: [desc: :id],
           limit: @user_posts_limit
         posts = Repo.all(Post.preload(query))
         ids = Enum.map(posts, &(&1.id))
         favs = Fav.get_favs(socket, ids)
-        {:reply, {:ok, %{posts: posts, favs: favs}}, socket}
+        res = %{
+          "user" => user,
+          "posts" => posts,
+          "favs" => favs,
+          "postCount" => post_count,
+          "following" => follow_count,
+          "followers" => followed_count
+        }
+        {:reply, {:ok, res}, socket}
     end
   end
 
