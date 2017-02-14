@@ -43,6 +43,27 @@ defmodule Share.PageChannel do
     end
   end
 
+  def handle_in("more_user_posts", %{"user" => name, "id" => less_than_id}, socket) do
+    query = from u in User, where: u.name == ^name
+    case Repo.get_by(User, name: name) do
+      nil -> {:reply, :error, socket}
+      user ->
+        query = from p in Post,
+          where: p.user_id == ^user.id,
+          where: p.id < ^less_than_id,
+          order_by: [desc: :id],
+          limit: @user_posts_limit
+        posts = Repo.all(Post.preload(query))
+        ids = Enum.map(posts, &(&1.id))
+        favs = Fav.get_favs(socket, ids)
+        res = %{
+          "posts" => posts,
+          "favs" => favs,
+        }
+        {:reply, {:ok, res}, socket}
+    end
+  end
+
   def handle_in("post", %{"id" => id}, socket) do
     case Repo.get(Post, id) do
       nil -> {:reply, :error, socket}
