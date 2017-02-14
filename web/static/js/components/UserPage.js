@@ -5,7 +5,7 @@ import Linkify from 'react-linkify'
 import { Card, Icon, Segment, Button, Dimmer, Loader, Header } from 'semantic-ui-react'
 
 import { userFormPage } from '../pages.js'
-import { openNewPostDialog, updatePostAddress } from '../actions.js'
+import { openNewPostDialog, updatePostAddress, requestMoreUserPosts } from '../actions.js'
 import { userSelector, userPageSelector, followingSelector } from '../selectors.js'
 import FollowButton from './FollowButton.js'
 import PostList from './PostList.js'
@@ -21,7 +21,7 @@ const mapStateToProps = state => {
 }
 
 const actionCreators = {
-  openNewPostDialog, updatePostAddress,
+  openNewPostDialog, updatePostAddress, requestMoreUserPosts,
   userFormPageAction: name => userFormPage.action({name})
 }
 
@@ -30,6 +30,7 @@ class UserPage extends Component {
     super(props)
     this.handleSendTo = this.handleSendTo.bind(this)
     this.handleClickEdit = this.handleClickEdit.bind(this)
+    this.handleLoadMorePosts = this.handleLoadMorePosts.bind(this)
   }
 
   handleSendTo() {
@@ -43,10 +44,18 @@ class UserPage extends Component {
     userFormPageAction(params.name)
   }
 
+  handleLoadMorePosts() {
+    const { requestMoreUserPosts, userPage: { user, posts }} = this.props
+    if (posts.length != 0) {
+      requestMoreUserPosts(user.name, posts[posts.length - 1].id)
+    }
+  }
+
   render() {
     const { isMe, isNotMe, userPage } = this.props
     const {
-      user, postCount, following, followers, posts
+      user, postCount, following, followers,
+      posts, isLoadingMorePosts
     } = userPage
     if (user != null) {
       return (
@@ -103,7 +112,16 @@ class UserPage extends Component {
           </Segment>
           <Segment>
             <Header>Recent Posts</Header>
-            <PostList posts={posts} />
+            <PostList posts={posts}>
+              <Segment vertical>
+                <Dimmer active={isLoadingMorePosts} inverted>
+                  <Loader inverted />
+                </Dimmer>
+                <Button primary fluid onClick={this.handleLoadMorePosts}>
+                  Load More
+                </Button>
+              </Segment>
+            </PostList>
           </Segment>
         </Segment.Group>
       )

@@ -42,6 +42,8 @@ export const follow = createAction('follow', id => id)
 export const unfollow = createAction('unfollow', id => id)
 export const requestFollow = createAction('request follow', id => id)
 export const requestUnfollow = createAction('request unfollow', id => id)
+export const requestMoreUserPosts = createAction('request more user posts', (user, id) => ({user, id}))
+export const addUserPosts = createAction('add user posts', posts => posts)
 
 // Post
 export const requestPost = createAction('request post', id => id)
