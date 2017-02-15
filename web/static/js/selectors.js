@@ -9,8 +9,9 @@ export const favsSelector = ({ favs }) => favs
 export const errorSelector = ({ error }) => error
 export const windowFocusedSelector = ({ windowFocused }) => windowFocused
 
-// New post page
+// New post
 export const newPostPageSelector = ({ newPostPage }) => newPostPage
+export const editorPluginsSelector = ({ editorPlugins }) => editorPlugins
 
 // User
 export const userPageSelector = ({ userPage }) => userPage

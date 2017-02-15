@@ -1,6 +1,9 @@
 import React from 'react'
 import { render } from 'react-dom'
-import { createStore, applyMiddleware, combineReducers } from 'redux'
+import {
+  createStore, applyMiddleware, combineReducers, compose
+} from 'redux'
+import { persistStore, autoRehydrate } from 'redux-persist'
 import { Provider } from 'react-redux'
 import createLogger from 'redux-logger'
 import createHistory from 'history/createBrowserHistory'
@@ -35,8 +38,12 @@ if (process.env.NODE_ENV !== 'production') {
 }
 const store = createStore(
   reducer,
-  applyMiddleware(reduxPagesMiddleware, pagesMiddleware, ...middlewares),
+  compose(
+    applyMiddleware(reduxPagesMiddleware, pagesMiddleware, ...middlewares),
+    autoRehydrate()
+  )
 )
+persistStore(store, {whitelist: ['editorPlugins']})
 
 // Socket
 const userChannelCallback = ({ userParams }) => {
