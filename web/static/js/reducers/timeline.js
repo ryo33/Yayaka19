@@ -6,7 +6,7 @@ import {
   requestTimeline, updateTimeline,
   addNewPosts, loadNewPosts,
   requestMoreTimeline, addTimeline
-} from '../actions.js'
+} from '../actions/index.js'
 
 const posts = createReducer({
   [requestTimeline]: () => [],

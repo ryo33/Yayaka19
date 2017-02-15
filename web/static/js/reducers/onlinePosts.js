@@ -3,7 +3,7 @@ import { createReducer } from 'redux-act'
 
 import {
   changeOnlineChannel, addOnlinePosts, addOnlinePostsNotices, showOnlinePosts
-} from '../actions.js'
+} from '../actions/index.js'
 import { DEFAULT_CHANNEL, isDefaultChannel } from '../utils.js'
 
 const posts = createReducer({

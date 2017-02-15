@@ -4,7 +4,7 @@ import { onlinePosts } from './pages.js'
 import {
   addNotices, addNewPosts, loadNewPosts,
   addOnlinePosts, addOnlinePostsNotices
-} from './actions.js'
+} from './actions/index.js'
 import {
   windowFocusedSelector, pageSelector, timelineSelector, userSelector,
   onlinePostsSelector

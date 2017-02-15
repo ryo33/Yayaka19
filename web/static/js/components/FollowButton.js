@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import { Button, Icon, Popup } from 'semantic-ui-react'
 
-import { requestFollow, requestUnfollow } from '../actions.js'
+import { requestFollow, requestUnfollow } from '../actions/index.js'
 import { userSelector, followingSelector } from '../selectors.js'
 
 const mapStateToProps = (state, { user }) => {
@@ -38,14 +38,14 @@ class FollowButton extends Component {
   }
 
   render() {
-    const { currentUser, following, user } = this.props
+    const { currentUser, following, user, floated } = this.props
     if (currentUser == null || currentUser.id == user.id) {
       return null
     }
     if (following.includes(user.id)) {
       return (
         <Popup
-          trigger={<Button size='mini' icon='user' color='blue' />}
+          trigger={<Button size='mini' icon='user' color='blue' floated={floated} />}
           flowing
           hoverable
           on='click'
@@ -56,7 +56,7 @@ class FollowButton extends Component {
       )
     } else {
       return (
-        <Button size='mini' icon='add user' onClick={this.follow} />
+        <Button size='mini' icon='add user' onClick={this.follow} floated={floated} />
       )
     }
   }
@@ -64,6 +64,7 @@ class FollowButton extends Component {
 
 FollowButton.propTypes = {
   user: React.PropTypes.object.isRequired,
+  floated: React.PropTypes.oneOf(['left', 'right'])
 }
 
 export default connect(mapStateToProps, actionCreators)(FollowButton)

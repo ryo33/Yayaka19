@@ -4,6 +4,7 @@ defmodule Share.PageChannel do
   alias Share.User
   alias Share.Post
   alias Share.Fav
+  alias Share.Follow
   alias Share.Repo
 
   require Logger
@@ -44,7 +45,6 @@ defmodule Share.PageChannel do
   end
 
   def handle_in("more_user_posts", %{"user" => name, "id" => less_than_id}, socket) do
-    query = from u in User, where: u.name == ^name
     case Repo.get_by(User, name: name) do
       nil -> {:reply, :error, socket}
       user ->
@@ -97,6 +97,24 @@ defmodule Share.PageChannel do
     Repo.update_all((from p in Post, where: p.id in ^post_ids), inc: [views: 1])
     favs = Fav.get_favs(socket, post_ids)
     {:reply, {:ok, %{posts: posts, favs: favs}}, socket}
+  end
+
+  def handle_in("followers", %{"name" => name}, socket) do
+    case Repo.get_by(User, name: name) do
+      nil -> {:reply, :error, socket}
+      user ->
+        followers = Repo.all(Follow.get_followers(user))
+        {:reply, {:ok, %{user: user, followers: followers}}, socket}
+    end
+  end
+
+  def handle_in("following", %{"name" => name}, socket) do
+    case Repo.get_by(User, name: name) do
+      nil -> {:reply, :error, socket}
+      user ->
+        following = Repo.all(Follow.get_following(user))
+        {:reply, {:ok, %{user: user, following: following}}, socket}
+    end
   end
 
   def handle_in("ping", _params, socket) do
