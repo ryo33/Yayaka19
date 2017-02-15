@@ -10,11 +10,13 @@ import {
   addFavs, fav, unfav,
   showError, hideError,
   setWindowFocused
-} from '../actions.js'
+} from '../actions/index.js'
 
 import notices from './notices.js'
 import newPostPage from './newPostPage.js'
 import userPage from './userPage.js'
+import followersPage from './followersPage.js'
+import followingPage from './followingPage.js'
 import postPage from './postPage.js'
 import publicTimeline from './publicTimeline.js'
 import timeline from './timeline.js'
@@ -70,6 +72,8 @@ export default combineReducers({
   favs,
   newPostPage,
   userPage,
+  followersPage,
+  followingPage,
   postPage,
   publicTimeline,
   timeline,

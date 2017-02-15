@@ -5,7 +5,7 @@ import { Form, Segment, Header, Button, Label, Dropdown, Icon } from 'semantic-u
 
 import {
   changeOnlineChannel, showOnlinePosts, submitOnlinePost, openNewPostDialog, updatePostText
-} from '../actions.js'
+} from '../actions/index.js'
 import { onlinePostsSelector, userSelector, followersSelector } from '../selectors.js'
 import Post from './Post.js'
 import { title } from '../global.js'

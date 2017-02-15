@@ -15,6 +15,12 @@ export const newPostPageSelector = ({ newPostPage }) => newPostPage
 // User
 export const userPageSelector = ({ userPage }) => userPage
 
+// Followers
+export const followersPageSelector = ({ followersPage }) => followersPage
+
+// Following
+export const followingPageSelector = ({ followingPage }) => followingPage
+
 // Post
 export const postPageSelector = ({ postPage }) => postPage
 

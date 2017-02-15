@@ -3,7 +3,7 @@ import { createReducer } from 'redux-act'
 
 import {
   requestUser, setUserInfo, requestMoreUserPosts, addUserPosts
-} from '../actions.js'
+} from '../actions/index.js'
 
 const user = createReducer({
   [setUserInfo]: (state, { user = null }) => user,

@@ -24,8 +24,8 @@ config :share,
   hashtag: "Yayaka19",
   admin: [name: "Ryo33",
            url: "https://twitter.com/ryo33music"],
-  source: [url: "https://github.com/ryo33/share",
-           title: "https://github.com/ryo33/share"],
+  source: [url: "https://github.com/ryo33/Yayaka19",
+           title: "https://github.com/ryo33/Yayaka19"],
   api: [url: "https://gist.github.com/ryo33/145e5ef24bad6f11abbb902edc6979d6",
         title: "https://gist.github.com/ryo33/145e5ef24bad6f11abbb902edc6979d6"]
 
@@ -46,7 +46,7 @@ config :ueberauth, Ueberauth,
 config :guardian, Guardian,
   allowed_algos: ["HS512"], # optional
   verify_module: Guardian.JWT,  # optional
-  issuer: "Share",
+  issuer: "Yayaka19",
   ttl: { 30, :days },
   verify_issuer: true, # optional
   secret_key: System.get_env("GUARDIAN_SECRET_KEY") || "abcdef",

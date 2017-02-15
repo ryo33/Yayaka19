@@ -15,16 +15,6 @@ import {
   apiURL, logoutURL, newAccountURL, getSwitchUserURL,
   passwordUpdateURL
 } from '../pages.js'
-import PublicTimeline from './PublicTimeline.js'
-import Timeline from './Timeline.js'
-import OnlinePosts from './OnlinePosts.js'
-import NewPost from './NewPost.js'
-import UserPage from './UserPage.js'
-import UserForm from './UserForm.js'
-import PostPage from './PostPage.js'
-import LoginPage from './LoginPage.js'
-import ErrorPage from './ErrorPage.js'
-import NoticesPage from './NoticesPage.js'
 import {
   pageSelector, userSelector, usersSelector,
   timelineSelector, onlinePostsCountSelector,
@@ -34,7 +24,8 @@ import {
 import {
   openNewPostDialog, closeNewPostDialog,
   hideError, doPing
-} from '../actions.js'
+} from '../actions/index.js'
+import Router from './Router.js'
 
 const mapStateToProps = state => {
   const { newPosts } = timelineSelector(state)
@@ -135,30 +126,6 @@ class App extends Component {
     window.location.href = getSwitchUserURL(name)
   }
 
-  renderPage() {
-    const { page } = this.props
-    switch (page.name) {
-      case publicTimeline.name:
-        return <PublicTimeline />
-      case timeline.name:
-        return <Timeline />
-      case onlinePosts.name:
-        return <OnlinePosts />
-      case userPage.name:
-        return <UserPage params={page.params} />
-      case userFormPage.name:
-        return <UserForm params={page.params} />
-      case postPage.name:
-        return <PostPage params={page.params} />
-      case noticesPage.name:
-        return <NoticesPage />
-      case loginPage.name:
-        return <LoginPage />
-      default:
-        return <ErrorPage />
-    }
-  }
-
   reload() {
     window.location.reload(true)
   }
@@ -170,7 +137,7 @@ class App extends Component {
 
   render() {
     const {
-      page: { name }, error, user, users,
+      page: { name, params }, error, user, users,
       userPageAction,
       userFormPageAction,
       homeAction,
@@ -317,7 +284,7 @@ class App extends Component {
                 </Message>
               ) : null}
               {newPost ? <NewPost top /> : null}
-              {this.renderPage()}
+              <Router name={name} params={params} />
             </Container>
             <div style={{height: "600px"}}></div>
           </Sidebar.Pusher>

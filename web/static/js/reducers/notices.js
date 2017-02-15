@@ -3,7 +3,7 @@ import { createReducer } from 'redux-act'
 
 import {
   initializeUser, updateNoticed, updateNotices, addNotices
-} from '../actions.js'
+} from '../actions/index.js'
 
 const noticed = createReducer({
   [updateNoticed]: (state, noticed) => noticed,

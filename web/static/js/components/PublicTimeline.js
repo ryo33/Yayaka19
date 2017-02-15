@@ -5,7 +5,7 @@ import { Segment, Message, Header, Button, Label, Dimmer, Loader } from 'semanti
 
 import { signedIn } from '../global.js'
 import { userSelector, publicTimelineSelector } from '../selectors.js'
-import { requestPublicTimeline } from '../actions.js'
+import { requestPublicTimeline } from '../actions/index.js'
 
 import PostList from './PostList.js'
 

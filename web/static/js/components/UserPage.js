@@ -4,8 +4,8 @@ import Linkify from 'react-linkify'
 
 import { Card, Icon, Segment, Button, Dimmer, Loader, Header } from 'semantic-ui-react'
 
-import { userFormPage } from '../pages.js'
-import { openNewPostDialog, updatePostAddress, requestMoreUserPosts } from '../actions.js'
+import { userFormPage, followersPage, followingPage } from '../pages.js'
+import { openNewPostDialog, updatePostAddress, requestMoreUserPosts } from '../actions/index.js'
 import { userSelector, userPageSelector, followingSelector } from '../selectors.js'
 import FollowButton from './FollowButton.js'
 import PostList from './PostList.js'
@@ -22,7 +22,9 @@ const mapStateToProps = state => {
 
 const actionCreators = {
   openNewPostDialog, updatePostAddress, requestMoreUserPosts,
-  userFormPageAction: name => userFormPage.action({name})
+  userFormPageAction: name => userFormPage.action({name}),
+  followersPageAction: name => followersPage.action({name}),
+  followingPageAction: name => followingPage.action({name})
 }
 
 class UserPage extends Component {
@@ -31,6 +33,8 @@ class UserPage extends Component {
     this.handleSendTo = this.handleSendTo.bind(this)
     this.handleClickEdit = this.handleClickEdit.bind(this)
     this.handleLoadMorePosts = this.handleLoadMorePosts.bind(this)
+    this.handleClickFollowers = this.handleClickFollowers.bind(this)
+    this.handleClickFollowing = this.handleClickFollowing.bind(this)
   }
 
   handleSendTo() {
@@ -51,6 +55,16 @@ class UserPage extends Component {
     }
   }
 
+  handleClickFollowers() {
+    const { followersPageAction, userPage: { user }} = this.props
+    followersPageAction(user.name)
+  }
+
+  handleClickFollowing() {
+    const { followingPageAction, userPage: { user }} = this.props
+    followingPageAction(user.name)
+  }
+
   render() {
     const { isMe, isNotMe, userPage } = this.props
     const {
@@ -61,7 +75,7 @@ class UserPage extends Component {
       return (
         <Segment.Group>
           <Segment>
-            <Card>
+            <Card fluid>
               <Card.Content>
                 <Card.Header>
                   {user.display} {isNotMe ? (
@@ -81,35 +95,42 @@ class UserPage extends Component {
                   </span>
                 </Card.Meta>
                 <Card.Description>
-                  <p>
-                    <Icon name='user' />
-                    {following} Following
-                  </p>
-                  <p>
-                    <Icon name='user' />
-                    {followers} Followers
-                  </p>
-                  {isNotMe ? (
-                    <div>
-                      <Button primary onClick={this.handleSendTo}>
-                        <Icon name='send' />
-                        Send to
-                      </Button>
-                    </div>
-                  ) : null}
+                  <Button
+                    content='Following'
+                    icon='user'
+                    label={{as: 'a', basic: true, content: following}}
+                    labelPosition='right'
+                    onClick={this.handleClickFollowing}
+                  />
+                  <Button
+                    content='Followers'
+                    icon='user'
+                    label={{as: 'a', basic: true, content: followers}}
+                    labelPosition='right'
+                    onClick={this.handleClickFollowers}
+                  />
                 </Card.Description>
               </Card.Content>
+              {isNotMe ? (
+                <Card.Content extra>
+                  <Button primary onClick={this.handleSendTo}>
+                    <Icon name='send' />
+                    Send to
+                  </Button>
+                </Card.Content>
+              ) : null}
             </Card>
-            {user.bio && user.bio.length >= 1 ? (
-              <Segment>
-                <pre>
-                  <Linkify properties={{target: '_blank'}}>
-                    {user.bio}
-                  </Linkify>
-                </pre>
-              </Segment>
-            ) : null}
           </Segment>
+          {user.bio && user.bio.length >= 1 ? (
+            <Segment>
+              <Header>Bio</Header>
+              <pre>
+                <Linkify properties={{target: '_blank'}}>
+                  {user.bio}
+                </Linkify>
+              </pre>
+            </Segment>
+          ) : null}
           <Segment>
             <Header>Recent Posts</Header>
             <PostList posts={posts}>

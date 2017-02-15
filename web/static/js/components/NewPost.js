@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import { Header, Segment, Button, Form, Label, Icon } from 'semantic-ui-react'
 
-import { submitPost, updatePostAddress } from '../actions.js'
+import { submitPost, updatePostAddress } from '../actions/index.js'
 import { newPostPageSelector, userSelector } from '../selectors.js'
 import Post from './Post.js'
 

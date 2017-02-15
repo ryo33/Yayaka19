@@ -4,7 +4,7 @@ import { createReducer } from 'redux-act'
 import {
   updatePostText, updatePostAddress, openNewPostDialog, closeNewPostDialog,
   submitPost
-} from '../actions.js'
+} from '../actions/index.js'
 
 const text = createReducer({
   [updatePostText]: (state, payload) => payload,

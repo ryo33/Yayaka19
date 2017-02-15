@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import { Segment, Header, Button, Rail, Icon, Dimmer, Loader } from 'semantic-ui-react'
 
-import { loadNewPosts, requestTimeline, requestMoreTimeline } from '../actions.js'
+import { loadNewPosts, requestTimeline, requestMoreTimeline } from '../actions/index.js'
 import { timelineSelector, userSelector } from '../selectors.js'
 import { publicTimeline } from '../pages.js'
 
