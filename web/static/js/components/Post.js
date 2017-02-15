@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Linkify from 'react-linkify'
 
-import { Comment, Icon, Segment } from 'semantic-ui-react'
+import { Comment, Icon, Segment, Button } from 'semantic-ui-react'
 
 import Time from './Time.js'
 import FollowButton from './FollowButton.js'
@@ -163,15 +163,25 @@ class Post extends Component {
   }
 
   renderChildPost(actions, size) {
+    const { postPageAction } = this.props
     const { post } = this.props
-    return (
-      <Segment size={size}>
-        <ConnectedPost
-          actions={actions}
-          post={post.post}
-        />
-      </Segment>
-    )
+    const notLoaded = post.post_id != null && post.post == null
+    if (notLoaded) {
+      return (
+        <Segment size={size}>
+          <Button onClick={() => postPageAction(post.id)}>Load More</Button>
+        </Segment>
+      )
+    } else {
+      return (
+        <Segment size={size}>
+          <ConnectedPost
+            actions={actions}
+            post={post.post}
+          />
+        </Segment>
+      )
+    }
   }
 
   render() {
@@ -180,8 +190,9 @@ class Post extends Component {
       attributeIcon, prefix, post, userPageAction
     } = this.props
     const { openReply, openQuote } = this.state
-    const reply = post.post && post.post_addresses.length >= 1
-    const quote = post.post && post.post_addresses.length == 0
+    const hasChild = post.post != null || post.post_id != null
+    const reply = hasChild && post.post_addresses.length >= 1
+    const quote = hasChild && post.post_addresses.length == 0
     const empty = post.text ? post.text.length === 0 : true
     const size = quote ? null : 'tiny'
     const userDisplay = post.user_display || post.user.display

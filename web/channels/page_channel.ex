@@ -69,7 +69,7 @@ defmodule Share.PageChannel do
       nil -> {:reply, :error, socket}
       post ->
         res = %{
-          post: Post.preload(post),
+          post: Post.deep_preload(post),
           favs: Fav.get_favs(socket, [post.id])
         }
         {:reply, {:ok, res}, socket}

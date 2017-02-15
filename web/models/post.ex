@@ -9,7 +9,8 @@ defmodule Share.Post do
       end
       |> Map.from_struct
       |> Enum.filter(fn {key, _} -> Enum.member?([
-        :id, :text, :user_display, :user, :post, :post_addresses, :inserted_at
+        :id, :text, :user_display, :user, :inserted_at,
+        :post, :post_id, :post_addresses
       ], key) end)
       |> Enum.into(%{})
       |> Poison.encode!(options)
@@ -47,9 +48,18 @@ defmodule Share.Post do
     |> order_by(fragment("RANDOM() * (LN(views + 1) + SIN(views) + 1)"))
   end
 
-  @preload [:user, post_addresses: :user, post: [:user, post_addresses: :user]]
+  @preload [
+    :user, post_addresses: :user, post: [
+      :user, post_addresses: :user]]
+  @deep_preload [
+    :user, post_addresses: :user, post: [
+      :user, post_addresses: :user, post: [
+        :user, post_addresses: :user, post: [
+          :user, post_addresses: :user, post: [
+            :user, :post, post_addresses: :user]]]]]
 
   def preload_params, do: @preload
+  def deep_preload_params, do: @deep_preload
 
   def preload(%Share.Post{} = post) do
     Share.Repo.preload(post, @preload)
@@ -58,5 +68,14 @@ defmodule Share.Post do
   def preload(query) do
     query
     |> preload(^@preload)
+  end
+
+  def deep_preload(%Share.Post{} = post) do
+    Share.Repo.preload(post, @deep_preload)
+  end
+
+  def deep_preload(query) do
+    query
+    |> preload(^@deep_preload)
   end
 end
