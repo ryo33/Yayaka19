@@ -143,7 +143,7 @@ class OnlinePosts extends Component {
             <span>
               <Icon name={isAll ? 'bar' : 'hashtag'} />
               {text} {count >= 1 ? (
-                <Label color='red' circular content={count} />
+                <Label color='yellow' circular content={count} />
               ) : null}
             </span>
           )
@@ -174,7 +174,7 @@ class OnlinePosts extends Component {
               return (
                 <Label as='a' key={name} onClick={() => this.changeChannel(name)}
                   icon={isAll ? 'bar' : 'hashtag'} content={text}
-                  detail={<Label color='red' circular content={count} />}
+                  detail={<Label color='yellow' circular content={count} />}
                   removeIcon={<Icon name='delete' />}
                   onRemove={(e) => {
                     e.stopPropagation()
