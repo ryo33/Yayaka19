@@ -26,8 +26,9 @@ defmodule Share.PageController do
     case Share.Repo.get_by(Share.User, name: name) do
       nil -> render_page(conn)
       user ->
+        title = Application.get_env(:share, :title)
         og = %{
-          title: "#{user.display} (@#{user.name}) on Share",
+          title: "#{user.display} (@#{user.name}) on #{title}",
           url: get_url(conn)
         }
       render_page(conn, og)

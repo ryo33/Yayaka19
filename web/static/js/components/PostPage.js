@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { Segment, Header, Button, Dimmer, Loader } from 'semantic-ui-react'
 
 import { postPageSelector } from '../selectors.js'
-import { requestContexts } from '../actions.js'
+import { requestContexts } from '../actions/index.js'
 import Post from './Post.js'
 import PostList from './PostList.js'
 

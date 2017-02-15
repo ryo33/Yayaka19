@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
 import { createReducer } from 'redux-act'
 
-import { requestPost, setPost, requestContexts, setContexts } from '../actions.js'
+import { requestPost, setPost, requestContexts, setContexts } from '../actions/index.js'
 
 const post = createReducer({
   [setPost]: (state, post) => post,

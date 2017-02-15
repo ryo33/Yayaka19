@@ -10,13 +10,13 @@ import App from './components/App.js'
 import { pages, pagesMiddleware } from './pages.js'
 import reducer from './reducers/index.js'
 import { pageSelector } from './selectors.js'
-import middleware from './middlewares.js'
+import middleware from './middlewares/index.js'
 import {
   initializeUser,
   addFavs, updateTimeline, setUser,
   setFollowing, setFollowers, updateNoticed, updateNotices,
   showError, hideError, doPing, setWindowFocused
-} from './actions.js'
+} from './actions/index.js'
 import { joinChannel, joinUserChannel } from './socket.js'
 import { watchUserChannel } from './userChannel.js'
 

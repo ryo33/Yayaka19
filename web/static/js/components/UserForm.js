@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { Segment, Header, Form } from 'semantic-ui-react'
 
 import { userPage } from '../pages.js'
-import { editUser } from '../actions.js'
+import { editUser } from '../actions/index.js'
 import { userSelector } from '../selectors.js'
 
 const mapStateToProps = state => {

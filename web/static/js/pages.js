@@ -11,7 +11,9 @@ import {
   openNoticesPage,
   showOnlinePosts,
   closeNewPostDialog
-} from './actions.js'
+} from './actions/index.js'
+import { requestFollowers } from './actions/followersPage.js'
+import { requestFollowing } from './actions/followingPage.js'
 import {
   pageSelector,
   homePostSelector,
@@ -24,8 +26,10 @@ const p = pages.addPage.bind(pages)
 export const home           = p('/', 'home')
 export const publicTimeline = p('/p', 'public')
 export const timeline       = p('/t', 'timeline')
-export const onlinePosts         = p('/o', 'online')
+export const onlinePosts    = p('/o', 'online')
 export const userPage       = p('/users/:name', 'user')
+export const followersPage  = p('/users/:name/followers', 'followers')
+export const followingPage  = p('/users/:name/following', 'following')
 export const userFormPage   = p('/users/:name/edit', 'userForm')
 export const postPage       = p('/posts/:id', 'post')
 export const noticesPage    = p('/n', 'notices')
@@ -100,6 +104,22 @@ const userPageHook = createAsyncHook(
   }
 )
 
+const followersPageHook = createAsyncHook(
+  ({ action }) => followersPage.check(action),
+  ({ dispatch, action }) => {
+    const name = action.payload.params.name
+    dispatch(requestFollowers(name))
+  }
+)
+
+const followingPageHook = createAsyncHook(
+  ({ action }) => followingPage.check(action),
+  ({ dispatch, action }) => {
+    const name = action.payload.params.name
+    dispatch(requestFollowing(name))
+  }
+)
+
 const postPageHook = createAsyncHook(
   ({ action }) => postPage.check(action),
   ({ dispatch, action }) => {
@@ -124,6 +144,8 @@ export const pagesMiddleware = composeMiddleware(
   publicTimelineHook,
   onlinePostsHook,
   userPageHook,
+  followersPageHook,
+  followingPageHook,
   postPageHook,
   noticesPageHook
 )

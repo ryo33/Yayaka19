@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
 import { createReducer } from 'redux-act'
 
-import { requestPublicTimeline, updatePublicTimeline } from '../actions.js'
+import { requestPublicTimeline, updatePublicTimeline } from '../actions/index.js'
 
 const posts = createReducer({
   [requestPublicTimeline]: () => [],

@@ -1,10 +1,10 @@
 import { createAsyncHook, createReplacer, composeMiddleware } from 'redux-middlewares'
 
-import { signedIn } from './global.js'
-import { pushMessage, channel, userChannel } from './socket.js'
+import { signedIn } from '../global.js'
+import { pushMessage, channel, userChannel } from '../socket.js'
 import {
   loginPage, home, timeline, publicTimeline, userPage, onlinePosts
-} from './pages.js'
+} from '../pages.js'
 import {
   editUser, setUser, initializeUser,
   submitOnlinePost, showOnlinePosts,
@@ -22,9 +22,11 @@ import {
   closeNewPostDialog,
   sendToOnline,
   setWindowFocused
-} from './actions.js'
-import { pageSelector, onlinePostsSelector } from './selectors.js'
-import { compareNotices } from './utils.js'
+} from '../actions/index.js'
+import { pageSelector, onlinePostsSelector } from '../selectors.js'
+import { compareNotices } from '../utils.js'
+import followersPageMiddleware from './followersPage.js'
+import followingPageMiddleware from './followingPage.js'
 
 const redirectLoginPageMiddleware = createReplacer(
   () => !signedIn, [
@@ -284,6 +286,8 @@ if (signedIn) {
 }
 
 export default composeMiddleware(
+  followersPageMiddleware,
+  followingPageMiddleware,
   ...signedInMiddlewares,
   redirectLoginPageMiddleware,
   requestUserMiddleware,
