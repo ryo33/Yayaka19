@@ -182,6 +182,7 @@ class Post extends Component {
     const { openReply, openQuote } = this.state
     const reply = post.post && post.post_addresses.length >= 1
     const quote = post.post && post.post_addresses.length == 0
+    const empty = post.text ? post.text.length === 0 : true
     const size = quote ? null : 'tiny'
     const userDisplay = post.user_display || post.user.display
     return (
@@ -190,6 +191,10 @@ class Post extends Component {
           <Comment.Content>
             {reply ? this.renderChildPost(quote, size) : null}
             {prefix}
+            {quote ? (
+              <Icon name={empty ? 'retweet' : 'quote right'}
+                size='large' color='blue' />
+            ) : null}
             <Comment.Author as={React.a} href={userPage.path({name: post.user.name})} onClick={this.handleClickUser}>
               {userDisplay}
             </Comment.Author>
@@ -202,9 +207,6 @@ class Post extends Component {
               ) : (
                 <Time time={post.inserted_at} />
               )}
-              {quote ? (
-                <Icon name='quote right' size='big' />
-              ) : null}
               {followButton ? (
                 <FollowButton user={post.user} />
               ) : null}
