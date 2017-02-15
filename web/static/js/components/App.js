@@ -26,6 +26,7 @@ import {
   hideError, doPing
 } from '../actions/index.js'
 import Router from './Router.js'
+import NewPost from './NewPost.js'
 
 const mapStateToProps = state => {
   const { newPosts } = timelineSelector(state)
