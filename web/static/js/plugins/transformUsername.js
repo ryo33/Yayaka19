@@ -8,18 +8,14 @@ function charAtFromEnd(text, index) {
 
 export default {
   handleChange(text, nextText) {
-    if (nextText.length === text.length + 1) {
-      if (charAtFromEnd(nextText, 1) === charAtFromEnd(text, 0)) {
-        // Only when added to the end
-        const matched = nextText.match(nameRegex)
-        if (matched) {
-          const value = matched[1]
-          const text = `@${value}`
-          return [{value, text}]
-        }
-      }
+    const matched = nextText.match(nameRegex)
+    if (matched) {
+      const value = matched[1]
+      const text = `@${value}`
+      return [{value, text}]
+    } else {
+      return []
     }
-    return []
   },
   handleSelect(text, option) {
     const name = option.value

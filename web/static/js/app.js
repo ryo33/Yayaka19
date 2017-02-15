@@ -44,6 +44,7 @@ const store = createStore(
   )
 )
 persistStore(store, {whitelist: ['editorPlugins']})
+
 // Socket
 const userChannelCallback = ({ userParams }) => {
   store.dispatch(initializeUser(userParams))

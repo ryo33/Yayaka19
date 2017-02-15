@@ -18,11 +18,15 @@ export const handlers = {
   handleChange(plugins, text, nextText) {
     const optionsList = plugins.map((pluginName, index) => {
       const plugin = pluginsObject[pluginName]
-      const options = plugin.handleChange(text, nextText)
-      return options.map(option => {
-        const id = `${plugin.id}/${option.text}`
-        return {id, plugin: plugin.id, ...option}
-      })
+      if (plugin.handleChange) {
+        const options = plugin.handleChange(text, nextText)
+        return options.map(option => {
+          const id = `${plugin.id}/${option.text}`
+          return {id, plugin: plugin.id, ...option}
+        })
+      } else {
+        return []
+      }
     })
     return Array.prototype.concat.apply([], optionsList)
   },
