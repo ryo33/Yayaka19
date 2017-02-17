@@ -154,11 +154,13 @@ class App extends Component {
       newPost
     } = this.props
     const { sidebar, logout } = this.state
-    const titleNotices = newPostsCount + onlinePostsCount + noticesCount
+    const titleNotices = error
+      ? -1
+      : newPostsCount + onlinePostsCount + noticesCount
     return (
       <div>
         <Helmet title={
-          titleNotices == 0 ? title : `(${titleNotices}) ${title}`
+          titleNotices === 0 ? title : `(${titleNotices}) ${title}`
         } />
         <Menu style={menuStyle}>
           <Container>
