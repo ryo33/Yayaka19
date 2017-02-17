@@ -87,14 +87,11 @@ defmodule Share.PageChannel do
 
   def handle_in("public_timeline", _params, socket) do
     query = Post
-            |> limit(50)
-            |> Post.random()
-    query = subquery(query)
             |> order_by([p], [desc: p.id])
+            |> limit(50)
             |> Post.preload()
     posts = Repo.all(query)
     post_ids = posts |> Enum.map(&(&1.id))
-    Repo.update_all((from p in Post, where: p.id in ^post_ids), inc: [views: 1])
     favs = Fav.get_favs(socket, post_ids)
     {:reply, {:ok, %{posts: posts, favs: favs}}, socket}
   end

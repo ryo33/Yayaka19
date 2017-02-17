@@ -19,7 +19,6 @@ defmodule Share.Post do
 
   schema "posts" do
     field :text, :string
-    field :views, :integer, default: 0
     field :user_display, :string
     belongs_to :user, Share.User
     belongs_to :post, Share.Post
@@ -41,11 +40,6 @@ defmodule Share.Post do
     |> cast(params, @fields)
     |> validate_required(@required_fields)
     |> validate_length(:text, min: 0)
-  end
-
-  def random(query) do
-    query
-    |> order_by(fragment("RANDOM() * (LN(views + 1) + SIN(views) + 1)"))
   end
 
   @preload [
