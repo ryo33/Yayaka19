@@ -56,7 +56,7 @@ class PublicTimeline extends Component {
         )}
         <Segment vertical>
           <Header>Public Timeline</Header>
-          <Button primary onClick={requestPublicTimeline}>Shuffle</Button>
+          <Button primary onClick={requestPublicTimeline}>Reload</Button>
           <Label size='large'>{user.display} @{user.name}</Label>
         </Segment>
         <PostList
