@@ -1,16 +1,21 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-
 import { Form, Segment, Header, Button, Label, Dropdown, Icon } from 'semantic-ui-react'
 
 import {
   changeOnlineChannel, showOnlinePosts, submitOnlinePost, openNewPostDialog, updatePostText
 } from '../actions/index.js'
-import { onlinePostsSelector, userSelector, followersSelector } from '../selectors.js'
+import {
+  onlinePostsSelector, userSelector, followersSelector, editorPluginsSelector
+} from '../selectors.js'
+import { handlers } from '../editorPlugins.js'
 import { title } from '../global.js'
 import { isDefaultChannel, DEFAULT_CHANNEL } from '../utils.js'
 import UserSelector from './UserSelector.js'
 import Post from './Post.js'
+import EditorPluginsOptions from './EditorPluginsOptions.js'
+import EditorPluginsButton from './EditorPluginsButton.js'
+import EditorPluginsSelector from './EditorPluginsSelector.js'
 
 const channelsSorter = (a, b) => {
   const l = a.count, r = b.count
@@ -56,6 +61,7 @@ function filterPosts(posts, channel) {
 
 const mapStateToProps = state => {
   const { posts, channel, channels } = onlinePostsSelector(state)
+  const { plugins } = editorPluginsSelector(state)
   const user = userSelector(state)
   const followers = followersSelector(state)
 
@@ -70,7 +76,7 @@ const mapStateToProps = state => {
     }
   })
   return {
-    posts, channel, followers, user, playableUsers,
+    posts, channel, followers, user, playableUsers, plugins,
     channels: getChannelsFromPosts(posts, channel, channels)
   }
 }
@@ -87,13 +93,17 @@ class OnlinePosts extends Component {
   constructor(props) {
     super(props)
     this.submit = this.submit.bind(this)
+    this.changeText = this.changeText.bind(this)
     this.handleChangeText = this.handleChangeText.bind(this)
     this.handleChangeUser = this.handleChangeUser.bind(this)
     this.handleKeyDown = this.handleKeyDown.bind(this)
     this.handleChangeChannel = this.handleChangeChannel.bind(this)
+    this.handleClickPlugins = this.handleClickPlugins.bind(this)
     this.state = {
       currentUser: null,
-      text: ''
+      text: '',
+      previousText: '',
+      showPlugins: false
     }
   }
 
@@ -103,17 +113,18 @@ class OnlinePosts extends Component {
 
   reset() {
     this.setState({
-      text: ''
+      text: '', previousText: ''
     })
   }
 
   submit(e) {
     e.preventDefault()
-    const { submitOnlinePost, channel } = this.props
+    const { submitOnlinePost, channel, plugins } = this.props
     const { text } = this.state
     const currentUser = this.getCurrentUser()
-    if (text.length >= 1) {
-      submitOnlinePost({user_id: currentUser, text, channel})
+    const transformedText = handlers.transform(plugins, text)
+    if (transformedText.length >= 1) {
+      submitOnlinePost({user_id: currentUser, text: transformedText, channel})
       this.reset()
     }
   }
@@ -122,8 +133,13 @@ class OnlinePosts extends Component {
     this.setState({currentUser: user})
   }
 
+  changeText(nextText) {
+    const { text } = this.state
+    this.setState({previousText: text, text: nextText})
+  }
+
   handleChangeText(event) {
-    this.setState({text: event.target.value})
+    this.changeText(event.target.value)
   }
 
   handleKeyDown(event) {
@@ -210,10 +226,16 @@ class OnlinePosts extends Component {
     )
   }
 
+  handleClickPlugins() {
+    this.setState({showPlugins: !this.state.showPlugins})
+  }
+
   render() {
-    const { posts, user, followers, channel, playableUsers } = this.props
-    const { text } = this.state
+    const { posts, user, followers, channel, playableUsers, plugins } = this.props
+    const { text, previousText, showPlugins } = this.state
     const currentUser = this.getCurrentUser()
+    const transformedText = handlers.transform(plugins, text)
+    const preview = text !== transformedText
     const filteredPosts = filterPosts(posts, channel)
     return (
       <div>
@@ -222,16 +244,33 @@ class OnlinePosts extends Component {
         </Segment>
         <Segment vertical>
           <Form onSubmit={this.submit}>
+            <EditorPluginsOptions text={text} previousText={previousText}
+              plugins={plugins} onChange={this.changeText} />
             <Form.TextArea name='text' value={text} rows='3' placeholder={'What\'s in your head?'}
               onChange={this.handleChangeText} onKeyDown={this.handleKeyDown} autoFocus />
             <Form.Group inline style={{marginBottom: "0px"}}>
               <Form.Button disabled={text.length == 0} primary>Submit</Form.Button>
               <UserSelector users={playableUsers} currentUser={currentUser}
                 onChange={this.handleChangeUser} />
+              <EditorPluginsButton plugins={plugins}
+                onClick={this.handleClickPlugins} />
             </Form.Group>
           </Form>
           {this.renderChannels()}
         </Segment>
+        {showPlugins ? (
+          <Segment vertical>
+            <EditorPluginsSelector />
+          </Segment>
+        ) : null}
+        {preview ? (
+          <Segment vertical>
+            <Header>Preview</Header>
+            <pre>
+              {transformedText}
+            </pre>
+          </Segment>
+        ) : null}
         {filteredPosts.length == 0 ? (
           <Segment vertical>
             <p>Nothing to show</p>

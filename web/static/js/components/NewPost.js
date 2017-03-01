@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-
 import { Header, Segment, Button, Form, Label, Icon } from 'semantic-ui-react'
 
 import { submitPost, updatePostAddress } from '../actions/index.js'
@@ -8,9 +7,9 @@ import {
   newPostPageSelector, userSelector, editorPluginsSelector
 } from '../selectors.js'
 import { handlers } from '../editorPlugins.js'
-
-
 import Post from './Post.js'
+import EditorPluginsOptions from './EditorPluginsOptions.js'
+import EditorPluginsButton from './EditorPluginsButton.js'
 import EditorPluginsSelector from './EditorPluginsSelector.js'
 
 const mapStateToProps = state => {
@@ -30,6 +29,7 @@ const actionCreators = {
 class NewPost extends Component {
   constructor(props) {
     super(props)
+    this.changeText = this.changeText.bind(this)
     this.handleChangeText = this.handleChangeText.bind(this)
     this.handleKeyDown = this.handleKeyDown.bind(this)
     this.submit = this.submit.bind(this)
@@ -37,7 +37,7 @@ class NewPost extends Component {
     this.handleClickPlugins = this.handleClickPlugins.bind(this)
     this.state = {
       text: '',
-      options: [],
+      previousText: '',
       showPlugins: false
     }
   }
@@ -45,14 +45,15 @@ class NewPost extends Component {
   componentWillMount() {
     const { top, text } = this.props
     if (top) {
-      this.setState({text, options: []})
+      this.setState({text, previousText: ''})
     }
   }
 
   componentWillReceiveProps(nextProps) {
     const { top, text } = this.props
     if (top && text !== nextProps.text) {
-      this.setState({text: nextProps.text, options: []})
+      const text = nextProps.text
+      this.setState({text, previousText: text})
     }
   }
 
@@ -62,7 +63,7 @@ class NewPost extends Component {
   }
 
   reset() {
-    this.setState({text: '', options: []})
+    this.setState({text: '', previousText: ''})
     updatePostAddress('')
   }
 
@@ -84,21 +85,12 @@ class NewPost extends Component {
   }
 
   changeText(nextText) {
-    const { plugins } = this.props
     const { text } = this.state
-    const options = handlers.handleChange(plugins, text, nextText)
-    this.setState({text: nextText, options})
+    this.setState({previousText: text, text: nextText})
   }
 
   handleChangeText(event) {
     this.changeText(event.target.value)
-  }
-
-  handleClickOption(option) {
-    const { plugins } = this.props
-    const { text } = this.state
-    const nextText = handlers.handleSelect(plugins, text, option)
-    this.changeText(nextText)
   }
 
   handleKeyDown(event) {
@@ -116,7 +108,7 @@ class NewPost extends Component {
       post, user, address, postAddresses, plugins,
       allowEmpty = false, rows = 6
     } = this.props
-    const { text, options, showPlugins } = this.state
+    const { text, previousText, showPlugins } = this.state
     const transformedText = handlers.transform(plugins, text)
     const preview = text !== transformedText
     return (
@@ -129,18 +121,14 @@ class NewPost extends Component {
                 <Icon name='send' /> {address} <Icon name='delete' onClick={this.handleRemoveAddress} />
               </Label>
             ) : null}
-            {
-              options.map(option => (
-                <Label basic as='a' key={option.id} content={option.text}
-                  onClick={() => this.handleClickOption(option)} />
-              ))
-            }
+            <EditorPluginsOptions text={text} previousText={previousText}
+              plugins={plugins} onChange={this.changeText} />
             <Form.TextArea name='text' value={text} rows={rows} placeholder={'What\'s in your head?'}
               onChange={this.handleChangeText} onKeyDown={this.handleKeyDown} autoFocus />
             <Form.Group inline style={{marginBottom: "0px"}}>
               <Form.Button disabled={!allowEmpty && text.length == 0} primary>Submit</Form.Button>
               <Label size='large'>{user.display} @{user.name}</Label>
-              <Label basic as='a' icon='puzzle' content={plugins.length} size='large'
+              <EditorPluginsButton plugins={plugins}
                 onClick={this.handleClickPlugins} />
             </Form.Group>
           </Form>
