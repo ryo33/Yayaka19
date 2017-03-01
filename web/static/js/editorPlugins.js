@@ -12,8 +12,6 @@ pluginsList.forEach(plugin => {
   pluginsObject[plugin.id] = plugin
 })
 
-console.log(pluginsList)
-
 export const handlers = {
   handleChange(plugins, text, nextText) {
     const optionsList = plugins.map((pluginName, index) => {

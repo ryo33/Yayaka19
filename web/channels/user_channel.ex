@@ -157,17 +157,31 @@ defmodule Share.UserChannel do
 
   def handle_in("online_post", params, socket) do
     user = socket.assigns.user
-    user = Repo.get!(User, user.id)
-    %{"text" => text, "channel" => channel} = params
-    post = %{
-      channel: channel,
-      text: text, user: user, id: UUID.uuid4(),
-      inserted_at: NaiveDateTime.utc_now(),
-      post_addresses: [],
-      isOnlinePost: true
-    }
-    Share.OnlinePostHandler.handle(post, user)
-    {:reply, :ok, socket}
+    playing_name = Map.get(params, "user_id", nil)
+    user = if is_nil(playing_name) or user.name == playing_name do
+      Repo.get!(User, user.id)
+    else
+      query = from f in Follow,
+        join: u in User, on: f.user_id == u.id,
+        where: f.target_user_id == ^user.id,
+        where: u.name == ^playing_name,
+        select: u
+      Repo.one(query)
+    end
+    if not is_nil(user) do
+      %{"text" => text, "channel" => channel} = params
+      post = %{
+        channel: channel,
+        text: text, user: user, id: UUID.uuid4(),
+        inserted_at: NaiveDateTime.utc_now(),
+        post_addresses: [],
+        isOnlinePost: true
+      }
+      Share.OnlinePostHandler.handle(post, user)
+      {:reply, :ok, socket}
+    else
+      {:reply, :error, socket}
+    end
   end
 
   def get_timeline(user_id, socket, opts \\ []) do

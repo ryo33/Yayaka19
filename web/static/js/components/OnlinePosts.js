@@ -7,9 +7,10 @@ import {
   changeOnlineChannel, showOnlinePosts, submitOnlinePost, openNewPostDialog, updatePostText
 } from '../actions/index.js'
 import { onlinePostsSelector, userSelector, followersSelector } from '../selectors.js'
-import Post from './Post.js'
 import { title } from '../global.js'
 import { isDefaultChannel, DEFAULT_CHANNEL } from '../utils.js'
+import UserSelector from './UserSelector.js'
+import Post from './Post.js'
 
 const channelsSorter = (a, b) => {
   const l = a.count, r = b.count
@@ -21,6 +22,7 @@ const channelsSorter = (a, b) => {
     return b.count - a.count // DESC
   }
 }
+
 function getChannelsFromPosts(posts, channel, channels) {
   const channelsObj = {}
   let countSum = 0
@@ -54,11 +56,22 @@ function filterPosts(posts, channel) {
 
 const mapStateToProps = state => {
   const { posts, channel, channels } = onlinePostsSelector(state)
+  const user = userSelector(state)
+  const followers = followersSelector(state)
+
+  const playableUsers = []
+  const playableUsersSet = new Set()
+  if (user.name) playableUsers.push(user)
+  posts.forEach(({ user }) => {
+    const id = user.id
+    if (followers.includes(id) && !playableUsersSet.has(id)) {
+      playableUsersSet.add(id)
+      playableUsers.push(user)
+    }
+  })
   return {
-    posts, channel,
-    channels: getChannelsFromPosts(posts, channel, channels),
-    followers: followersSelector(state),
-    user: userSelector(state)
+    posts, channel, followers, user, playableUsers,
+    channels: getChannelsFromPosts(posts, channel, channels)
   }
 }
 
@@ -75,11 +88,17 @@ class OnlinePosts extends Component {
     super(props)
     this.submit = this.submit.bind(this)
     this.handleChangeText = this.handleChangeText.bind(this)
+    this.handleChangeUser = this.handleChangeUser.bind(this)
     this.handleKeyDown = this.handleKeyDown.bind(this)
     this.handleChangeChannel = this.handleChangeChannel.bind(this)
     this.state = {
+      currentUser: null,
       text: ''
     }
+  }
+
+  getCurrentUser() {
+    return this.state.currentUser || this.props.user.name
   }
 
   reset() {
@@ -92,10 +111,15 @@ class OnlinePosts extends Component {
     e.preventDefault()
     const { submitOnlinePost, channel } = this.props
     const { text } = this.state
+    const currentUser = this.getCurrentUser()
     if (text.length >= 1) {
-      submitOnlinePost({text, channel})
+      submitOnlinePost({user_id: currentUser, text, channel})
       this.reset()
     }
+  }
+
+  handleChangeUser(user) {
+    this.setState({currentUser: user})
   }
 
   handleChangeText(event) {
@@ -131,25 +155,23 @@ class OnlinePosts extends Component {
   renderChannels() {
     const { channels, channel } = this.props
     const getText = (text, isAll) => isAll ? 'All' : `${text}`
-    const options = [
-      ...channels.map(({ name, count }) => {
-        const isAll = isDefaultChannel(name)
-        const text = getText(name, isAll)
-        return {
-          key: name,
-          value: name,
-          text: text,
-          content: (
-            <span>
-              <Icon name={isAll ? 'bar' : 'hashtag'} />
-              {text} {count >= 1 ? (
-                <Label color='yellow' circular content={count} />
-              ) : null}
-            </span>
-          )
-        }
-      })
-    ]
+    const options = channels.map(({ name, count }) => {
+      const isAll = isDefaultChannel(name)
+      const text = getText(name, isAll)
+      return {
+        key: name,
+        value: name,
+        text: text,
+        content: (
+          <span>
+            <Icon name={isAll ? 'bar' : 'hashtag'} />
+            {text} {count >= 1 ? (
+              <Label color='yellow' circular content={count} />
+            ) : null}
+          </span>
+        )
+      }
+    })
     return (
       <span>
         <Dropdown
@@ -189,8 +211,9 @@ class OnlinePosts extends Component {
   }
 
   render() {
-    const { posts, user, followers, channel } = this.props
+    const { posts, user, followers, channel, playableUsers } = this.props
     const { text } = this.state
+    const currentUser = this.getCurrentUser()
     const filteredPosts = filterPosts(posts, channel)
     return (
       <div>
@@ -203,7 +226,8 @@ class OnlinePosts extends Component {
               onChange={this.handleChangeText} onKeyDown={this.handleKeyDown} autoFocus />
             <Form.Group inline style={{marginBottom: "0px"}}>
               <Form.Button disabled={text.length == 0} primary>Submit</Form.Button>
-              <Label size='large'>{user.display} @{user.name}</Label>
+              <UserSelector users={playableUsers} currentUser={currentUser}
+                onChange={this.handleChangeUser} />
             </Form.Group>
           </Form>
           {this.renderChannels()}
