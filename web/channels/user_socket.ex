@@ -6,7 +6,7 @@ defmodule Share.UserSocket do
   channel "user:*", Share.UserChannel
 
   ## Transports
-  transport :websocket, Phoenix.Transports.WebSocket
+  transport :websocket, Phoenix.Transports.WebSocket, timeout: 45_000
 
   def connect(%{"token" => token}, socket) do
     case Phoenix.Token.verify(Share.Endpoint, "channel", token) do
