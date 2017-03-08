@@ -1,5 +1,6 @@
 import transformUsername from './plugins/transformUsername.js'
 import number from './plugins/number.js'
+import emoji from './plugins/emoji.js'
 
 export const pluginsList = [{
   id: 'transformUsername',
@@ -10,6 +11,11 @@ export const pluginsList = [{
   id: 'line number',
   name: 'number',
   ...number,
+  description: ''
+}, {
+  id: 'emoji',
+  name: ':emoji:',
+  ...emoji,
   description: ''
 }]
 
