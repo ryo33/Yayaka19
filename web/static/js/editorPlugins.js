@@ -1,9 +1,15 @@
 import transformUsername from './plugins/transformUsername.js'
+import number from './plugins/number.js'
 
 export const pluginsList = [{
   id: 'transformUsername',
   name: '@username to link',
   ...transformUsername,
+  description: ''
+}, {
+  id: 'line number',
+  name: 'number',
+  ...number,
   description: ''
 }]
 
@@ -11,8 +17,6 @@ const pluginsObject = {}
 pluginsList.forEach(plugin => {
   pluginsObject[plugin.id] = plugin
 })
-
-console.log(pluginsList)
 
 export const handlers = {
   handleChange(plugins, text, nextText) {
