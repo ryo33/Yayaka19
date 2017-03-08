@@ -1,9 +1,15 @@
 import transformUsername from './plugins/transformUsername.js'
+import number from './plugins/number.js'
 
 export const pluginsList = [{
   id: 'transformUsername',
   name: '@username to link',
   ...transformUsername,
+  description: ''
+}, {
+  id: 'line number',
+  name: 'number',
+  ...number,
   description: ''
 }]
 
