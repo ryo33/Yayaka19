@@ -22,6 +22,12 @@ export const followersPageSelector = ({ followersPage }) => followersPage
 // Following
 export const followingPageSelector = ({ followingPage }) => followingPage
 
+// Mysteries
+export const mysteriesPageSelector = ({ mysteriesPage }) => mysteriesPage
+
+// Opened mysteries
+export const openedMysteriesPageSelector = ({ openedMysteriesPage }) => openedMysteriesPage
+
 // Post
 export const postPageSelector = ({ postPage }) => postPage
 

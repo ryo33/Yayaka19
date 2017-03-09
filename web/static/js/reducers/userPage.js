@@ -22,6 +22,14 @@ const followers = createReducer({
   [setUserInfo]: (state, { followers = 0 }) => followers
 }, 0)
 
+const mysteries = createReducer({
+  [setUserInfo]: (state, { mysteries = 0 }) => mysteries
+}, 0)
+
+const openedMysteries = createReducer({
+  [setUserInfo]: (state, { openedMysteries = 0 }) => openedMysteries
+}, 0)
+
 const posts = createReducer({
   [setUserInfo]: (state, { posts = [] }) => posts,
   [addUserPosts]: (state, posts) => state.concat(posts)
@@ -37,6 +45,8 @@ export default combineReducers({
   postCount,
   following,
   followers,
+  mysteries,
+  openedMysteries,
   posts,
   isLoadingMorePosts
 })

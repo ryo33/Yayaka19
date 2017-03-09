@@ -23,6 +23,11 @@ defmodule Share.Mystery do
     |> validate_length(:text, min: 1, max: 4096)
   end
 
+  def user_mysteries(user) do
+    from m in Share.Mystery,
+      where: m.user_id == ^user.id
+  end
+
   @preload [:user]
 
   def preload(%Share.Mystery{} = mystery) do

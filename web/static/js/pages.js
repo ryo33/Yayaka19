@@ -11,7 +11,9 @@ import {
   openNoticesPage,
   showOnlinePosts,
   closeNewPostDialog,
-  openMystery
+  openMystery,
+  requestMysteries,
+  requestOpenedMysteries
 } from './actions/index.js'
 import { requestFollowers } from './actions/followersPage.js'
 import { requestFollowing } from './actions/followingPage.js'
@@ -25,20 +27,22 @@ import {
 export const pages = createPages()
 const p = pages.addPage.bind(pages)
 
-export const home           = p('/', 'home')
-export const publicTimeline = p('/p', 'public')
-export const timeline       = p('/t', 'timeline')
-export const onlinePosts    = p('/o', 'online')
-export const userPage       = p('/users/:name', 'user')
-export const followersPage  = p('/users/:name/followers', 'followers')
-export const followingPage  = p('/users/:name/following', 'following')
-export const userFormPage   = p('/users/:name/edit', 'userForm')
-export const postPage       = p('/posts/:id', 'post')
-export const noticesPage    = p('/n', 'notices')
-export const loginPage      = p('/login', 'login')
-export const mysteryPage    = p('/mysteries/:id', 'mysteries')
-export const newMysteryPage = p('/new-mystery', 'newMystery')
-export const errorPage      = p('/*', 'error')
+export const home                = p('/', 'home')
+export const publicTimeline      = p('/p', 'public')
+export const timeline            = p('/t', 'timeline')
+export const onlinePosts         = p('/o', 'online')
+export const userPage            = p('/users/:name', 'user')
+export const followersPage       = p('/users/:name/followers', 'followers')
+export const followingPage       = p('/users/:name/following', 'following')
+export const mysteriesPage       = p('/users/:name/mysteries', 'userMysteries')
+export const openedMysteriesPage = p('/users/:name/opened-mysteries', 'openedMysteries')
+export const userFormPage        = p('/users/:name/edit', 'userForm')
+export const postPage            = p('/posts/:id', 'post')
+export const noticesPage         = p('/n', 'notices')
+export const loginPage           = p('/login', 'login')
+export const mysteryPage         = p('/mysteries/:id', 'mystery')
+export const newMysteryPage      = p('/new-mystery', 'newMystery')
+export const errorPage           = p('/*', 'error')
 
 export const passwordUpdateURL = '/login/password/update'
 export const passwordLoginURL = '/login/password'
@@ -126,6 +130,22 @@ const followingPageHook = createAsyncHook(
   }
 )
 
+const mysteriesPageHook = createAsyncHook(
+  ({ action }) => mysteriesPage.check(action),
+  ({ dispatch, action }) => {
+    const name = action.payload.params.name
+    dispatch(requestMysteries(name))
+  }
+)
+
+const openedMysteriesPageHook = createAsyncHook(
+  ({ action }) => openedMysteriesPage.check(action),
+  ({ dispatch, action }) => {
+    const name = action.payload.params.name
+    dispatch(requestOpenedMysteries(name))
+  }
+)
+
 const postPageHook = createAsyncHook(
   ({ action }) => postPage.check(action),
   ({ dispatch, action }) => {
@@ -160,6 +180,8 @@ export const pagesMiddleware = composeMiddleware(
   userPageHook,
   followersPageHook,
   followingPageHook,
+  mysteriesPageHook,
+  openedMysteriesPageHook,
   postPageHook,
   noticesPageHook,
   mysteryPageHook

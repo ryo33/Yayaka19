@@ -27,6 +27,8 @@ import { pageSelector, onlinePostsSelector } from '../selectors.js'
 import { compareNotices } from '../utils.js'
 import followersPageMiddleware from './followersPage.js'
 import followingPageMiddleware from './followingPage.js'
+import mysteriesPageMiddleware from './mysteriesPage.js'
+import openedMysteriesPageMiddleware from './openedMysteriesPage.js'
 import mysteryPageMiddleware from './mysteryPage.js'
 
 const redirectLoginPageMiddleware = createReplacer(
@@ -62,9 +64,9 @@ const requestUserMiddleware = createAsyncHook(
     setUserInfo({})
     pushMessage(channel, 'user_info', {name: action.payload})
       .then(resp => {
-        const { user, posts, favs, postCount, following, followers } = resp
+        const { user, posts, favs, postCount, following, followers, mysteries, openedMysteries } = resp
         dispatch(addFavs(favs))
-        dispatch(setUserInfo({user, posts, postCount, following, followers}))
+        dispatch(setUserInfo({user, posts, postCount, following, followers, mysteries, openedMysteries}))
       }, ({ error, timeout }) => {
         dispatch(home.action())
       })
@@ -289,6 +291,8 @@ if (signedIn) {
 export default composeMiddleware(
   followersPageMiddleware,
   followingPageMiddleware,
+  mysteriesPageMiddleware,
+  openedMysteriesPageMiddleware,
   mysteryPageMiddleware,
   ...signedInMiddlewares,
   redirectLoginPageMiddleware,
