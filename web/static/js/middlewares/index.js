@@ -27,6 +27,7 @@ import { pageSelector, onlinePostsSelector } from '../selectors.js'
 import { compareNotices } from '../utils.js'
 import followersPageMiddleware from './followersPage.js'
 import followingPageMiddleware from './followingPage.js'
+import mysteryPageMiddleware from './mysteryPage.js'
 
 const redirectLoginPageMiddleware = createReplacer(
   () => !signedIn, [
@@ -288,6 +289,7 @@ if (signedIn) {
 export default composeMiddleware(
   followersPageMiddleware,
   followingPageMiddleware,
+  mysteryPageMiddleware,
   ...signedInMiddlewares,
   redirectLoginPageMiddleware,
   requestUserMiddleware,

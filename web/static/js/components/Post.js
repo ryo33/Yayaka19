@@ -8,6 +8,7 @@ import Time from './Time.js'
 import FollowButton from './FollowButton.js'
 import UserButton from './UserButton.js'
 import NewPost from './NewPost.js'
+import Mystery from './Mystery.js'
 import { requestFav, requestUnfav, setAddressPost, sendToOnline, submitPost } from '../actions/index.js'
 import { userPage, postPage } from '../pages.js'
 import { userSelector, favsSelector } from '../selectors.js'
@@ -184,6 +185,14 @@ class Post extends Component {
     }
   }
 
+  renderMystery(mystery) {
+    return (
+      <Segment>
+        <Mystery mystery={mystery} />
+      </Segment>
+    )
+  }
+
   render() {
     const {
       list = false, followButton = true, actions = true, postLink = true,
@@ -193,7 +202,8 @@ class Post extends Component {
     const hasChild = post.post != null || post.post_id != null
     const reply = hasChild && post.post_addresses.length >= 1
     const quote = hasChild && post.post_addresses.length == 0
-    const empty = post.text ? post.text.length === 0 : true
+    const quoteMystery = post.mystery_id != null
+    const empty = !quoteMystery && (post.text ? post.text.length === 0 : true)
     const size = quote ? null : 'tiny'
     const userDisplay = post.user_display || post.user.display
     return (
@@ -237,6 +247,7 @@ class Post extends Component {
                 </pre>
               ) : null}
               {quote ? this.renderChildPost(quote, size) : null}
+              {post.mystery ? this.renderMystery(post.mystery) : null}
             </Comment.Text>
             {actions && post.text ? (
               <Comment.Actions>

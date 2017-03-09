@@ -12,6 +12,7 @@ import {
   home, publicTimeline, timeline, onlinePosts,
   userPage, userFormPage,
   postPage, loginPage, noticesPage,
+  newMysteryPage,
   apiURL, logoutURL, newAccountURL, getSwitchUserURL,
   passwordUpdateURL
 } from '../pages.js'
@@ -51,6 +52,7 @@ const actionCreators = {
   userFormPageAction: name => userFormPage.action({name}),
   loginPageAction: () => loginPage.action(),
   noticesPageAction: () => noticesPage.action(),
+  newMysteryPageAction: () => newMysteryPage.action(),
   openNewPostDialog, closeNewPostDialog,
   hideError, doPing
 }
@@ -148,6 +150,7 @@ class App extends Component {
       newPostAction,
       loginPageAction,
       noticesPageAction,
+      newMysteryPageAction,
       newPostsCount,
       onlinePostsCount,
       noticesCount,
@@ -217,6 +220,16 @@ class App extends Component {
         <Sidebar.Pushable as={React.div}>
           <Sidebar onClick={this.toggleSidebar}
             as={Menu} animation='overlay' direction='top' visible={sidebar} vertical>
+            {signedIn ? (
+              <Menu.Item>
+                <Menu.Header>Laboratory</Menu.Header>
+                <Menu.Menu>
+                  <Menu.Item onClick={newMysteryPageAction}>
+                    New Mystery Post
+                  </Menu.Item>
+                </Menu.Menu>
+              </Menu.Item>
+            ) : null}
             {signedIn ? (
               <Menu.Item>
                 <Menu.Header>{user.display} @{user.name}</Menu.Header>

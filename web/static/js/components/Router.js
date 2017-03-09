@@ -3,7 +3,7 @@ import React from 'react'
 import {
   publicTimeline, timeline, onlinePosts,
   userPage, followersPage, followingPage, userFormPage,
-  postPage, noticesPage, loginPage
+  postPage, noticesPage, mysteryPage, newMysteryPage, loginPage
 } from '../pages.js'
 import PublicTimeline from './PublicTimeline.js'
 import Timeline from './Timeline.js'
@@ -14,6 +14,8 @@ import FollowingPage from './FollowingPage.js'
 import UserForm from './UserForm.js'
 import PostPage from './PostPage.js'
 import NoticesPage from './NoticesPage.js'
+import MysteryPage from './MysteryPage.js'
+import NewMystery from './NewMystery.js'
 import LoginPage from './LoginPage.js'
 import ErrorPage from './ErrorPage.js'
 
@@ -37,6 +39,10 @@ export default ({ name, params }) => {
       return <PostPage params={params} />
     case noticesPage.name:
       return <NoticesPage />
+    case mysteryPage.name:
+      return <MysteryPage />
+    case newMysteryPage.name:
+      return <NewMystery />
     case loginPage.name:
       return <LoginPage />
     default:

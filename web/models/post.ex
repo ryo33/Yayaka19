@@ -3,14 +3,18 @@ defmodule Share.Post do
 
   defimpl Poison.Encoder, for: Share.Post do
     def encode(params, options) do
-      case params.post do
+      params = case params.post do
         %Ecto.Association.NotLoaded{} -> Map.delete(params, :post)
         _ -> params
       end
-      |> Map.from_struct
+      params = case params.mystery do
+        %Ecto.Association.NotLoaded{} -> Map.delete(params, :mystery)
+        _ -> params
+      end
+      Map.from_struct(params)
       |> Enum.filter(fn {key, _} -> Enum.member?([
         :id, :text, :user_display, :user, :inserted_at,
-        :post, :post_id, :post_addresses
+        :post, :post_id, :post_addresses, :mystery, :mystery_id
       ], key) end)
       |> Enum.into(%{})
       |> Poison.encode!(options)
@@ -22,6 +26,7 @@ defmodule Share.Post do
     field :user_display, :string
     belongs_to :user, Share.User
     belongs_to :post, Share.Post
+    belongs_to :mystery, Share.Mystery
 
     has_many :post_addresses, Share.PostAddress
 
@@ -29,7 +34,7 @@ defmodule Share.Post do
   end
 
   @required_fields ~w(user_id)a
-  @optional_fields ~w(text post_id user_display)a
+  @optional_fields ~w(text post_id user_display mystery_id)a
   @fields @required_fields ++ @optional_fields
 
   @doc """
@@ -43,14 +48,14 @@ defmodule Share.Post do
   end
 
   @preload [
-    :user, post_addresses: :user, post: [
-      :user, post_addresses: :user]]
+    :user, mystery: [:user], post_addresses: :user, post: [
+      :user, mystery: [:user], post_addresses: :user]]
   @deep_preload [
-    :user, post_addresses: :user, post: [
-      :user, post_addresses: :user, post: [
-        :user, post_addresses: :user, post: [
-          :user, post_addresses: :user, post: [
-            :user, :post, post_addresses: :user]]]]]
+    :user, mystery: [:user], post_addresses: :user, post: [
+      :user, mystery: [:user], post_addresses: :user, post: [
+        :user, mystery: [:user], post_addresses: :user, post: [
+          :user, mystery: [:user], post_addresses: :user, post: [
+            :user, :post, mystery: [:user], post_addresses: :user]]]]]
 
   def preload_params, do: @preload
   def deep_preload_params, do: @deep_preload

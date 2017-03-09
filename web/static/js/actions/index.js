@@ -68,3 +68,8 @@ export const fav = createAction('fav', id => id)
 export const unfav = createAction('unfav', id => id)
 export const requestFav = createAction('request fav', id => id)
 export const requestUnfav = createAction('request unfav', id => id)
+
+// Mystery
+export const openMystery = createAction('open mystery', id => id)
+export const setMysteryInfo = createAction('set mystery', mystery => mystery)
+export const submitMystery = createAction('submit mystery', mystery => mystery)
