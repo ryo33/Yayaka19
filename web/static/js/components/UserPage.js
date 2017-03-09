@@ -4,7 +4,10 @@ import Linkify from 'react-linkify'
 
 import { Card, Icon, Segment, Button, Dimmer, Loader, Header } from 'semantic-ui-react'
 
-import { userFormPage, followersPage, followingPage } from '../pages.js'
+import {
+  userFormPage, followersPage, followingPage,
+  mysteriesPage, openedMysteriesPage
+} from '../pages.js'
 import { openNewPostDialog, updatePostAddress, requestMoreUserPosts } from '../actions/index.js'
 import { userSelector, userPageSelector, followingSelector } from '../selectors.js'
 import FollowButton from './FollowButton.js'
@@ -24,7 +27,9 @@ const actionCreators = {
   openNewPostDialog, updatePostAddress, requestMoreUserPosts,
   userFormPageAction: name => userFormPage.action({name}),
   followersPageAction: name => followersPage.action({name}),
-  followingPageAction: name => followingPage.action({name})
+  followingPageAction: name => followingPage.action({name}),
+  mysteriesPageAction: name => mysteriesPage.action({name}),
+  openedMysteriesPageAction: name => openedMysteriesPage.action({name})
 }
 
 class UserPage extends Component {
@@ -35,6 +40,8 @@ class UserPage extends Component {
     this.handleLoadMorePosts = this.handleLoadMorePosts.bind(this)
     this.handleClickFollowers = this.handleClickFollowers.bind(this)
     this.handleClickFollowing = this.handleClickFollowing.bind(this)
+    this.handleClickMysteries = this.handleClickMysteries.bind(this)
+    this.handleClickOpenedMysteries = this.handleClickOpenedMysteries.bind(this)
   }
 
   handleSendTo() {
@@ -65,10 +72,20 @@ class UserPage extends Component {
     followingPageAction(user.name)
   }
 
+  handleClickMysteries() {
+    const { mysteriesPageAction, userPage: { user }} = this.props
+    mysteriesPageAction(user.name)
+  }
+
+  handleClickOpenedMysteries() {
+    const { openedMysteriesPageAction, userPage: { user }} = this.props
+    openedMysteriesPageAction(user.name)
+  }
+
   render() {
     const { isMe, isNotMe, userPage } = this.props
     const {
-      user, postCount, following, followers,
+      user, postCount, following, followers, mysteries, openedMysteries,
       posts, isLoadingMorePosts
     } = userPage
     if (user != null) {
@@ -108,6 +125,20 @@ class UserPage extends Component {
                     label={{as: 'a', basic: true, content: followers}}
                     labelPosition='right'
                     onClick={this.handleClickFollowers}
+                  />
+                  <Button
+                    content='Opened Mysteries'
+                    icon='bomb'
+                    label={{as: 'a', basic: true, content: openedMysteries}}
+                    labelPosition='right'
+                    onClick={this.handleClickOpenedMysteries}
+                  />
+                  <Button
+                    content='Mysteries'
+                    icon='bomb'
+                    label={{as: 'a', basic: true, content: mysteries}}
+                    labelPosition='right'
+                    onClick={this.handleClickMysteries}
                   />
                 </Card.Description>
               </Card.Content>

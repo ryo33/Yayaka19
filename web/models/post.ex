@@ -47,6 +47,21 @@ defmodule Share.Post do
     |> validate_length(:text, min: 0)
   end
 
+  def opened_mystery_posts(user) do
+    from p in Share.Post,
+      join: m in Share.Mystery, on: p.mystery_id == m.id,
+      where: p.user_id == ^user.id and m.user_id != ^user.id,
+      order_by: [desc: :id]
+  end
+
+  def from_mysteries(query, user) do
+    from p in Share.Post,
+      right_join: m in ^query, on: p.mystery_id == m.id,
+      where: p.user_id == ^user.id,
+      preload: ^Share.Post.preload_params,
+      order_by: [desc: :id]
+  end
+
   @preload [
     :user, mystery: [:user], post_addresses: :user, post: [
       :user, mystery: [:user], post_addresses: :user]]

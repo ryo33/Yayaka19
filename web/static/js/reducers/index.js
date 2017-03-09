@@ -17,6 +17,8 @@ import newPostPage from './newPostPage.js'
 import userPage from './userPage.js'
 import followersPage from './followersPage.js'
 import followingPage from './followingPage.js'
+import mysteriesPage from './mysteriesPage.js'
+import openedMysteriesPage from './openedMysteriesPage.js'
 import postPage from './postPage.js'
 import publicTimeline from './publicTimeline.js'
 import timeline from './timeline.js'
@@ -76,6 +78,8 @@ export default combineReducers({
   userPage,
   followersPage,
   followingPage,
+  mysteriesPage,
+  openedMysteriesPage,
   postPage,
   publicTimeline,
   timeline,

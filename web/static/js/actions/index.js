@@ -45,6 +45,12 @@ export const requestUnfollow = createAction('request unfollow', id => id)
 export const requestMoreUserPosts = createAction('request more user posts', (user, id) => ({user, id}))
 export const addUserPosts = createAction('add user posts', posts => posts)
 
+// Mysteries
+export const requestMysteries = createAction('request mysteries', name => name)
+export const setMysteries = createAction('set mysteries', (user, mysteries) => ({user, mysteries}))
+export const requestOpenedMysteries = createAction('request opened mysteries', name => name)
+export const setOpenedMysteries = createAction('set opened mysteries', (user, mysteries) => ({user, mysteries}))
+
 // Post
 export const requestPost = createAction('request post', id => id)
 export const setPost = createAction('set post', post => post)

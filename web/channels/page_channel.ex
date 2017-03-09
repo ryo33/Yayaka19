@@ -5,6 +5,7 @@ defmodule Share.PageChannel do
   alias Share.Post
   alias Share.Fav
   alias Share.Follow
+  alias Share.Mystery
   alias Share.Repo
 
   require Logger
@@ -32,13 +33,17 @@ defmodule Share.PageChannel do
         posts = Repo.all(Post.preload(query))
         ids = Enum.map(posts, &(&1.id))
         favs = Fav.get_favs(socket, ids)
+        mysteries_count = Repo.aggregate(Mystery.user_mysteries(user), :count, :id)
+        opened_mysteries_count = Repo.aggregate(Post.opened_mystery_posts(user), :count, :id)
         res = %{
           "user" => user,
           "posts" => posts,
           "favs" => favs,
           "postCount" => post_count,
           "following" => follow_count,
-          "followers" => followed_count
+          "followers" => followed_count,
+          "mysteries" => mysteries_count,
+          "openedMysteries" => opened_mysteries_count
         }
         {:reply, {:ok, res}, socket}
     end
@@ -111,6 +116,28 @@ defmodule Share.PageChannel do
       user ->
         following = Repo.all(Follow.get_following(user))
         {:reply, {:ok, %{user: user, following: following}}, socket}
+    end
+  end
+
+  def handle_in("user_mysteries", %{"name" => name}, socket) do
+    case Repo.get_by(User, name: name) do
+      nil -> {:reply, :error, socket}
+      user ->
+        query = Mystery.user_mysteries(user)
+                |> Post.from_mysteries(user)
+        mysteries = Repo.all(query)
+        {:reply, {:ok, %{user: user, mysteries: mysteries}}, socket}
+    end
+  end
+
+  def handle_in("opened_mysteries", %{"name" => name}, socket) do
+    case Repo.get_by(User, name: name) do
+      nil -> {:reply, :error, socket}
+      user ->
+        query = Post.opened_mystery_posts(user)
+                |> Post.preload()
+        mysteries = Repo.all(query)
+        {:reply, {:ok, %{user: user, mysteries: mysteries}}, socket}
     end
   end
 
