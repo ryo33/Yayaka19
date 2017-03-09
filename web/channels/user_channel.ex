@@ -5,6 +5,7 @@ defmodule Share.UserChannel do
   alias Share.Post
   alias Share.PostAddress
   alias Share.Fav
+  alias Share.Mystery
   alias Share.Repo
 
   require Logger
@@ -31,22 +32,80 @@ defmodule Share.UserChannel do
     end
   end
 
-  def handle_in("new_post", params, socket) do
-    user = socket.assigns.user
-    user = Repo.get!(User, user.id)
-    %{"post" => params, "address" => address} = params
+  def post(user, params, address \\ "") do
     params = params
              |> Map.put("user_id", user.id)
              |> Map.put("user_display", user.display)
     text = Map.get(params, "text")
     post_id = Map.get(params, "post_id")
-    if is_nil(post_id) and text == "" do
-      {:reply, :error, socket}
+    mystery_id = Map.get(params, "mystery_id")
+    if is_nil(mystery_id) and is_nil(post_id) and text == "" do
+      :error
     else
       changeset = Post.changeset(%Post{}, params)
       post = Repo.insert!(changeset)
       Share.PostHandler.handle(post, address)
-      {:reply, :ok, socket}
+      :ok
+    end
+  end
+
+  def handle_in("new_post", params, socket) do
+    user = socket.assigns.user
+    user = Repo.get!(User, user.id)
+    %{"post" => params, "address" => address} = params
+    case post(user, params, address) do
+      :ok -> {:reply, :ok, socket}
+      :error -> {:reply, :error, socket}
+    end
+  end
+
+  def handle_in("new_mystery", params, socket) do
+    user = socket.assigns.user
+    user = Repo.get!(User, user.id)
+    params = params
+             |> Map.put("user_id", user.id)
+    changeset = Mystery.changeset(%Mystery{}, params)
+    mystery = Repo.insert!(changeset)
+              |> Mystery.preload()
+    res = %{
+      mystery: mystery,
+      text: mystery.text
+    }
+    params = %{"text" => "",
+      "mystery_id" => mystery.id,
+      "user_id" => user.id}
+    case post(user, params) do
+      :ok -> {:reply, {:ok, res}, socket}
+      :error -> {:reply, :error, socket}
+    end
+  end
+
+  def handle_in("open_mystery", %{"id" => id}, socket) do
+    user = socket.assigns.user
+
+    user = socket.assigns.user
+    query = from m in Mystery,
+      where: m.id == ^id
+    mystery = Repo.one(Mystery.preload(query))
+    query = from p in Post,
+      where: p.user_id == ^user.id,
+      where: p.mystery_id == ^mystery.id
+    res = %{
+      mystery: mystery,
+      text: mystery.text
+    }
+    if user.id != mystery.user_id and Repo.aggregate(query, :count, :id) == 0 do
+      # Quote and open
+      params = %{"text" => "",
+        "mystery_id" => mystery.id,
+        "user_id" => user.id}
+      case post(user, params) do
+        :ok -> {:reply, {:ok, res}, socket}
+        :error -> {:reply, :error, socket}
+      end
+    else
+      # Open
+      {:reply, {:ok, res}, socket}
     end
   end
 

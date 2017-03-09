@@ -10,14 +10,16 @@ import {
   requestPost, setContexts,
   openNoticesPage,
   showOnlinePosts,
-  closeNewPostDialog
+  closeNewPostDialog,
+  openMystery
 } from './actions/index.js'
 import { requestFollowers } from './actions/followersPage.js'
 import { requestFollowing } from './actions/followingPage.js'
 import {
   pageSelector,
   homePostSelector,
-  onlinePostsSelector
+  onlinePostsSelector,
+  mysteryPageSelector
 } from './selectors.js'
 
 export const pages = createPages()
@@ -34,6 +36,8 @@ export const userFormPage   = p('/users/:name/edit', 'userForm')
 export const postPage       = p('/posts/:id', 'post')
 export const noticesPage    = p('/n', 'notices')
 export const loginPage      = p('/login', 'login')
+export const mysteryPage    = p('/mysteries/:id', 'mysteries')
+export const newMysteryPage = p('/new-mystery', 'newMystery')
 export const errorPage      = p('/*', 'error')
 
 export const passwordUpdateURL = '/login/password/update'
@@ -50,6 +54,8 @@ const onlySignedInMiddleware = createReplacer(
       || onlinePosts.check(action)
       || noticesPage.check(action)
       || userFormPage.check(action)
+      || mysteryPage.check(action)
+      || newMysteryPage.check(action)
   },
   () => loginPage.action()
 )
@@ -135,6 +141,14 @@ const noticesPageHook = createAsyncHook(
   }
 )
 
+const mysteryPageHook = createAsyncHook(
+  ({ action }) => mysteryPage.check(action),
+  ({ dispatch, getState, action }) => {
+    const id = parseInt(action.payload.params.id, 10)
+    const { mystery } = mysteryPageSelector(getState())
+    dispatch(openMystery(id))
+  }
+)
 
 export const pagesMiddleware = composeMiddleware(
   onlySignedInMiddleware,
@@ -147,5 +161,6 @@ export const pagesMiddleware = composeMiddleware(
   followersPageHook,
   followingPageHook,
   postPageHook,
-  noticesPageHook
+  noticesPageHook,
+  mysteryPageHook
 )

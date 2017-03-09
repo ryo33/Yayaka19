@@ -21,6 +21,7 @@ import postPage from './postPage.js'
 import publicTimeline from './publicTimeline.js'
 import timeline from './timeline.js'
 import onlinePosts from './onlinePosts.js'
+import mysteryPage from './mysteryPage.js'
 import editorPlugins from './editorPlugins.js'
 
 const page = createPagesReducer(errorPage.name, {})
@@ -79,6 +80,7 @@ export default combineReducers({
   publicTimeline,
   timeline,
   onlinePosts,
+  mysteryPage,
   windowFocused,
   editorPlugins
 })

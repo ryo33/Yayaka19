@@ -48,3 +48,6 @@ export const noticesCountSelctor = ({ notices: { noticed, favs, follows, address
     return favs.length + follows.length + addresses.length + replies.length
   }
 }
+
+// Mystery
+export const mysteryPageSelector = ({ mysteryPage }) => mysteryPage
