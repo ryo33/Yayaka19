@@ -3,6 +3,14 @@ defmodule Share.PageController do
 
   @max_length 64
 
+  def terms(conn, _params) do
+    render(conn, "terms.html")
+  end
+
+  def privacy(conn, _params) do
+    render(conn, "privacy.html")
+  end
+
   def index(conn, _params) do
     render_page(conn)
   end

@@ -110,15 +110,22 @@ defmodule Share.AuthController do
       where: u.name == ^name
       case Repo.one(query) do
         nil ->
+          Comeonin.Bcrypt.dummy_checkpw
           conn
           |> render("password.html", name: name, password: "", error: "Failed to sign in")
         user ->
-          if Comeonin.Bcrypt.checkpw(password, user.password) do
-            conn
-            |> login(user)
-          else
+          if is_nil(user.password) do
+            Comeonin.Bcrypt.dummy_checkpw
             conn
             |> render("password.html", name: name, password: "", error: "Failed to sign in")
+          else
+            if Comeonin.Bcrypt.checkpw(password, user.password) do
+              conn
+              |> login(user)
+            else
+              conn
+              |> render("password.html", name: name, password: "", error: "Failed to sign in")
+            end
           end
       end
     end

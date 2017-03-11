@@ -29,6 +29,9 @@ defmodule Share.Router do
   scope "/", Share do
     pipe_through [:browser, :browser_auth]
 
+    get "/terms", PageController, :terms
+    get "/privacy", PageController, :privacy
+
     get "/profile/api", UserController, :api
     get "/profile/api/update", UserController, :update_api
 

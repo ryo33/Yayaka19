@@ -13,6 +13,7 @@ import {
   userPage, userFormPage,
   postPage, loginPage, noticesPage,
   newMysteryPage,
+  termsURL, privacyURL,
   apiURL, logoutURL, newAccountURL, getSwitchUserURL,
   passwordUpdateURL
 } from '../pages.js'
@@ -280,6 +281,12 @@ class App extends Component {
             </Menu.Item>
             <Menu.Item link href={source.url} target='_blank'>
               Source code
+            </Menu.Item>
+            <Menu.Item link href={termsURL} target='_blank'>
+              Terms
+            </Menu.Item>
+            <Menu.Item link href={privacyURL} target='_blank'>
+              Privacy
             </Menu.Item>
             {signedIn ? (
               <Menu.Item onClick={this.openLogoutDialog}>

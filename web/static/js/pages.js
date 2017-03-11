@@ -44,9 +44,11 @@ export const mysteryPage         = p('/mysteries/:id', 'mystery')
 export const newMysteryPage      = p('/new-mystery', 'newMystery')
 export const errorPage           = p('/*', 'error')
 
+export const termsURL = '/terms'
+export const privacyURL = '/privacy'
 export const passwordUpdateURL = '/login/password/update'
 export const passwordLoginURL = '/login/password'
-export const apiURL = 'profile/api'
+export const apiURL = '/profile/api'
 export const logoutURL = '/logout'
 export const newAccountURL = '/new'
 export const getSwitchUserURL = name => `/switch/${name}`
