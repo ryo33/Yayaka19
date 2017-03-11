@@ -22,9 +22,8 @@ class LoginPage extends Component {
     const { agreed } = this.state
     return (
       <div>
-        <Checkbox onChange={this.handleToggle} checked={agreed} label={(
-          <label>I agree to the <a href={termsURL} target='_blank'>terms of service</a></label>
-        )} />
+        <Checkbox onChange={this.handleToggle} checked={agreed}
+          label='I agree to the' /> <a href={termsURL} target='_blank'>terms of service</a>
         <Segment.Group>
           <Dimmer inverted active={!agreed} />
           <Segment>
