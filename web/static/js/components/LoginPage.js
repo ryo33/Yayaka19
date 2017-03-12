@@ -1,31 +1,18 @@
 import React, { Component } from 'react'
 
-import { Header, Button, Segment, Dimmer, Checkbox, Icon } from 'semantic-ui-react'
+import { Header, Button, Segment, Icon } from 'semantic-ui-react'
 import { passwordLoginURL, termsURL } from '../pages.js'
 
 class LoginPage extends Component {
-  constructor(props) {
-    super(props)
-    this.handleToggle = this.handleToggle.bind(this)
-    this.state = {
-      agreed: false
-    }
-  }
-
-  handleToggle() {
-    this.setState({
-      agreed: !this.state.agreed
-    })
-  }
-
   render() {
-    const { agreed } = this.state
     return (
       <div>
-        <Checkbox onChange={this.handleToggle} checked={agreed}
-          label='I agree to the' /> <a href={termsURL} target='_blank'>terms of service</a>
         <Segment.Group>
-          <Dimmer inverted active={!agreed} />
+          <Segment>
+            <Header as='h4'>By signing in or registering, you will be deemed to have agreed to the <a
+                href={termsURL} target='_blank'>terms of service</a>.
+            </Header>
+          </Segment>
           <Segment>
             <Header>Sign in or Register</Header>
             <Segment vertical>
@@ -57,7 +44,7 @@ class LoginPage extends Component {
             </Segment>
           </Segment>
         </Segment.Group>
-    </div>
+      </div>
     )
   }
 }
