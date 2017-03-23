@@ -36,6 +36,7 @@ defmodule Share.Endpoint do
   plug Plug.Session,
     store: :cookie,
     key: "_share_key",
+    max_age: 3600 * 24 * 30,
     signing_salt: "LDrXKrFB"
 
   plug Share.Router
