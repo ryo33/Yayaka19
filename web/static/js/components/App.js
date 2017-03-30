@@ -171,36 +171,30 @@ class App extends Component {
             <Menu.Item style={iconItemStyle} active={name == publicTimeline.name} onClick={publicTimelineAction}>
               <Icon style={iconStyle} size='large' name='world' />
             </Menu.Item>
-            {signedIn ? (
-              <Menu.Item style={iconItemStyle} active={name == timeline.name} onClick={timelineAction}>
-                <Icon style={iconStyle} size='large' name='home' />
-                { newPostsCount >= 1 ? (
-                  <Label size='tiny' circular style={labelStyle} color='blue'>
-                    {newPostsCount}
-                  </Label>
-                ) : null }
-              </Menu.Item>
-            ) : null}
-            {signedIn ? (
-              <Menu.Item style={iconItemStyle} active={name == onlinePosts.name} onClick={onlinePostsAction}>
-                <Icon style={iconStyle} size='large' name='bar' />
-                { onlinePostsCount >= 1 ? (
-                  <Label size='tiny' circular style={labelStyle} color='yellow'>
-                    {onlinePostsCount}
-                  </Label>
-                ) : null }
-              </Menu.Item>
-            ) : null }
-            {signedIn ? (
-              <Menu.Item style={iconItemStyle} active={name == noticesPage.name} onClick={noticesPageAction}>
-                <Icon style={iconStyle} size='large' color='red' name='alarm outline' />
-                { noticesCount >= 1 ? (
-                  <Label size='tiny' circular style={labelStyle} color='red'>
-                    {noticesCount}
-                  </Label>
-                ) : null }
-              </Menu.Item>
-            ) : null }
+            <Menu.Item style={iconItemStyle} active={name == timeline.name} onClick={timelineAction}>
+              <Icon style={iconStyle} size='large' name='home' />
+              { newPostsCount >= 1 ? (
+                <Label size='tiny' circular style={labelStyle} color='blue'>
+                  {newPostsCount}
+                </Label>
+              ) : null }
+            </Menu.Item>
+            <Menu.Item style={iconItemStyle} active={name == onlinePosts.name} onClick={onlinePostsAction}>
+              <Icon style={iconStyle} size='large' name='bar' />
+              { onlinePostsCount >= 1 ? (
+                <Label size='tiny' circular style={labelStyle} color='yellow'>
+                  {onlinePostsCount}
+                </Label>
+              ) : null }
+            </Menu.Item>
+            <Menu.Item style={iconItemStyle} active={name == noticesPage.name} onClick={noticesPageAction}>
+              <Icon style={iconStyle} size='large' color='red' name='alarm outline' />
+              { noticesCount >= 1 ? (
+                <Label size='tiny' circular style={labelStyle} color='red'>
+                  {noticesCount}
+                </Label>
+              ) : null }
+            </Menu.Item>
             {signedIn ? (
               <Menu.Item style={iconItemStyle} active={newPost} onClick={newPost ? this.closeNewPost : this.openNewPost}>
                 <Icon style={iconStyle} size='large' color='blue' name='write' />
