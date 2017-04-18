@@ -17,6 +17,11 @@ config :share, Share.Endpoint,
   pubsub: [name: Share.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
+config :share, Share.Tasks,
+  post_workers: 10,
+  online_post_workers: 10,
+  notice_workers: 10
+
 config :share,
   title: "Yayaka19",
   description: "What's in your head?",

@@ -1,5 +1,29 @@
-defmodule Share.Notice do
+defmodule Share.Tasks.Notice do
+  alias Share.Repo
+  alias Share.Post
+  alias Share.Fav
+  alias Share.Follow
+  import Ecto.Query
+
+  def post(post) do
+    if length(post.post_addresses) >= 1 do
+      if is_nil(post.post_id) do
+        {:add_address_notice, [post]}
+        |> Honeydew.async(:notice)
+      else
+        query = from p in Post, where: p.id == ^post.post_id
+        case Repo.aggregate(query, :count, :id) do
+          1 ->
+            {:add_reply_notice, [post]}
+            |> Honeydew.async(:notice)
+          _ -> ()
+        end
+      end
+    end
+  end
+
   def add_fav_notice(user, fav) do
+    fav = Fav.preload(fav)
     target_user = fav.post.user
     if target_user.id != fav.user_id do
       payload = %{
@@ -11,6 +35,7 @@ defmodule Share.Notice do
   end
 
   def add_follow_notice(user, follow) do
+    follow = Follow.preload(follow)
     target_user = follow.target_user
     payload = %{
       follows: [%{id: follow.id, user: user, inserted_at: follow.inserted_at}]

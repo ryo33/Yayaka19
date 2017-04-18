@@ -8,12 +8,9 @@ defmodule Share do
 
     # Define workers and child supervisors to be supervised
     children = [
-      # Start the Ecto repository
       supervisor(Share.Repo, []),
-      # Start the endpoint when the application starts
       supervisor(Share.Endpoint, []),
-      # Start your own worker by calling: Share.Worker.start_link(arg1, arg2, arg3)
-      # worker(Share.Worker, [arg1, arg2, arg3]),
+      worker(Share.Tasks, [])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

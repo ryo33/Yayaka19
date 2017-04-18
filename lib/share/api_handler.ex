@@ -9,7 +9,7 @@ defmodule Share.APIHandler do
          {_, true} <- {:invalid, is_nil(post_id) or String.length(address) == 0},
          changeset <- Post.changeset(%Post{}, Map.put(params, "user_id", user.id)),
          {_, {:ok, post}} <- {:insert, Repo.insert(changeset)} do
-      Share.PostHandler.handle(post, address)
+      Share.Handlers.Post.handle(post, address)
       {:ok, 200, %{post_id: post.id}}
     else
       {:invalid, _} ->
