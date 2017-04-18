@@ -49,7 +49,8 @@ defmodule Share.Mixfile do
      {:oauth, github: "tim/erlang-oauth"},
      {:secure_random, "~> 0.5"},
      {:uuid, "~> 1.1"},
-     {:comeonin, "~> 3.0"}]
+     {:comeonin, "~> 3.0"},
+     {:honeydew, "~> 1.0.0-rc5"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

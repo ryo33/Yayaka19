@@ -44,7 +44,7 @@ defmodule Share.UserChannel do
     else
       changeset = Post.changeset(%Post{}, params)
       post = Repo.insert!(changeset)
-      Share.PostHandler.handle(post, address)
+      Share.Handlers.Post.handle(post, address)
       :ok
     end
   end
@@ -118,7 +118,7 @@ defmodule Share.UserChannel do
          params <- %{user_id: user.id, post_id: id},
          changeset <- Fav.changeset(%Fav{}, params),
          {:ok, fav} <- Repo.insert(changeset) do
-      Task.start(fn -> Share.Notice.add_fav_notice(user, Fav.preload(fav)) end)
+      Share.Handlers.Notice.add_fav_notice(user, fav)
       {:reply, :ok, socket}
     else
       _ -> {:reply, :error, socket}
@@ -149,7 +149,7 @@ defmodule Share.UserChannel do
          params <- %{user_id: user.id, target_user_id: id},
          changeset <- Follow.changeset(%Follow{}, params),
          {:ok, follow} <- Repo.insert(changeset) do
-      Task.start(fn -> Share.Notice.add_follow_notice(user, Follow.preload(follow)) end)
+      Share.Handlers.Notice.add_follow_notice(user, follow)
       {:reply, :ok, socket}
     else
       _ -> {:reply, :error, socket}
@@ -209,7 +209,7 @@ defmodule Share.UserChannel do
           post_addresses: [],
           isOnlinePost: false
         }
-        Share.OnlinePostHandler.handle(post, user)
+        Share.Handlers.OnlinePost.handle(post, user)
         {:reply, :ok, socket}
     end
   end
@@ -236,7 +236,7 @@ defmodule Share.UserChannel do
         post_addresses: [],
         isOnlinePost: true
       }
-      Share.OnlinePostHandler.handle(post, user)
+      Share.Handlers.OnlinePost.handle(post, user)
       {:reply, :ok, socket}
     else
       {:reply, :error, socket}
