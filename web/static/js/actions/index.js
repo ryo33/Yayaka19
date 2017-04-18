@@ -8,13 +8,6 @@ export const addFavs = createAction('add favs', favs => favs)
 export const initializeUser = createAction('initialize user', params => params)
 export const setWindowFocused = createAction('set window focused', focused => focused)
 
-// Online
-export const addOnlinePosts = createAction('add online posts', posts => posts)
-export const addOnlinePostsNotices = createAction('add online posts notices', notices => notices)
-export const showOnlinePosts = createAction('show online posts', channel => channel)
-export const submitOnlinePost = createAction('submit online post', post => post)
-export const changeOnlineChannel = createAction('change online channel', channel => channel)
-
 // Error
 export const showError = createAction('show error', message => message)
 export const hideError = createAction('hide error')
@@ -33,7 +26,6 @@ export const updatePostText = createAction('update post text', text => text)
 export const updatePostAddress = createAction('update post address', address => address)
 export const submitPost = createAction('submit post',
   (text, address, post) => ({text, address, post}))
-export const sendToOnline = createAction('send to online', id => id)
 
 // User
 export const requestUser = createAction('request user', name => name)

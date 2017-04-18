@@ -22,7 +22,6 @@ import openedMysteriesPage from './openedMysteriesPage.js'
 import postPage from './postPage.js'
 import publicTimeline from './publicTimeline.js'
 import timeline from './timeline.js'
-import onlinePosts from './onlinePosts.js'
 import mysteryPage from './mysteryPage.js'
 import editorPlugins from './editorPlugins.js'
 
@@ -83,7 +82,6 @@ export default combineReducers({
   postPage,
   publicTimeline,
   timeline,
-  onlinePosts,
   mysteryPage,
   windowFocused,
   editorPlugins

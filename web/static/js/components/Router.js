@@ -1,7 +1,7 @@
 import React from 'react'
 
 import {
-  publicTimeline, timeline, onlinePosts,
+  publicTimeline, timeline,
   userPage, followersPage, followingPage,
   mysteriesPage, openedMysteriesPage,
   userFormPage, postPage, noticesPage,
@@ -9,7 +9,6 @@ import {
 } from '../pages.js'
 import PublicTimeline from './PublicTimeline.js'
 import Timeline from './Timeline.js'
-import OnlinePosts from './OnlinePosts.js'
 import UserPage from './UserPage.js'
 import FollowersPage from './FollowersPage.js'
 import FollowingPage from './FollowingPage.js'
@@ -29,8 +28,6 @@ export default ({ name, params }) => {
       return <PublicTimeline />
     case timeline.name:
       return <Timeline />
-    case onlinePosts.name:
-      return <OnlinePosts />
     case userPage.name:
       return <UserPage params={params} />
     case followersPage.name:
