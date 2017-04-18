@@ -31,12 +31,6 @@ export const openedMysteriesPageSelector = ({ openedMysteriesPage }) => openedMy
 // Post
 export const postPageSelector = ({ postPage }) => postPage
 
-// Online
-export const onlinePostsSelector = ({ onlinePosts }) => onlinePosts
-export const onlinePostsCountSelector = ({ onlinePosts: { channels }}) => {
-  return Object.keys(channels).reduce((acc, channel) => acc + channels[channel], 0)
-}
-
 // Public timeline
 export const publicTimelineSelector = ({ publicTimeline }) => publicTimeline
 

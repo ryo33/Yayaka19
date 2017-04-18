@@ -9,7 +9,7 @@ import FollowButton from './FollowButton.js'
 import UserButton from './UserButton.js'
 import NewPost from './NewPost.js'
 import Mystery from './Mystery.js'
-import { requestFav, requestUnfav, setAddressPost, sendToOnline, submitPost } from '../actions/index.js'
+import { requestFav, requestUnfav, setAddressPost, submitPost } from '../actions/index.js'
 import { userPage, postPage } from '../pages.js'
 import { userSelector, favsSelector } from '../selectors.js'
 import { getTweetURL } from '../utils.js'
@@ -22,7 +22,7 @@ const mapStateToProps = (state) => {
 }
 
 const actionCreators = {
-  requestFav, requestUnfav, setAddressPost, sendToOnline,
+  requestFav, requestUnfav, setAddressPost,
   userPageAction: name => userPage.action({name}),
   postPageAction: id => postPage.action({id}),
   submitPost
@@ -54,7 +54,6 @@ class Post extends Component {
     this.closeQuote = this.closeQuote.bind(this)
     this.handleClickUser = this.handleClickUser.bind(this)
     this.handleClickTime = this.handleClickTime.bind(this)
-    this.handleSendToOnline = this.handleSendToOnline.bind(this)
     this.handleEmptyQuote = this.handleEmptyQuote.bind(this)
     this.state = {
       openReply: false,
@@ -98,11 +97,6 @@ class Post extends Component {
     e.preventDefault()
     const { post, postPageAction } = this.props
     postPageAction(post.id)
-  }
-
-  handleSendToOnline() {
-    const { post, sendToOnline } = this.props
-    sendToOnline(post.id)
   }
 
   handleEmptyQuote() {
@@ -256,9 +250,6 @@ class Post extends Component {
                 {this.renderQuoteButton()}
                 <Comment.Action onClick={this.handleEmptyQuote}>
                   <Icon name='retweet' size='large' />
-                </Comment.Action>
-                <Comment.Action onClick={this.handleSendToOnline}>
-                  <Icon name='bar' size='large' />
                 </Comment.Action>
                 <Comment.Action as='a' href={getTweetURL(post)} target='_blank'>
                   <Icon name='twitter' size='large' />

@@ -194,41 +194,6 @@ defmodule Share.UserChannel do
     {:reply, {:ok, timeline}, socket}
   end
 
-  def handle_in("send_to_online", params, socket) do
-    user = socket.assigns.user
-    user = Repo.get!(User, user.id)
-    %{"post_id" => post_id} = params
-    case Repo.get(Post, post_id) do
-      nil -> {:reply, :error, socket}
-      post ->
-        post = Post.preload(post)
-        post = %{
-          text: nil, user: user, id: UUID.uuid4(),
-          inserted_at: NaiveDateTime.utc_now(),
-          post: post,
-          post_addresses: [],
-          isOnlinePost: false
-        }
-        Share.Handlers.OnlinePost.handle(post, user)
-        {:reply, :ok, socket}
-    end
-  end
-
-  def handle_in("online_post", params, socket) do
-    user = socket.assigns.user
-    user = Repo.get!(User, user.id)
-    %{"text" => text, "channel" => channel} = params
-    post = %{
-      channel: channel,
-      text: text, user: user, id: UUID.uuid4(),
-      inserted_at: NaiveDateTime.utc_now(),
-      post_addresses: [],
-      isOnlinePost: true
-    }
-    Share.Handlers.OnlinePost.handle(post, user)
-    {:reply, :ok, socket}
-  end
-
   def get_timeline(user_id, socket, opts \\ []) do
     less_than_id = Keyword.get(opts, :less_than_id)
     limitation = Keyword.get(opts, :limit, @timeline_limit)
