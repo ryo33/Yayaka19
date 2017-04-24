@@ -22,6 +22,9 @@ config :share, Share.Tasks,
   online_post_workers: 10,
   notice_workers: 10
 
+config :share, Share.Remote,
+  pusher_workers: 10
+
 config :share,
   title: "Yayaka19",
   description: "What's in your head?",

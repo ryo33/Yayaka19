@@ -2,6 +2,7 @@ defmodule Share.Endpoint do
   use Phoenix.Endpoint, otp_app: :share
 
   socket "/socket", Share.UserSocket
+  socket "/yayaka", Share.RemoteSocket
 
   # Serve at "/" the static files from "priv/static" directory.
   #

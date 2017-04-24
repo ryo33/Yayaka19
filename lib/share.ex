@@ -10,7 +10,8 @@ defmodule Share do
     children = [
       supervisor(Share.Repo, []),
       supervisor(Share.Endpoint, []),
-      worker(Share.Tasks, [])
+      worker(Share.Tasks, []),
+      worker(Share.Remote, [])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

@@ -7,13 +7,13 @@ use Mix.Config
 # watchers to your application. For example, we use it
 # with brunch.io to recompile .js and .css sources.
 config :share, Share.Endpoint,
-  http: [port: 4000],
-  url: [host: "localhost", port: 4000],
+  http: [port: System.get_env("PORT") || 4000],
+  url: [host: "localhost", port: System.get_env("PORT") || 4000],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
   watchers: [node: ["node_modules/webpack/bin/webpack.js",
-    "--watch-stdin", "--progress", "--colors", cd: Path.expand("../", __DIR__)]]
+    "--watch-stdin", cd: Path.expand("../", __DIR__)]]
 
 
 # Watch static and templates for browser reloading.

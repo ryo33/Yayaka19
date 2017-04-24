@@ -22,7 +22,6 @@ defmodule Share.Tasks do
       Honeydew.worker_spec(:notice, Share.Tasks.Notice, num: @notice_workers)
     ]
 
-    # supervise/2 is imported from Supervisor.Spec
     supervise(children, strategy: :one_for_one)
   end
 end
