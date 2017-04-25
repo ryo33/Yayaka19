@@ -8,6 +8,7 @@ import {
 import {
   editUser, setUser, initializeUser,
   submitPost, updatePostText,
+  saveFailedPost, resubmitFailedPost,
   requestUser, setUserInfo,
   requestMoreUserPosts, addUserPosts,
   requestPost, setPost, requestContexts, setContexts,
@@ -50,7 +51,19 @@ const submitPostMiddleware = createAsyncHook(
     pushMessage(userChannel, 'new_post', payload)
       .then(() => {})
       .catch(() => {
-        dispatch(showError('Failed to submit.'))
+        dispatch(saveFailedPost(payload))
+      })
+  }
+)
+
+const resubmitFailedPostMiddleware = createAsyncHook(
+  resubmitFailedPost.getType(),
+  ({ dispatch, getState, action }) => {
+    const { payload } = action
+    pushMessage(userChannel, 'new_post', payload)
+      .then(() => {})
+      .catch(() => {
+        dispatch(saveFailedPost(payload))
       })
   }
 )
@@ -241,6 +254,7 @@ let signedInMiddlewares = []
 if (signedIn) {
   signedInMiddlewares = [
     submitPostMiddleware,
+    resubmitFailedPostMiddleware,
     requestFollowMiddleware,
     requestUnfollowMiddleware,
     requestFavMiddleware,

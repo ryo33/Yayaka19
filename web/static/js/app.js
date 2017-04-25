@@ -43,7 +43,7 @@ const store = createStore(
     autoRehydrate()
   )
 )
-persistStore(store, {whitelist: ['editorPlugins']})
+persistStore(store, {whitelist: ['editorPlugins', 'failedPost']})
 
 // Socket
 const userChannelCallback = ({ userParams }) => {

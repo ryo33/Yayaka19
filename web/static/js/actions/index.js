@@ -26,6 +26,9 @@ export const updatePostText = createAction('update post text', text => text)
 export const updatePostAddress = createAction('update post address', address => address)
 export const submitPost = createAction('submit post',
   (text, address, post) => ({text, address, post}))
+export const saveFailedPost = createAction('save failed post', p => p)
+export const resubmitFailedPost = createAction('resubmit failed post', p => p)
+export const dismissFailedPost = createAction('dismiss failed post')
 
 // User
 export const requestUser = createAction('request user', name => name)
