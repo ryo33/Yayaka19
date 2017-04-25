@@ -14,6 +14,7 @@ import {
 
 import notices from './notices.js'
 import newPostPage from './newPostPage.js'
+import failedPost from './failedPost.js'
 import userPage from './userPage.js'
 import followersPage from './followersPage.js'
 import followingPage from './followingPage.js'
@@ -75,6 +76,7 @@ export default combineReducers({
   followers,
   favs,
   newPostPage,
+  failedPost,
   userPage,
   followersPage,
   followingPage,

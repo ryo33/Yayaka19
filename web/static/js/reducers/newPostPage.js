@@ -9,7 +9,6 @@ import {
 const text = createReducer({
   [updatePostText]: (state, payload) => payload,
   [submitPost]: () => '',
-  [closeNewPostDialog]: () => ''
 }, '')
 
 const address = createReducer({

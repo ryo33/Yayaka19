@@ -12,6 +12,7 @@ export const windowFocusedSelector = ({ windowFocused }) => windowFocused
 // New post
 export const newPostPageSelector = ({ newPostPage }) => newPostPage
 export const editorPluginsSelector = ({ editorPlugins }) => editorPlugins
+export const failedPostSelector = ({ failedPost }) => failedPost
 
 // User
 export const userPageSelector = ({ userPage }) => userPage

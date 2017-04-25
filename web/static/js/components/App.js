@@ -21,11 +21,12 @@ import {
   pageSelector, userSelector, usersSelector,
   timelineSelector, onlinePostsCountSelector,
   noticesCountSelctor, newPostPageSelector,
-  errorSelector
+  errorSelector, failedPostSelector
 } from '../selectors.js'
 import {
   openNewPostDialog, closeNewPostDialog,
-  hideError, doPing
+  hideError, doPing,
+  resubmitFailedPost, dismissFailedPost
 } from '../actions/index.js'
 import Router from './Router.js'
 import NewPost from './NewPost.js'
@@ -33,6 +34,7 @@ import NewPost from './NewPost.js'
 const mapStateToProps = state => {
   const { newPosts } = timelineSelector(state)
   return {
+    failedPost: failedPostSelector(state).payload,
     newPost: newPostPageSelector(state).open,
     newPostsCount: newPosts.length,
     onlinePostsCount: onlinePostsCountSelector(state),
@@ -55,7 +57,8 @@ const actionCreators = {
   noticesPageAction: () => noticesPage.action(),
   newMysteryPageAction: () => newMysteryPage.action(),
   openNewPostDialog, closeNewPostDialog,
-  hideError, doPing
+  hideError, doPing,
+  resubmitFailedPost, dismissFailedPost
 }
 
 const menuStyle = {
@@ -85,6 +88,8 @@ class App extends Component {
     this.closeNewPost = this.closeNewPost.bind(this)
     this.hideError = this.hideError.bind(this)
     this.doPing = this.doPing.bind(this)
+    this.resubmitFailedPost = this.resubmitFailedPost.bind(this)
+    this.dismissFailedPost = this.dismissFailedPost.bind(this)
     this.state = {
       sidebar: false,
       logout: false,
@@ -139,6 +144,16 @@ class App extends Component {
     doPing()
   }
 
+  resubmitFailedPost() {
+    const { failedPost, resubmitFailedPost } = this.props
+    resubmitFailedPost(failedPost)
+  }
+
+  dismissFailedPost() {
+    const { dismissFailedPost } = this.props
+    dismissFailedPost()
+  }
+
   render() {
     const {
       page: { name, params }, error, user, users,
@@ -155,7 +170,8 @@ class App extends Component {
       newPostsCount,
       onlinePostsCount,
       noticesCount,
-      newPost
+      newPost,
+      failedPost
     } = this.props
     const { sidebar, logout } = this.state
     const titleNotices = error
@@ -298,6 +314,15 @@ class App extends Component {
                   <Message.Header>{error}</Message.Header>
                   <Button onClick={this.doPing}>Ping</Button>
                   <Button onClick={this.reload}>Reload</Button>
+                </Message>
+              ) : null}
+              {failedPost !== null ? (
+                <Message
+                  negative
+                  onDismiss={this.dismissFailedPost}
+                >
+                  <Message.Header>Failed to submit.</Message.Header>
+                  <Button onClick={this.resubmitFailedPost}>Retry!</Button>
                 </Message>
               ) : null}
               {newPost ? <NewPost top /> : null}
