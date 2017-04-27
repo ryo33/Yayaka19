@@ -6,14 +6,19 @@ use Mix.Config
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with brunch.io to recompile .js and .css sources.
+watchers = if System.get_env("WEBPACK") == "false" do
+  []
+else
+  [node: ["node_modules/webpack/bin/webpack.js",
+   "--watch-stdin", cd: Path.expand("../", __DIR__)]]
+end
 config :share, Share.Endpoint,
   http: [port: System.get_env("PORT") || 4000],
   url: [host: "localhost", port: System.get_env("PORT") || 4000],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
-  watchers: [node: ["node_modules/webpack/bin/webpack.js",
-    "--watch-stdin", cd: Path.expand("../", __DIR__)]]
+  watchers: watchers
 
 
 # Watch static and templates for browser reloading.

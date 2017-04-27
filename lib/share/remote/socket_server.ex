@@ -36,7 +36,7 @@ defmodule Share.Remote.SocketServer do
   end
 
   def handle_cast({:delete, host}, state) do
-    {:reply, Map.delete(state, host), state}
+    {:noreply, Map.delete(state, host)}
   end
 
   def handle_call({:get, host}, _from, state) do

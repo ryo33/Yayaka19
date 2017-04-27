@@ -3,8 +3,6 @@ defmodule Share.Remote.Socket do
 
   defstruct [:host, :type, :pid, :channel]
 
-  @port Application.get_env(:share, Share.Endpoint)[:url][:port]
-
   @reconnect_timer 10000
   @reconnect_times 50
 
@@ -16,6 +14,7 @@ defmodule Share.Remote.Socket do
   end
 
   def connect_to(host) do
+    token = Phoenix.Token.sign(Share.Endpoint, "remote", host)
     path = "/yayaka/websocket" # TODO get from server info
     {host, opts} = case String.split(host, ":") do
       [host] ->
@@ -32,7 +31,9 @@ defmodule Share.Remote.Socket do
     end
     {:ok, pid} = PhoenixChannelClient.start_link()
     {:ok, socket} = PhoenixChannelClient.connect(pid, opts)
-    channel = PhoenixChannelClient.channel(socket, host, %{port: @port})
+    topic = Share.Remote.host
+    params = %{token: token, port: Share.Remote.port}
+    channel = PhoenixChannelClient.channel(socket, topic, params)
     GenServer.start_link(__MODULE__, %{channel: channel, host: host})
     %__MODULE__{
       host: host,
@@ -66,7 +67,7 @@ defmodule Share.Remote.Socket do
   def init(%{channel: channel} = opts) do
     case PhoenixChannelClient.join(channel) do
       {:ok, _} -> {:ok, opts}
-      {:error, %{reason: reason}} -> {:stop, reason}
+      {:error, reason} -> {:stop, reason}
       :timeout -> {:stop, :timeout}
     end
   end

@@ -20,4 +20,25 @@ defmodule Share.Remote do
 
     supervise(children, strategy: :one_for_one)
   end
+
+  @port Application.get_env(:share, Share.Endpoint)[:url][:port]
+  @hostname Application.get_env(:share, Share.Endpoint)[:url][:host]
+  @host "#{@hostname}:#{@port}"
+
+  if Mix.env == :dev do
+    def port, do: Application.get_env(:share, Share.Endpoint)[:url][:port]
+    def hostname, do: Application.get_env(:share, Share.Endpoint)[:url][:host]
+    def host, do: "#{hostname}:#{port}"
+  else
+    def port, do: @port
+    def hostname, do: @hostname
+    def host, do: @host
+  end
+
+  def remove_port(host) do
+    hd(String.split(host, ":"))
+  end
+  def create_host(host, port) do
+    "#{remove_port(host)}:#{port}"
+  end
 end

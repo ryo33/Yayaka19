@@ -21,7 +21,8 @@ defmodule Share.Mixfile do
      applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext,
                     :phoenix_ecto, :postgrex, :comeonin,
                     :ueberauth, :ueberauth_google, :ueberauth_facebook,
-                    :ueberauth_twitter, :ueberauth_github]]
+                    :ueberauth_twitter, :ueberauth_github,
+                    :httpoison]]
   end
 
   # Specifies which paths to compile per environment.
@@ -52,7 +53,8 @@ defmodule Share.Mixfile do
      {:comeonin, "~> 3.0"},
      {:honeydew, "~> 1.0.0-rc5"},
      {:uuid, "~> 1.1"},
-     {:phoenixchannelclient, "~> 0.1.0"}]
+     {:phoenixchannelclient, "~> 0.1.0"},
+     {:httpoison, "~> 0.11.1"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

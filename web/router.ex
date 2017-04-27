@@ -26,6 +26,19 @@ defmodule Share.Router do
     plug Guardian.Plug.LoadResource
   end
 
+  scope "/yayaka", Share do
+    pipe_through [:api]
+
+    get "/token", RemoteController, :token
+  end
+
+  scope "/api", Share do
+    pipe_through [:api, :api_auth]
+    put "/users/:user", APIController, :login
+    post "/users/:user/post", APIController, :post
+    delete "/users/:user", APIController, :logout
+  end
+
   scope "/", Share do
     pipe_through [:browser, :browser_auth]
 
@@ -56,12 +69,5 @@ defmodule Share.Router do
     get "/posts/:id", PageController, :post
     get "/users/:name", PageController, :user
     get "/*page", PageController, :index
-  end
-
-  scope "/api", Share do
-    pipe_through [:api, :api_auth]
-    put "/users/:user", APIController, :login
-    post "/users/:user/post", APIController, :post
-    delete "/users/:user", APIController, :logout
   end
 end
