@@ -1,10 +1,11 @@
 var webpack = require("webpack");
+var path = require("path");
 
 module.exports = {
   devtool: "source-map",
   entry: ["babel-polyfill", "./web/static/js/app.js", "./web/static/css/app.css"],
   output: {
-    path: "./priv/static",
+    path: path.resolve(__dirname, "./priv/static"),
     filename: "js/app.js"
   },
   module: {
