@@ -22,12 +22,6 @@ class LoginPage extends Component {
               </Button>
             </Segment>
             <Segment vertical>
-              <Button color='facebook' size='large' href="/auth/facebook">
-                <Icon name='facebook' />
-                Sign in with Facebook
-              </Button>
-            </Segment>
-            <Segment vertical>
               <Button color='black' size='large' href="/auth/github">
                 <Icon name='github' />
                 Sign in with GitHub
