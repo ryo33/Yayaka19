@@ -13,9 +13,8 @@ defmodule Share.Remote.SocketServer do
     host = message.host
     socket = GenServer.call(__MODULE__, {:get, host})
     if is_nil(socket) do
-      socket = Share.Remote.Socket.connect_to(host)
-      put_socket(host, socket)
-      socket
+      Share.Remote.Socket.connect_to(host)
+      GenServer.call(__MODULE__, {:get, host})
     else
       socket
     end

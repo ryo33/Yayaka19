@@ -14,6 +14,9 @@ import { userPage, postPage } from '../pages.js'
 import { userSelector, favsSelector } from '../selectors.js'
 import { getTweetURL } from '../utils.js'
 
+const getPostPath = ({ id, host, path }) =>
+  host != null ? `https://${host+path}` : postPage.path({id})
+
 const mapStateToProps = (state) => {
   const favs = favsSelector(state)
   return {
@@ -95,9 +98,11 @@ class Post extends Component {
   }
 
   handleClickTime(e) {
-    e.preventDefault()
     const { post, postPageAction } = this.props
-    postPageAction(post.id)
+    if (post.host == null) {
+      e.preventDefault()
+      postPageAction(post.id)
+    }
   }
 
   handleSendToOnline() {
@@ -204,6 +209,7 @@ class Post extends Component {
     const quote = hasChild && post.post_addresses.length == 0
     const quoteMystery = post.mystery_id != null
     const empty = !quoteMystery && (post.text ? post.text.length === 0 : true)
+    const remote = post.host != null
     const size = quote ? null : 'tiny'
     const userDisplay = post.user_display || post.user.display
     return (
@@ -222,7 +228,10 @@ class Post extends Component {
             <Comment.Metadata>
               <span>@{post.user.name}</span>
               {postLink ? (
-                <a href={postPage.path({id: post.id})} onClick={this.handleClickTime}>
+                <a href={getPostPath(post)} onClick={this.handleClickTime}>
+                  {remote ? (
+                    <Icon name='external' />
+                  ) : null}
                   <Time time={post.inserted_at} />
                 </a>
               ) : (

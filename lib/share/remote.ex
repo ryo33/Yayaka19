@@ -21,17 +21,14 @@ defmodule Share.Remote do
     supervise(children, strategy: :one_for_one)
   end
 
+  @host Application.get_env(:share, Share.Endpoint)[:url][:host]
   @port Application.get_env(:share, Share.Endpoint)[:url][:port]
-  @hostname Application.get_env(:share, Share.Endpoint)[:url][:host]
-  @host "#{@hostname}:#{@port}"
 
   if Mix.env == :dev do
     def port, do: Application.get_env(:share, Share.Endpoint)[:url][:port]
-    def hostname, do: Application.get_env(:share, Share.Endpoint)[:url][:host]
-    def host, do: "#{hostname}:#{port}"
+    def host, do: "#{@host}:#{port}"
   else
     def port, do: @port
-    def hostname, do: @hostname
     def host, do: @host
   end
 

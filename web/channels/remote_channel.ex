@@ -13,8 +13,7 @@ defmodule Share.RemoteChannel do
     params = %{token: token, host: Share.Remote.host}
     with {:ok, {:ok, response}} <- Share.Tasks.HTTP.get(url, params),
          {:ok, true} <- Poison.decode(response.body) do
-      sock = Share.Remote.Socket.connect_from(host)
-      Share.Remote.SocketServer.put_socket(host, sock)
+      Share.Remote.Socket.connect_from(host)
       socket = socket |> assign(:host, host)
       {:ok, socket}
     else
@@ -24,7 +23,7 @@ defmodule Share.RemoteChannel do
 
   def handle_in("messages", %{"messages" => messages}, socket) do
     Enum.each(messages, fn message ->
-      spawn fn ->
+      spawn_link fn ->
         message = message |> Map.put("from", socket.assigns.host)
         Share.Remote.Handler.enqueue(message)
       end

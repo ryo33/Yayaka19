@@ -3,20 +3,7 @@ defmodule Share.Post do
 
   defimpl Poison.Encoder, for: Share.Post do
     def encode(params, options) do
-      params = case params.post do
-        %Ecto.Association.NotLoaded{} -> Map.delete(params, :post)
-        _ -> params
-      end
-      params = case params.mystery do
-        %Ecto.Association.NotLoaded{} -> Map.delete(params, :mystery)
-        _ -> params
-      end
-      Map.from_struct(params)
-      |> Enum.filter(fn {key, _} -> Enum.member?([
-        :id, :text, :user_display, :user, :inserted_at,
-        :post, :post_id, :post_addresses, :mystery, :mystery_id
-      ], key) end)
-      |> Enum.into(%{})
+      Share.Post.to_map(params)
       |> Poison.encode!(options)
     end
   end
@@ -31,6 +18,23 @@ defmodule Share.Post do
     has_many :post_addresses, Share.PostAddress
 
     timestamps()
+  end
+
+  def to_map(params) do
+    params = case params.post do
+      %Ecto.Association.NotLoaded{} -> Map.delete(params, :post)
+      _ -> params
+    end
+    params = case params.mystery do
+      %Ecto.Association.NotLoaded{} -> Map.delete(params, :mystery)
+      _ -> params
+    end
+    Map.from_struct(params)
+    |> Enum.filter(fn {key, _} -> Enum.member?([
+      :id, :text, :user_display, :user, :inserted_at,
+      :post, :post_id, :post_addresses, :mystery, :mystery_id
+    ], key) end)
+    |> Enum.into(%{})
   end
 
   @required_fields ~w(user_id)a
@@ -60,6 +64,13 @@ defmodule Share.Post do
       where: p.user_id == ^user.id,
       preload: ^Share.Post.preload_params,
       order_by: [desc: :id]
+  end
+
+  def public_timeline do
+    Share.Post
+    |> order_by([p], [desc: p.id])
+    |> limit(50)
+    |> Share.Post.preload()
   end
 
   @preload [

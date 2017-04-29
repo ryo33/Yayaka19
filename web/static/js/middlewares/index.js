@@ -24,9 +24,10 @@ import {
   setWindowFocused
 } from '../actions/index.js'
 import { pageSelector, onlinePostsSelector } from '../selectors.js'
-import { compareNotices } from '../utils.js'
+import { compareInsertedAtDesc, compareNotices } from '../utils.js'
 import followersPageMiddleware from './followersPage.js'
 import followingPageMiddleware from './followingPage.js'
+import followingServersPageMiddleware from './followingServersPage.js'
 import mysteriesPageMiddleware from './mysteriesPage.js'
 import openedMysteriesPageMiddleware from './openedMysteriesPage.js'
 import mysteryPageMiddleware from './mysteryPage.js'
@@ -165,9 +166,10 @@ const requestPublicTimelineMiddleware = createAsyncHook(
   requestPublicTimeline.getType(),
   ({ dispatch, action }) => {
     pushMessage(channel, 'public_timeline', {})
-      .then(({ posts, favs }) => {
+      .then(({ posts, favs, hosts }) => {
+        posts.sort(compareInsertedAtDesc)
         dispatch(addFavs(favs))
-        dispatch(updatePublicTimeline({posts}))
+        dispatch(updatePublicTimeline({hosts, posts}))
       }).catch(() => {
         dispatch(showError('Failed to fetch the public timeline.'))
       })
@@ -291,6 +293,7 @@ if (signedIn) {
 export default composeMiddleware(
   followersPageMiddleware,
   followingPageMiddleware,
+  followingServersPageMiddleware,
   mysteriesPageMiddleware,
   openedMysteriesPageMiddleware,
   mysteryPageMiddleware,

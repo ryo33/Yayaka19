@@ -13,7 +13,8 @@ import {
   closeNewPostDialog,
   openMystery,
   requestMysteries,
-  requestOpenedMysteries
+  requestOpenedMysteries,
+  requestFollowingServers
 } from './actions/index.js'
 import { requestFollowers } from './actions/followersPage.js'
 import { requestFollowing } from './actions/followingPage.js'
@@ -37,6 +38,8 @@ export const followingPage       = p('/users/:name/following', 'following')
 export const mysteriesPage       = p('/users/:name/mysteries', 'userMysteries')
 export const openedMysteriesPage = p('/users/:name/opened-mysteries', 'openedMysteries')
 export const userFormPage        = p('/users/:name/edit', 'userForm')
+export const followingServersPage =
+  p('/users/:name/following-servers', 'followingServers')
 export const postPage            = p('/posts/:id', 'post')
 export const noticesPage         = p('/n', 'notices')
 export const loginPage           = p('/login', 'login')
@@ -54,7 +57,7 @@ export const newAccountURL = '/new'
 export const getSwitchUserURL = name => `/switch/${name}`
 
 const onlySignedInMiddleware = createReplacer(
-  () => signedIn === false,
+  ({ action }) => signedIn === false && action.type === CHANGE_PAGE,
   ({ action }) => {
     return timeline.check(action)
       || onlinePosts.check(action)
@@ -172,6 +175,14 @@ const mysteryPageHook = createAsyncHook(
   }
 )
 
+const followingServersPageHook = createAsyncHook(
+  ({ action }) => followingServersPage.check(action),
+  ({ dispatch, action }) => {
+    const name = action.payload.params.name
+    dispatch(requestFollowingServers(name))
+  }
+)
+
 export const pagesMiddleware = composeMiddleware(
   onlySignedInMiddleware,
   errorPageHook,
@@ -186,5 +197,6 @@ export const pagesMiddleware = composeMiddleware(
   openedMysteriesPageHook,
   postPageHook,
   noticesPageHook,
-  mysteryPageHook
+  mysteryPageHook,
+  followingServersPageHook
 )

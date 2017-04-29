@@ -1,5 +1,5 @@
 defmodule Share.Remote.Message do
-  def create(host, action, payload) do
+  def create(host, action, payload \\ %{}) do
     %{
       host: host,
       action: action,

@@ -5,7 +5,8 @@ defmodule Share.RemoteSocket do
   channel "*", Share.RemoteChannel
 
   ## Transports
-  transport :websocket, Phoenix.Transports.WebSocket
+  transport :websocket, Phoenix.Transports.WebSocket,
+    check_origin: false
 
   def connect(_params, socket) do
     {:ok, socket}

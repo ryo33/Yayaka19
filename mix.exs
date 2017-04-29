@@ -53,8 +53,9 @@ defmodule Share.Mixfile do
      {:comeonin, "~> 3.0"},
      {:honeydew, "~> 1.0.0-rc5"},
      {:uuid, "~> 1.1"},
-     {:phoenixchannelclient, "~> 0.1.0"},
-     {:httpoison, "~> 0.11.1"}]
+     {:phoenixchannelclient, "~> 0.1.2"},
+     {:httpoison, "~> 0.11.1"},
+     {:flow, "~> 0.11"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

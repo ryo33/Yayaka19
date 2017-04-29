@@ -11,26 +11,38 @@ defmodule Share.Remote.RequestServer do
     noreply = Keyword.get(opts, :noreply, false) or Map.get(message, :noreply, false)
     id = UUID.uuid4()
     pid = self()
-    socket = Share.Remote.SocketServer.get_socket(message)
-    message = message
-              |> Map.put(:socket, socket)
-              |> Map.put(:id, id)
-    unless noreply do
-      message = message
-                |> Map.put(:reply_pid, pid)
-      GenServer.cast(__MODULE__, {:request, message})
+    try do
+      do_request(message, noreply, id, pid)
+    rescue
+      _ -> :error
     end
-    Share.Remote.Pusher.enqueue(message)
-    unless noreply do
-      receive do
-        {:message, message} -> message
-      after
-        @timeout ->
-          GenServer.cast(__MODULE__, {:cancel, message.id})
-          :timeout
+  end
+
+  defp do_request(message, noreply, id, pid) do
+    socket = Share.Remote.SocketServer.get_socket(message)
+    if not is_nil(socket) do
+      message = message
+                |> Map.put(:socket, socket)
+                |> Map.put(:id, id)
+      unless noreply do
+        message = message
+                  |> Map.put(:reply_pid, pid)
+        GenServer.cast(__MODULE__, {:request, message})
+      end
+      Share.Remote.Pusher.enqueue(message)
+      unless noreply do
+        receive do
+          {:message, message} -> message
+        after
+          @timeout ->
+            GenServer.cast(__MODULE__, {:cancel, message.id})
+            :timeout
+        end
+      else
+        :ok
       end
     else
-      :ok
+      :error
     end
   end
 
