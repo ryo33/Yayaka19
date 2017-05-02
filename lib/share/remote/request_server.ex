@@ -19,7 +19,7 @@ defmodule Share.Remote.RequestServer do
   end
 
   defp do_request(message, noreply, id, pid) do
-    socket = Share.Remote.SocketServer.get_socket(message)
+    socket = Share.Remote.SocketRegistry.get_or_create_socket(message)
     if not is_nil(socket) do
       message = message
                 |> Map.put(:socket, socket)

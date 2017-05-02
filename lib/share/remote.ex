@@ -15,7 +15,7 @@ defmodule Share.Remote do
       Honeydew.queue_spec(:request_pusher),
       Honeydew.worker_spec(:request_pusher, Share.Remote.Pusher, num: @pusher_workers),
       worker(Share.Remote.RequestServer, []),
-      worker(Share.Remote.SocketServer, [])
+      supervisor(Share.Remote.SocketRegistry, [])
     ]
 
     supervise(children, strategy: :one_for_one)

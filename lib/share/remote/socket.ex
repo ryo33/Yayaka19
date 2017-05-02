@@ -11,7 +11,7 @@ defmodule Share.Remote.Socket do
       host: host,
       type: :from
     }
-    Share.Remote.SocketServer.put_socket(host, socket)
+    Registry.register(Share.Remote.SocketRegistry, host, socket)
   end
 
   def connect_to(host) do
@@ -29,7 +29,8 @@ defmodule Share.Remote.Socket do
            path: path,
            secure: Mix.env == :prod]}
     end
-    GenServer.start_link(__MODULE__, host: host, opts: opts)
+    args = [host: host, opts: opts]
+    {:ok, pid} = GenServer.start_link(__MODULE__, args)
   end
 
   def send(socket, messages) do
@@ -55,8 +56,7 @@ defmodule Share.Remote.Socket do
     end
   end
 
-  def cleanup(%{host: host, pid: pid}) do
-    Share.Remote.SocketServer.delete_socket(host)
+  def cleanup(%{client_pid: pid}) do
     GenServer.stop(pid)
   end
 
@@ -79,12 +79,12 @@ defmodule Share.Remote.Socket do
         state = %{
           host: host,
           socket: socket,
-          pid: pid,
+          client_pid: pid,
           channel: channel
         }
         case PhoenixChannelClient.join(channel) do
           {:ok, _} ->
-            Share.Remote.SocketServer.put_socket(host, socket)
+            Registry.register(Share.Remote.SocketRegistry, host, socket)
             {:ok, state}
           {:error, reason} ->
             cleanup(state)
