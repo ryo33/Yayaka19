@@ -3,11 +3,10 @@ import { createAsyncHook, createReplacer, composeMiddleware } from 'redux-middle
 import { signedIn } from '../global.js'
 import { pushMessage, channel, userChannel } from '../socket.js'
 import {
-  loginPage, home, timeline, publicTimeline, userPage, onlinePosts
+  loginPage, home, timeline, publicTimeline, userPage
 } from '../pages.js'
 import {
   editUser, setUser, initializeUser,
-  submitOnlinePost, showOnlinePosts,
   submitPost, updatePostText,
   saveFailedPost, resubmitFailedPost,
   requestUser, setUserInfo,
@@ -21,7 +20,6 @@ import {
   openNoticesPage, updateNoticed,
   showError, hideError, doPing,
   closeNewPostDialog,
-  sendToOnline,
   setWindowFocused
 } from '../actions/index.js'
 import { pageSelector, onlinePostsSelector } from '../selectors.js'
@@ -37,8 +35,7 @@ const redirectLoginPageMiddleware = createReplacer(
   () => !signedIn, [
     requestFollow.getType(),
     requestFav.getType(),
-    submitPost.getType(),
-    sendToOnline.getType()],
+    submitPost.getType()],
   () => loginPage.action()
 )
 
@@ -255,36 +252,6 @@ const doPingMiddleware = createAsyncHook(
   }
 )
 
-const submitOnlinePostMiddleware = createAsyncHook(
-  submitOnlinePost.getType(),
-  ({ action }) => {
-    const params = action.payload
-    pushMessage(userChannel, 'online_post', params)
-      .then(() => {/* TODO */})
-  }
-)
-
-const sendToOnlineMiddleware = createAsyncHook(
-  sendToOnline.getType(),
-  ({ action }) => {
-    const id = action.payload
-    pushMessage(userChannel, 'send_to_online', {post_id: id})
-      .then(() => {/* TODO */})
-  }
-)
-
-const onFocusMiddleware = createAsyncHook(
-  setWindowFocused.getType(),
-  ({ action }) => action.payload === true,
-  ({ dispatch, getState }) => {
-    const state = getState()
-    if (pageSelector(state).name == onlinePosts.name) {
-      const { channel } = onlinePostsSelector(state)
-      dispatch(showOnlinePosts(channel))
-    }
-  }
-)
-
 let signedInMiddlewares = []
 if (signedIn) {
   signedInMiddlewares = [
@@ -297,10 +264,7 @@ if (signedIn) {
     requestTimelineMiddleware,
     requestMoreTimelineMiddleware,
     openNoticesPageMiddleware,
-    editUserMiddleware,
-    submitOnlinePostMiddleware,
-    sendToOnlineMiddleware,
-    onFocusMiddleware
+    editUserMiddleware
   ]
 }
 

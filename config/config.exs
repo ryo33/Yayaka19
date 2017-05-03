@@ -19,7 +19,6 @@ config :share, Share.Endpoint,
 
 config :share, Share.Tasks,
   post_workers: 10,
-  online_post_workers: 10,
   notice_workers: 10,
   http_workers: 10
 

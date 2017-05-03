@@ -9,7 +9,6 @@ import {
   requestUser,
   requestPost, setContexts,
   openNoticesPage,
-  showOnlinePosts,
   closeNewPostDialog,
   openMystery,
   requestMysteries,
@@ -21,7 +20,6 @@ import { requestFollowing } from './actions/followingPage.js'
 import {
   pageSelector,
   homePostSelector,
-  onlinePostsSelector,
   mysteryPageSelector
 } from './selectors.js'
 
@@ -31,7 +29,6 @@ const p = pages.addPage.bind(pages)
 export const home                = p('/', 'home')
 export const publicTimeline      = p('/p', 'public')
 export const timeline            = p('/t', 'timeline')
-export const onlinePosts         = p('/o', 'online')
 export const userPage            = p('/users/:name', 'user')
 export const followersPage       = p('/users/:name/followers', 'followers')
 export const followingPage       = p('/users/:name/following', 'following')
@@ -60,7 +57,6 @@ const onlySignedInMiddleware = createReplacer(
   ({ action }) => signedIn === false && action.type === CHANGE_PAGE,
   ({ action }) => {
     return timeline.check(action)
-      || onlinePosts.check(action)
       || noticesPage.check(action)
       || userFormPage.check(action)
       || mysteryPage.check(action)
@@ -101,14 +97,6 @@ const publicTimelineHook = createAsyncHook(
   },
   ({ dispatch, action }) => {
     dispatch(requestPublicTimeline())
-  }
-)
-
-const onlinePostsHook = createAsyncHook(
-  ({ action }) => onlinePosts.check(action),
-  ({ dispatch, getState }) => {
-    const { channel } = onlinePostsSelector(getState())
-    dispatch(showOnlinePosts(channel))
   }
 )
 
@@ -189,7 +177,6 @@ export const pagesMiddleware = composeMiddleware(
   closeNewPostDialogMiddleware,
   homeHook,
   publicTimelineHook,
-  onlinePostsHook,
   userPageHook,
   followersPageHook,
   followingPageHook,

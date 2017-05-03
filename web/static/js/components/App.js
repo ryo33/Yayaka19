@@ -9,7 +9,7 @@ import {
 
 import { title, signedIn, source, admin } from '../global.js'
 import {
-  home, publicTimeline, timeline, onlinePosts,
+  home, publicTimeline, timeline,
   userPage, userFormPage,
   postPage, loginPage, noticesPage,
   newMysteryPage,
@@ -19,7 +19,7 @@ import {
 } from '../pages.js'
 import {
   pageSelector, userSelector, usersSelector,
-  timelineSelector, onlinePostsCountSelector,
+  timelineSelector,
   noticesCountSelctor, newPostPageSelector,
   errorSelector, failedPostSelector
 } from '../selectors.js'
@@ -38,7 +38,6 @@ const mapStateToProps = state => {
     failedPost: failedPostSelector(state).payload,
     newPost: newPostPageSelector(state).open,
     newPostsCount: newPosts.length,
-    onlinePostsCount: onlinePostsCountSelector(state),
     page: pageSelector(state),
     user: userSelector(state),
     users: usersSelector(state),
@@ -51,7 +50,6 @@ const actionCreators = {
   homeAction: () => home.action(),
   publicTimelineAction: () => publicTimeline.action(),
   timelineAction: () => timeline.action(),
-  onlinePostsAction: () => onlinePosts.action(),
   userPageAction: name => userPage.action({name}),
   userFormPageAction: name => userFormPage.action({name}),
   loginPageAction: () => loginPage.action(),
@@ -163,13 +161,11 @@ class App extends Component {
       homeAction,
       publicTimelineAction,
       timelineAction,
-      onlinePostsAction,
       newPostAction,
       loginPageAction,
       noticesPageAction,
       newMysteryPageAction,
       newPostsCount,
-      onlinePostsCount,
       noticesCount,
       newPost,
       failedPost
@@ -177,7 +173,7 @@ class App extends Component {
     const { sidebar, logout } = this.state
     const titleNotices = error
       ? -1
-      : newPostsCount + onlinePostsCount + noticesCount
+      : newPostsCount + noticesCount
     return (
       <div>
         <Helmet title={
@@ -193,14 +189,6 @@ class App extends Component {
               { newPostsCount >= 1 ? (
                 <Label size='tiny' circular style={labelStyle} color='blue'>
                   {newPostsCount}
-                </Label>
-              ) : null }
-            </Menu.Item>
-            <Menu.Item style={iconItemStyle} active={name == onlinePosts.name} onClick={onlinePostsAction}>
-              <Icon style={iconStyle} size='large' name='bar' />
-              { onlinePostsCount >= 1 ? (
-                <Label size='tiny' circular style={labelStyle} color='yellow'>
-                  {onlinePostsCount}
                 </Label>
               ) : null }
             </Menu.Item>
