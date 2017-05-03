@@ -39,7 +39,22 @@ defmodule Share.PageController do
           title: "#{user.display} (@#{user.name}) on #{title}",
           url: get_url(conn)
         }
-      render_page(conn, og)
+        render_page(conn, og)
+    end
+  end
+
+  def mystery(conn, %{"id" => id}) do
+    case Share.Repo.get_by(Share.Mystery, id: id) do
+      nil -> render_page(conn)
+      mystery ->
+        mystery = Share.Repo.preload(mystery, [:user])
+        user = mystery.user
+        og = %{
+          title: "#{user.display} (@#{user.name})'s mystery",
+          description: ellipsize(mystery.title),
+          url: get_url(conn)
+        }
+        render_page(conn, og)
     end
   end
 

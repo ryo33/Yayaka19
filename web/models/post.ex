@@ -3,20 +3,7 @@ defmodule Share.Post do
 
   defimpl Poison.Encoder, for: Share.Post do
     def encode(params, options) do
-      params = case params.post do
-        %Ecto.Association.NotLoaded{} -> Map.delete(params, :post)
-        _ -> params
-      end
-      params = case params.mystery do
-        %Ecto.Association.NotLoaded{} -> Map.delete(params, :mystery)
-        _ -> params
-      end
-      Map.from_struct(params)
-      |> Enum.filter(fn {key, _} -> Enum.member?([
-        :id, :text, :user_display, :user, :inserted_at,
-        :post, :post_id, :post_addresses, :mystery, :mystery_id
-      ], key) end)
-      |> Enum.into(%{})
+      Share.Post.to_map(params)
       |> Poison.encode!(options)
     end
   end
@@ -31,6 +18,40 @@ defmodule Share.Post do
     has_many :post_addresses, Share.PostAddress
 
     timestamps()
+  end
+
+  def to_map(params) do
+    params = case params.post do
+      %Ecto.Association.NotLoaded{} -> Map.delete(params, :post)
+      _ -> params
+    end
+    params = case params.mystery do
+      %Ecto.Association.NotLoaded{} -> Map.delete(params, :mystery)
+      _ -> params
+    end
+    Map.from_struct(params)
+    |> Map.take([
+      :id, :text, :user_display, :user, :inserted_at,
+      :post, :post_id, :post_addresses, :mystery, :mystery_id
+    ])
+  end
+
+  def put_path(%__MODULE__{} = post), do: put_path(to_map(post))
+  def put_path(post) do
+    path = Share.Router.Helpers.page_path(Share.Endpoint, :post, post.id)
+    Map.put(post, :path, path)
+    |> Map.update(:post, nil, fn post ->
+      if is_nil(post), do: nil, else: put_path(post)
+    end)
+    |> Map.update(:mystery, nil, fn mystery ->
+      if is_nil(mystery), do: nil, else: Share.Mystery.put_path(mystery)
+    end)
+    |> Map.update(:user, nil, fn user -> Share.User.put_path(user) end)
+    |> Map.update(:post_addresses, nil, fn addresses ->
+      Enum.map(addresses, fn address ->
+        Share.PostAddress.put_path(address)
+      end)
+    end)
   end
 
   @required_fields ~w(user_id)a
@@ -60,6 +81,13 @@ defmodule Share.Post do
       where: p.user_id == ^user.id,
       preload: ^Share.Post.preload_params,
       order_by: [desc: :id]
+  end
+
+  def public_timeline do
+    Share.Post
+    |> order_by([p], [desc: p.id])
+    |> limit(50)
+    |> Share.Post.preload()
   end
 
   @preload [

@@ -11,6 +11,7 @@ import {
 import { handlers } from '../editorPlugins.js'
 import { title } from '../global.js'
 import { isDefaultChannel, DEFAULT_CHANNEL } from '../utils.js'
+import UserID from './UserID.js'
 import Post from './Post.js'
 import EditorPluginsOptions from './EditorPluginsOptions.js'
 import EditorPluginsButton from './EditorPluginsButton.js'
@@ -227,7 +228,7 @@ class OnlinePosts extends Component {
               onChange={this.handleChangeText} onKeyDown={this.handleKeyDown} autoFocus />
             <Form.Group inline style={{marginBottom: "0px"}}>
               <Form.Button disabled={text.length == 0} primary>Submit</Form.Button>
-              <Label size='large'>{user.display} @{user.name}</Label>
+              <Label size='large'>{user.display} <UserID user={user} /></Label>
               <EditorPluginsButton plugins={plugins}
                 onClick={this.handleClickPlugins} />
             </Form.Group>

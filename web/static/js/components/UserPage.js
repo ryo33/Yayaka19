@@ -10,6 +10,7 @@ import {
 } from '../pages.js'
 import { openNewPostDialog, updatePostAddress, requestMoreUserPosts } from '../actions/index.js'
 import { userSelector, userPageSelector, followingSelector } from '../selectors.js'
+import UserID from './UserID.js'
 import FollowButton from './FollowButton.js'
 import PostList from './PostList.js'
 
@@ -105,7 +106,7 @@ class UserPage extends Component {
                   ) : null}
                 </Card.Header>
                 <Card.Meta>
-                  @{user.name}
+                  <UserID user={user} />
                   <span>
                     <Icon name='write' />
                     {postCount} Posts

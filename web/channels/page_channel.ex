@@ -6,6 +6,7 @@ defmodule Share.PageChannel do
   alias Share.Fav
   alias Share.Follow
   alias Share.Mystery
+  alias Share.Server
   alias Share.Repo
 
   require Logger
@@ -31,8 +32,8 @@ defmodule Share.PageChannel do
           order_by: [desc: :id],
           limit: @user_posts_limit
         posts = Repo.all(Post.preload(query))
-        ids = Enum.map(posts, &(&1.id))
-        favs = Fav.get_favs(socket, ids)
+        user = socket.assigns.user
+        favs = Fav.get_favs(posts, user)
         mysteries_count = Repo.aggregate(Mystery.user_mysteries(user), :count, :id)
         opened_mysteries_count = Repo.aggregate(Post.opened_mystery_posts(user), :count, :id)
         res = %{
@@ -59,8 +60,7 @@ defmodule Share.PageChannel do
           order_by: [desc: :id],
           limit: @user_posts_limit
         posts = Repo.all(Post.preload(query))
-        ids = Enum.map(posts, &(&1.id))
-        favs = Fav.get_favs(socket, ids)
+        favs = Fav.get_favs(posts, socket.assigns.user)
         res = %{
           "posts" => posts,
           "favs" => favs,
@@ -75,7 +75,7 @@ defmodule Share.PageChannel do
       post ->
         res = %{
           post: Post.deep_preload(post),
-          favs: Fav.get_favs(socket, [post.id])
+          favs: Fav.get_favs([post], socket.assigns.user)
         }
         {:reply, {:ok, res}, socket}
     end
@@ -91,14 +91,58 @@ defmodule Share.PageChannel do
   end
 
   def handle_in("public_timeline", _params, socket) do
-    query = Post
-            |> order_by([p], [desc: p.id])
-            |> limit(50)
-            |> Post.preload()
-    posts = Repo.all(query)
-    post_ids = posts |> Enum.map(&(&1.id))
-    favs = Fav.get_favs(socket, post_ids)
-    {:reply, {:ok, %{posts: posts, favs: favs}}, socket}
+    user = socket.assigns.user
+    servers = if is_nil(user) do
+      []
+    else
+      Share.ServerFollow.following_servers(user)
+      |> Repo.all()
+    end
+    task = Task.async(fn ->
+      posts = Post.public_timeline()
+              |> Repo.all()
+    end)
+    response = Task.async_stream(servers, fn %{host: host} ->
+      resp = Share.Remote.Message.create(host, "public_timeline")
+               |> Share.Remote.RequestServer.request()
+      {resp, host}
+    end)
+    |> Enum.map(fn result ->
+      case result do
+        {:ok, {resp, host}} ->
+          case resp do
+            %{"payload" => %{"posts" => posts}} ->
+              posts = Task.async_stream(posts, fn post ->
+                Map.put(post, "host", host)
+              end)
+              |> Enum.map(fn {:ok, post} -> post end)
+              {:ok, host, posts}
+            :timeout -> {:timeout, host}
+            _ -> {:error, host}
+          end
+        _ -> :error
+      end
+    end)
+    posts = Task.await(task)
+    favs = Fav.get_favs(posts, user)
+    {hosts, posts} = Enum.reduce(response, {%{}, [posts]}, fn res, {hosts, list} ->
+      case res do
+        {:ok, host, posts} ->
+          hosts = Map.put(hosts, host, "ok")
+          list = [posts | list]
+          {hosts, list}
+        {:timeout, host} ->
+          hosts = Map.put(hosts, host, "timeout")
+          {hosts, list}
+        {:error, host} ->
+          hosts = Map.put(hosts, host, "error")
+          {hosts, list}
+        _ ->
+          {hosts, list}
+      end
+    end)
+    posts = List.flatten(posts)
+    {:reply, {:ok, %{hosts: hosts, posts: posts, favs: favs}}, socket}
   end
 
   def handle_in("followers", %{"name" => name}, socket) do
@@ -138,6 +182,16 @@ defmodule Share.PageChannel do
                 |> Post.preload()
         mysteries = Repo.all(query)
         {:reply, {:ok, %{user: user, mysteries: mysteries}}, socket}
+    end
+  end
+
+  def handle_in("following_servers", %{"name" => name}, socket) do
+    case Repo.get_by(User, name: name) do
+      nil -> {:reply, :error, socket}
+      user ->
+        query = Server.following(user)
+        servers = Repo.all(query)
+        {:reply, {:ok, %{user: user, servers: servers}}, socket}
     end
   end
 

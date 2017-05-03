@@ -19,8 +19,8 @@ defmodule Share.Fav do
     |> validate_required(@fields)
   end
 
-  def get_favs(socket, posts) do
-    user = socket.assigns.user
+  def get_favs(posts, user) do
+    posts = Enum.map(posts, &(&1.id))
     if is_nil(user) do
       []
     else
