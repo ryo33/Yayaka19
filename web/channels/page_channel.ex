@@ -32,8 +32,7 @@ defmodule Share.PageChannel do
           order_by: [desc: :id],
           limit: @user_posts_limit
         posts = Repo.all(Post.preload(query))
-        user = socket.assigns.user
-        favs = Fav.get_favs(posts, user)
+        favs = Fav.get_favs(posts, socket.assigns.user)
         mysteries_count = Repo.aggregate(Mystery.user_mysteries(user), :count, :id)
         opened_mysteries_count = Repo.aggregate(Post.opened_mystery_posts(user), :count, :id)
         res = %{
