@@ -2,7 +2,6 @@ defmodule Share.Tasks do
   use Supervisor
 
   [post_workers: post_workers,
-   online_post_workers: online_post_workers,
    notice_workers: notice_workers,
    http_workers: http_workers] = Application.get_env(:share, Share.Tasks)
   @post_workers post_workers
