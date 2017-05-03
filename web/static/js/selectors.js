@@ -52,3 +52,6 @@ export const noticesCountSelctor = ({ notices: { noticed, favs, follows, address
 
 // Mystery
 export const mysteryPageSelector = ({ mysteryPage }) => mysteryPage
+
+// Following Servers
+export const followingServersPageSelector = ({ followingServersPage: page }) => page

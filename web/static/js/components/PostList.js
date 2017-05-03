@@ -6,11 +6,19 @@ import { Comment, Segment } from 'semantic-ui-react'
 import { userSelector } from '../selectors.js'
 import Post from './Post.js'
 
+function get_id(post) {
+  if (post.host) {
+    return `${post.host}/${post.id}`
+  } else {
+    return post.id
+  }
+}
+
 const PostList = ({ followButton = true, posts, children }) => (
   <div>
     {
       posts.map(post => (
-        <Segment key={post.id} vertical>
+        <Segment key={get_id(post)} vertical>
           <Post
             list
             followButton={followButton}

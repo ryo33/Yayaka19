@@ -2,9 +2,12 @@ defmodule Share.Tasks do
   use Supervisor
 
   [post_workers: post_workers,
-   notice_workers: notice_workers] = Application.get_env(:share, Share.Tasks)
+   online_post_workers: online_post_workers,
+   notice_workers: notice_workers,
+   http_workers: http_workers] = Application.get_env(:share, Share.Tasks)
   @post_workers post_workers
   @notice_workers notice_workers
+  @http_workers http_workers
 
   def start_link do
     Supervisor.start_link(__MODULE__, [])
@@ -15,10 +18,11 @@ defmodule Share.Tasks do
       Honeydew.queue_spec(:post),
       Honeydew.worker_spec(:post, Share.Tasks.Post, num: @post_workers),
       Honeydew.queue_spec(:notice),
-      Honeydew.worker_spec(:notice, Share.Tasks.Notice, num: @notice_workers)
+      Honeydew.worker_spec(:notice, Share.Tasks.Notice, num: @notice_workers),
+      Honeydew.queue_spec(:http),
+      Honeydew.worker_spec(:http, Share.Tasks.HTTP, num: @http_workers)
     ]
 
-    # supervise/2 is imported from Supervisor.Spec
     supervise(children, strategy: :one_for_one)
   end
 end

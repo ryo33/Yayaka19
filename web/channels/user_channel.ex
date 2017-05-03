@@ -6,6 +6,8 @@ defmodule Share.UserChannel do
   alias Share.PostAddress
   alias Share.Fav
   alias Share.Mystery
+  alias Share.Server
+  alias Share.ServerFollow
   alias Share.Repo
 
   require Logger
@@ -170,6 +172,36 @@ defmodule Share.UserChannel do
     end
   end
 
+  def handle_in("follow_server", %{"host" => host}, socket) do
+    user = socket.assigns.user
+    server = Server.from_host(host)
+    query = from f in ServerFollow,
+      where: f.user_id == ^user.id,
+      where: f.server_id == ^server.id
+    with 0 <- Repo.aggregate(query, :count, :id),
+         params <- %{user_id: user.id, server_id: server.id},
+         changeset <- ServerFollow.changeset(%ServerFollow{}, params),
+         {:ok, follow} <- Repo.insert(changeset) do
+      {:reply, {:ok, %{server: server}}, socket}
+    else
+      _ -> {:reply, :error, socket}
+    end
+  end
+
+  def handle_in("unfollow_server", %{"id" => id}, socket) do
+    user = socket.assigns.user
+    query = from f in ServerFollow,
+      where: f.user_id == ^user.id,
+      where: f.server_id == ^id
+    case Repo.one(query) do
+      nil -> {:reply, :error, socket}
+      follow -> case Repo.delete(follow) do
+        {:ok, _} -> {:reply, :ok, socket}
+        _ -> {:reply, :error, socket}
+      end
+    end
+  end
+
   def handle_in("open_notices", %{"noticed" => noticed}, socket) do
     user = socket.assigns.user
     user = Repo.get!(User, user.id)
@@ -213,8 +245,7 @@ defmodule Share.UserChannel do
       where(query, [p], p.id < ^less_than_id)
     end
     posts = Repo.all(query)
-    post_ids = posts |> Enum.map(&(&1.id))
-    favs = Fav.get_favs(socket, post_ids)
+    favs = Fav.get_favs(posts, socket.assigns.user)
     %{posts: posts, favs: favs}
   end
 

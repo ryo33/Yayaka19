@@ -28,10 +28,6 @@ defmodule Share.Plugs.DomainRedirect do
   end
 
   defp validate_domain(host) do
-    IO.puts('a')
-    IO.puts(host)
-    IO.puts('b')
-    IO.puts(@host)
     host == @host
   end
 end

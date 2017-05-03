@@ -4,7 +4,8 @@ import {
   publicTimeline, timeline,
   userPage, followersPage, followingPage,
   mysteriesPage, openedMysteriesPage,
-  userFormPage, postPage, noticesPage,
+  userFormPage, followingServersPage,
+  postPage, noticesPage,
   mysteryPage, newMysteryPage, loginPage
 } from '../pages.js'
 import PublicTimeline from './PublicTimeline.js'
@@ -15,6 +16,7 @@ import FollowingPage from './FollowingPage.js'
 import MysteriesPage from './MysteriesPage.js'
 import OpenedMysteriesPage from './OpenedMysteriesPage.js'
 import UserForm from './UserForm.js'
+import FollowingServersPage from './FollowingServersPage.js'
 import PostPage from './PostPage.js'
 import NoticesPage from './NoticesPage.js'
 import MysteryPage from './MysteryPage.js'
@@ -40,6 +42,8 @@ export default ({ name, params }) => {
       return <OpenedMysteriesPage />
     case userFormPage.name:
       return <UserForm params={params} />
+    case followingServersPage.name:
+      return <FollowingServersPage params={params} />
     case postPage.name:
       return <PostPage params={params} />
     case noticesPage.name:

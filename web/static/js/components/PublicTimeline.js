@@ -6,7 +6,7 @@ import { Segment, Message, Header, Button, Label, Dimmer, Loader } from 'semanti
 import { signedIn } from '../global.js'
 import { userSelector, publicTimelineSelector } from '../selectors.js'
 import { requestPublicTimeline } from '../actions/index.js'
-
+import UserID from './UserID.js'
 import PostList from './PostList.js'
 
 const mapStateToProps = state => {
@@ -57,7 +57,7 @@ class PublicTimeline extends Component {
         <Segment vertical>
           <Header>Public Timeline</Header>
           <Button primary onClick={requestPublicTimeline}>Reload</Button>
-          <Label size='large'>{user.display} @{user.name}</Label>
+          <Label size='large'>{user.display} <UserID user={user} /></Label>
         </Segment>
         <PostList
           posts={posts}

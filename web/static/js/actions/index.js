@@ -74,3 +74,12 @@ export const requestUnfav = createAction('request unfav', id => id)
 export const openMystery = createAction('open mystery', id => id)
 export const setMysteryInfo = createAction('set mystery', mystery => mystery)
 export const submitMystery = createAction('submit mystery', mystery => mystery)
+
+// Following Servers
+export const requestFollowingServers = createAction('request following servers', name => name)
+export const setFollowingServers = createAction('set following servers',
+  (user, followingServers) => ({user, followingServers}))
+export const requestFollowServer = createAction('request follow server', host => host)
+export const requestUnfollowServer = createAction('request unfollow server', host => host)
+export const followServer = createAction('follow server', server => server)
+export const unfollowServer = createAction('unfollow server', id => id)

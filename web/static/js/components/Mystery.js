@@ -4,14 +4,34 @@ import Linkify from 'react-linkify'
 
 import { Comment, Icon, Header, Label } from 'semantic-ui-react'
 
+import UserID from './UserID.js'
 import Time from './Time.js'
 import FollowButton from './FollowButton.js'
 import UserButton from './UserButton.js'
 import { userPage, mysteryPage } from '../pages.js'
+import { createRemotePath } from '../utils.js'
 
 const actionCreators = {
   userPageAction: name => userPage.action({name}),
   mysteryPageAction: id => mysteryPage.action({id})
+}
+
+const MysteryLink = ({ mystery, host: post_host, onClick, children }) => {
+  const { id } = mystery
+  const host = mystery.host || post_host
+  if (host) {
+    return (
+      <a href={createRemotePath(host, mystery.path)}>
+        {children}
+      </a>
+    )
+  } else {
+    return (
+      <a href={mysteryPage.path({id})} onClick={onClick}>
+        {children}
+      </a>
+    )
+  }
 }
 
 class Mystery extends Component {
@@ -41,25 +61,33 @@ class Mystery extends Component {
 
   render() {
     const {
-      mystery: { id, user, title, text, inserted_at },
+      host: post_host,
+      mystery,
       mysteryLink = true
     } = this.props
+    const { id, user, title, text, inserted_at } = mystery
     const onlyTitle = text == null || text == ''
+    const host = mystery.host || post_host
     if (onlyTitle) {
       return (
         <div>
           <Header as='h2'>
-            <a href={mysteryPage.path({id})} onClick={this.handleClickTitle}>
-              <Icon name='bomb' color='black' />
+            <MysteryLink host={host} mystery={mystery}
+              onClick={this.handleClickTime}>
+              <Icon name={host ? 'military' : 'bomb'} color='black' />
               {title}
-            </a>
+            </MysteryLink>
           </Header>
-          <Label href={userPage.path({name: user.name})} onClick={this.handleClickUser}>
-            {user.display} @{user.name}
-          </Label>
-          <a href={mysteryPage.path({id})} onClick={this.handleClickTime}>
+          <UserButton Component={Label} user={user} host={host}>
+            {user.display} <UserID host={host} user={user} />
+          </UserButton>
+          <MysteryLink host={host} mystery={mystery}
+            onClick={this.handleClickTime}>
+            {host ? (
+              <Icon name='external' />
+            ) : null}
             <Time time={inserted_at} />
-          </a>
+          </MysteryLink>
         </div>
       )
     } else {
@@ -67,14 +95,15 @@ class Mystery extends Component {
         <Comment.Group style={{padding: '0px', maxWidth: 'initial'}}>
           <Comment>
             <Comment.Content>
-              <Comment.Author as={React.a} href={userPage.path({name: user.name})} onClick={this.handleClickUser}>
+              <UserButton Component={Comment.Author} user={user} host={host}>
                 {user.display}
-              </Comment.Author>
+              </UserButton>
               <Comment.Metadata>
-                <span>@{user.name}</span>
-                <a href={mysteryPage.path({id})} onClick={this.handleClickTime}>
+                <UserID host={host} user={user} />
+                <MysteryLink host={host} mystery={mystery}
+                  onClick={this.handleClickTime}>
                   <Time time={inserted_at} />
-                </a>
+                </MysteryLink>
                 <FollowButton user={user} />
               </Comment.Metadata>
               <Comment.Text>
