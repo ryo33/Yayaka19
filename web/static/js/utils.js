@@ -25,3 +25,11 @@ export const DEFAULT_CHANNEL = `@@/${title}/DEFAULT_CHANNEL`
 export function isDefaultChannel(channel) {
   return channel == null || channel === DEFAULT_CHANNEL
 }
+
+export function createRemotePath(host, path) {
+  if (path) {
+    return `https://${host}${path}`
+  } else {
+    return null
+  }
+}

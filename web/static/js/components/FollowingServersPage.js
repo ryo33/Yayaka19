@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Menu, Input, Button, Icon, Header } from 'semantic-ui-react'
 
+import UserID from './UserID.js'
 import { userPage } from '../pages.js'
 import { userSelector, followingServersPageSelector } from '../selectors.js'
 import { requestFollowServer, requestUnfollowServer } from '../actions/index.js'
@@ -83,7 +84,7 @@ class FollowingServersPage extends Component {
           <Menu secondary>
             <Menu.Item href={userPage.path({name: pageUser.name})}
               onClick={(e) => { e.preventDefault(); userPageAction(pageUser.name) }}>
-              {pageUser.display} @{pageUser.name}
+              {pageUser.display} <UserID user={pageUser} />
             </Menu.Item>
           </Menu>
           {isMe ? (

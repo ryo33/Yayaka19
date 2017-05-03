@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 
 import { Header, Feed, Segment, Icon } from 'semantic-ui-react'
 
+import UserID from './UserID.js'
 import Time from './Time.js'
 import { userPage } from '../pages.js'
 import Post from './Post.js'
@@ -39,7 +40,7 @@ const FavNotice = ({ fav: { user, post, inserted_at }, userPageAction }) => (
       <Feed.Summary>
         <Feed.User onClick={() => userPageAction(user.name)}>
           {user.display}
-        </Feed.User> (@{user.name}) favorited
+        </Feed.User> (<UserID user={user} />) favorited
         <Feed.Date>
           <Time time={inserted_at} />
         </Feed.Date>
@@ -65,7 +66,7 @@ const FollowNotice = ({ follow: { user, inserted_at }, userPageAction}) => (
       <Feed.Summary>
         <Feed.User onClick={() => userPageAction(user.name)}>
           {user.display}
-        </Feed.User> (@{user.name}) followed you <FollowButton user={user} />
+        </Feed.User> (<UserID user={user} />) followed you <FollowButton user={user} />
         <Feed.Date>
           <Time time={inserted_at} />
         </Feed.Date>
@@ -83,7 +84,7 @@ const AddressNotice = ({ address, userPageAction }) => (
       <Feed.Summary>
         <Feed.User onClick={() => userPageAction(address.user.name)}>
           {address.user.display}
-        </Feed.User> (@{address.user.name}) addressed you
+        </Feed.User> (<UserID user={address.user} />) addressed you
         <Feed.Date>
           <Time time={address.inserted_at} />
         </Feed.Date>
@@ -108,7 +109,7 @@ const ReplyNotice = ({ reply: post, userPageAction }) => (
       <Feed.Summary>
         <Feed.User onClick={() => userPageAction(post.user.name)}>
           {post.user.display}
-        </Feed.User> (@{post.user.name}) replied to you
+        </Feed.User> (<UserID user={post.user} />) replied to you
         <Feed.Date>
           <Time time={post.inserted_at} />
         </Feed.Date>

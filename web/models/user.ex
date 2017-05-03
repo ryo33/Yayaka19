@@ -1,8 +1,9 @@
 defmodule Share.User do
   use Share.Web, :model
-  @derive {Poison.Encoder, only: [
+  @map_keys [
     :name, :display, :bio, :id,
-  ]}
+  ]
+  @derive {Poison.Encoder, only: @map_keys}
 
   schema "users" do
     field :provider, :string
@@ -16,6 +17,17 @@ defmodule Share.User do
     field :password, :string
 
     timestamps()
+  end
+
+  def to_map(params) do
+    Map.from_struct(params)
+    |> Map.take(@map_keys)
+  end
+
+  def put_path(%__MODULE__{} = user), do: put_path(to_map(user))
+  def put_path(user) do
+    path = Share.Router.Helpers.page_path(Share.Endpoint, :user, user.name)
+    Map.put(user, :path, path)
   end
 
   @required_fields [:name, :display]

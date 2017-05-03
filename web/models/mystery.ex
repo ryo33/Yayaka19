@@ -1,8 +1,9 @@
 defmodule Share.Mystery do
   use Share.Web, :model
-  @derive {Poison.Encoder, only: [
+  @map_keys [
     :id, :user, :title, :inserted_at # ! :text
-  ]}
+  ]
+  @derive {Poison.Encoder, only: @map_keys}
 
   schema "mysteries" do
     field :title, :string
@@ -10,6 +11,18 @@ defmodule Share.Mystery do
     belongs_to :user, Share.User
 
     timestamps()
+  end
+
+  def to_map(params) do
+    Map.from_struct(params)
+    |> Map.take(@map_keys)
+  end
+
+  def put_path(%__MODULE__{} = mystery), do: put_path(to_map(mystery))
+  def put_path(mystery) do
+    path = Share.Router.Helpers.page_path(Share.Endpoint, :mystery, mystery.id)
+    Map.put(mystery, :path, path)
+    |> Map.update(:user, nil, fn user -> Share.User.put_path(user) end)
   end
 
   @doc """

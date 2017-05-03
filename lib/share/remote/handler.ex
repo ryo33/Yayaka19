@@ -11,11 +11,7 @@ defmodule Share.Remote.Handler do
   def handle(%{"action" => "public_timeline"} = message) do
     posts = Share.Post.public_timeline()
             |> Share.Repo.all()
-            |> Enum.map(fn post ->
-              path = Share.Router.Helpers.page_path(Share.Endpoint, :post, post.id)
-              post = Share.Post.to_map(post)
-                     |> Map.put(:path, path)
-            end)
+            |> Enum.map(&Share.Post.put_path(&1))
     payload = %{
       posts: posts
     }

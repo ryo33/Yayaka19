@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Segment, Menu, Icon, Label, Header } from 'semantic-ui-react'
 
+import UserID from './UserID.js'
 import Time from './Time.js'
 import FollowButton from './FollowButton.js'
 import { userPage } from '../pages.js'
@@ -25,7 +26,7 @@ const FollowersPage = ({ pageUser, followers, userPageAction }) => (
       <Menu secondary>
         <Menu.Item href={userPage.path({name: pageUser.name})}
           onClick={(e) => { e.preventDefault(); userPageAction(pageUser.name) }}>
-          {pageUser.display} @{pageUser.name}
+          {pageUser.display} <UserID user={pageUser} />
         </Menu.Item>
       </Menu>
     </Segment>
@@ -35,7 +36,7 @@ const FollowersPage = ({ pageUser, followers, userPageAction }) => (
           <Menu secondary>
             <Menu.Item href={userPage.path({name: user.name})}
               onClick={(e) => { e.preventDefault(); userPageAction(user.name) }}>
-              {user.display} @{user.name}
+              {user.display} <UserID user={user} />
             </Menu.Item>
             <Menu.Menu position='right'>
               <Menu.Item>

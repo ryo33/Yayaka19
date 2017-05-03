@@ -4,6 +4,7 @@ import Linkify from 'react-linkify'
 
 import { Comment, Icon, Segment, Button } from 'semantic-ui-react'
 
+import UserID from './UserID.js'
 import Time from './Time.js'
 import FollowButton from './FollowButton.js'
 import UserButton from './UserButton.js'
@@ -12,7 +13,7 @@ import Mystery from './Mystery.js'
 import { requestFav, requestUnfav, setAddressPost, sendToOnline, submitPost } from '../actions/index.js'
 import { userPage, postPage } from '../pages.js'
 import { userSelector, favsSelector } from '../selectors.js'
-import { getTweetURL } from '../utils.js'
+import { getTweetURL, createRemotePath } from '../utils.js'
 
 const getPostPath = ({ id, host, path }) =>
   host != null ? `https://${host+path}` : postPage.path({id})
@@ -31,20 +32,70 @@ const actionCreators = {
   submitPost
 }
 
-const PostAddresses = ({ addresses = [] }) => (
+const PostAddresses = ({ host, addresses = [] }) => (
   <div>
     {
       addresses.map(({ user }) => (
         <span key={user.name}>
-          <UserButton user={user} className='link'>
+          <UserButton host={host} user={user}>
             <Icon name='send' />
-            {user.display} (@{user.name})
+            {user.display} (<UserID user={user} />)
           </UserButton>
         </span>
       ))
     }
   </div>
 )
+
+const PostLink = ({ post, host, onClick }) => {
+  const { path, inserted_at, id } = post
+  if (host) {
+    return (
+      <a href={createRemotePath(host, path)}>
+        <Icon name='external' />
+        <Time time={post.inserted_at} />
+      </a>
+    )
+  } else {
+    return (
+      <a href={postPage.path({id})} onClick={onClick}>
+        <Time time={post.inserted_at} />
+      </a>
+    )
+  }
+}
+
+const ChildPost = ({ postPageAction, post, host, actions, size }) => {
+  const notLoaded = post.post_id != null && post.post == null
+  if (notLoaded) {
+    if (host) {
+      return (
+        <Segment size={size}>
+          <Button as='a' href={createRemotePath(host, post.path)}>
+            <Icon name='external' />
+            Load More
+          </Button>
+        </Segment>
+      )
+    } else {
+      return (
+        <Segment size={size}>
+          <Button onClick={() => postPageAction(post.id)}>Load More</Button>
+        </Segment>
+      )
+    }
+  } else {
+    return (
+      <Segment size={size}>
+        <ConnectedPost
+          host={host}
+          actions={actions}
+          post={post.post}
+        />
+      </Segment>
+    )
+  }
+}
 
 class Post extends Component {
   constructor(props) {
@@ -168,72 +219,50 @@ class Post extends Component {
     }
   }
 
-  renderChildPost(actions, size) {
-    const { postPageAction } = this.props
-    const { post } = this.props
-    const notLoaded = post.post_id != null && post.post == null
-    if (notLoaded) {
-      return (
-        <Segment size={size}>
-          <Button onClick={() => postPageAction(post.id)}>Load More</Button>
-        </Segment>
-      )
-    } else {
-      return (
-        <Segment size={size}>
-          <ConnectedPost
-            actions={actions}
-            post={post.post}
-          />
-        </Segment>
-      )
-    }
-  }
-
-  renderMystery(mystery) {
-    return (
-      <Segment>
-        <Mystery mystery={mystery} />
-      </Segment>
-    )
-  }
-
   render() {
     const {
       list = false, followButton = true, actions = true, postLink = true,
-      attributeIcon, prefix, post, userPageAction
+      attributeIcon, prefix, post, userPageAction, postPageAction
     } = this.props
     const { openReply, openQuote } = this.state
+    const host = post.host || this.props.host
+    const remote = host != null
     const hasChild = post.post != null || post.post_id != null
     const reply = hasChild && post.post_addresses.length >= 1
     const quote = hasChild && post.post_addresses.length == 0
     const quoteMystery = post.mystery_id != null
     const empty = !quoteMystery && (post.text ? post.text.length === 0 : true)
-    const remote = post.host != null
     const size = quote ? null : 'tiny'
     const userDisplay = post.user_display || post.user.display
     return (
       <Comment.Group style={{padding: '0px', maxWidth: 'initial'}}>
         <Comment>
           <Comment.Content>
-            {reply ? this.renderChildPost(quote, size) : null}
+            {reply ? (
+              <ChildPost
+                post={post}
+                postPageAction={postPageAction}
+                host={host}
+                address={quote}
+                size={size}
+              />
+            ) : null}
             {prefix}
             {quote ? (
               <Icon name={empty ? 'retweet' : 'quote right'}
                 size='large' color='blue' />
             ) : null}
-            <Comment.Author as={React.a} href={userPage.path({name: post.user.name})} onClick={this.handleClickUser}>
+            <UserButton Component={Comment.Author} host={host} user={post.user}>
               {userDisplay}
-            </Comment.Author>
+            </UserButton>
             <Comment.Metadata>
-              <span>@{post.user.name}</span>
+              <UserID host={host} user={post.user} />
               {postLink ? (
-                <a href={getPostPath(post)} onClick={this.handleClickTime}>
-                  {remote ? (
-                    <Icon name='external' />
-                  ) : null}
-                  <Time time={post.inserted_at} />
-                </a>
+                <PostLink
+                  post={post}
+                  host={host}
+                  onClick={this.handleClickTime}
+                />
               ) : (
                 <Time time={post.inserted_at} />
               )}
@@ -246,7 +275,7 @@ class Post extends Component {
             </Comment.Metadata>
             <Comment.Text>
               {!reply ? (
-                <PostAddresses addresses={post.post_addresses} />
+                <PostAddresses host={host} addresses={post.post_addresses} />
               ) : null}
               {post.text ? (
                 <pre>
@@ -255,10 +284,22 @@ class Post extends Component {
                   </Linkify>
                 </pre>
               ) : null}
-              {quote ? this.renderChildPost(quote, size) : null}
-              {post.mystery ? this.renderMystery(post.mystery) : null}
+              {quote ? (
+                <ChildPost
+                  post={post}
+                  postPageAction={postPageAction}
+                  host={host}
+                  address={quote}
+                  size={size}
+                />
+              ) : null}
+              {post.mystery ? (
+                <Segment>
+                  <Mystery host={host} mystery={post.mystery} />
+                </Segment>
+              ) : null}
             </Comment.Text>
-            {actions && post.text ? (
+            {actions && !remote && post.text ? (
               <Comment.Actions>
                 {this.renderReplyButton()}
                 {this.renderFavButton()}

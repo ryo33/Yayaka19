@@ -68,6 +68,7 @@ defmodule Share.Router do
 
     get "/posts/:id", PageController, :post
     get "/users/:name", PageController, :user
+    get "/mysteries/:id", PageController, :mystery
     get "/*page", PageController, :index
   end
 end

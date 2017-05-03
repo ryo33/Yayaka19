@@ -7,6 +7,7 @@ import {
   userSelector, editorPluginsSelector
 } from '../selectors.js'
 import { handlers } from '../editorPlugins.js'
+import UserID from './UserID.js'
 import Mystery from './Mystery.js'
 import EditorPluginsOptions from './EditorPluginsOptions.js'
 import EditorPluginsButton from './EditorPluginsButton.js'
@@ -115,7 +116,7 @@ class NewMystery extends Component {
               onChange={this.handleChangeText} onKeyDown={this.handleKeyDown} />
             <Form.Group inline style={{marginBottom: "0px"}}>
               <Form.Button disabled={!valid} primary>Submit</Form.Button>
-              <Label size='large'>{user.display} @{user.name}</Label>
+              <Label size='large'>{user.display} <UserID user={user} /></Label>
               <EditorPluginsButton plugins={plugins}
                 onClick={this.handleClickPlugins} />
             </Form.Group>

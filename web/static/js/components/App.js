@@ -29,6 +29,7 @@ import {
 } from '../actions/index.js'
 import Router from './Router.js'
 import NewPost from './NewPost.js'
+import UserID from './UserID.js'
 
 const mapStateToProps = state => {
   const { newPosts } = timelineSelector(state)
@@ -227,7 +228,7 @@ class App extends Component {
             ) : null}
             {signedIn ? (
               <Menu.Item>
-                <Menu.Header>{user.display} @{user.name}</Menu.Header>
+                <Menu.Header>{user.display} <UserID user={user} /></Menu.Header>
                 <Menu.Menu>
                   <Menu.Item onClick={() => userPageAction(user.name)}>
                     View my profile
@@ -247,7 +248,7 @@ class App extends Component {
               <Menu.Menu>
                 {users.map(user => (
                   <Menu.Item key={user.id} onClick={() => this.handleSwitchUser(user.name)}>
-                    {user.display} @{user.name}
+                    {user.display} <UserID user={user} />
                   </Menu.Item>
                 ))}
                 <Menu.Item link href={newAccountURL}>
