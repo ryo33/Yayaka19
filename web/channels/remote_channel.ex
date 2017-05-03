@@ -10,6 +10,11 @@ defmodule Share.RemoteChannel do
     else
       "#{Share.Remote.create_host(host, port)}/yayaka/token"
     end
+    url = if Mix.env == :prod do
+      "https://#{url}"
+    else
+      url
+    end
     params = %{token: token, host: Share.Remote.host}
     with {:ok, {:ok, response}} <- Share.Tasks.HTTP.get(url, params),
          {:ok, true} <- Poison.decode(response.body) do
