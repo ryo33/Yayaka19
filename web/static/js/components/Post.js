@@ -260,7 +260,7 @@ class Post extends Component {
               ) : (
                 <Time time={post.inserted_at} />
               )}
-              {followButton ? (
+              {!remote && followButton ? (
                 <FollowButton user={post.user} />
               ) : null}
               {attributeIcon ? (
