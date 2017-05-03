@@ -90,6 +90,7 @@ defmodule Share.PageChannel do
     end
   end
 
+  @remote_timeout 4000
   def handle_in("public_timeline", _params, socket) do
     user = socket.assigns.user
     servers = if is_nil(user) do
@@ -102,14 +103,17 @@ defmodule Share.PageChannel do
       posts = Post.public_timeline()
               |> Repo.all()
     end)
-    response = Task.async_stream(servers, fn %{host: host} ->
-      resp = Share.Remote.Message.create(host, "public_timeline")
+    response = Enum.map(servers, fn %{host: host} ->
+      task = Task.async(fn ->
+        resp = Share.Remote.Message.create(host, "public_timeline")
                |> Share.Remote.RequestServer.request()
-      {resp, host}
+        resp
+      end)
+      {task, host}
     end)
-    |> Enum.map(fn result ->
-      case result do
-        {:ok, {resp, host}} ->
+    |> Enum.map(fn {task, host} ->
+      case Task.yield(task, @remote_timeout) || Task.shutdown(task) do
+        {:ok, resp} ->
           case resp do
             %{"payload" => %{"posts" => posts}} ->
               posts = Task.async_stream(posts, fn post ->
@@ -120,7 +124,8 @@ defmodule Share.PageChannel do
             :timeout -> {:timeout, host}
             _ -> {:error, host}
           end
-        _ -> :error
+        {:exit, _} -> {:error, host}
+        nil -> {:timeout, host}
       end
     end)
     posts = Task.await(task)
