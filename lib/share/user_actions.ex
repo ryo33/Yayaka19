@@ -5,6 +5,8 @@ defmodule Share.UserActions do
   alias Share.Server
   alias Share.User
   alias Share.Post
+  alias Share.Fav
+  alias Share.Mystery
 
   def post(user, params, address \\ "") do
     params = params
@@ -79,5 +81,38 @@ defmodule Share.UserActions do
     else
       _ -> :error
     end
+  end
+
+  def remote_user_info(user, request_user \\ nil) do
+    user_info(user, request_user)
+    |> Map.update!("user", fn user -> User.put_path(user) end)
+    |> Map.update!("posts", fn posts -> Enum.map(posts, &Post.put_path(&1)) end)
+  end
+
+  def user_info(user, request_user \\ nil) do
+    query = from p in Post, where: p.user_id == ^user.id
+    post_count = Repo.aggregate(query, :count, :id)
+    query = from f in Follow, where: f.user_id == ^user.id
+    follow_count = Repo.aggregate(query, :count, :id)
+    query = from f in Follow, where: f.target_user_id == ^user.id
+    followed_count = Repo.aggregate(query, :count, :id)
+    query = from p in Post,
+      where: p.user_id == ^user.id,
+      order_by: [desc: :id],
+      limit: @user_posts_limit
+    posts = Repo.all(Post.preload(query))
+    favs = Fav.get_favs(posts, request_user)
+    mysteries_count = Repo.aggregate(Mystery.user_mysteries(user), :count, :id)
+    opened_mysteries_count = Repo.aggregate(Post.opened_mystery_posts(user), :count, :id)
+    res = %{
+      "user" => user,
+      "posts" => posts,
+      "favs" => favs,
+      "postCount" => post_count,
+      "following" => follow_count,
+      "followers" => followed_count,
+      "mysteries" => mysteries_count,
+      "openedMysteries" => opened_mysteries_count
+    }
   end
 end

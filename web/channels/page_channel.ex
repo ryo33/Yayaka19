@@ -1,5 +1,6 @@
 defmodule Share.PageChannel do
   use Share.Web, :channel
+  alias Share.UserActions
   alias Share.Follow
   alias Share.User
   alias Share.Post
@@ -21,31 +22,24 @@ defmodule Share.PageChannel do
     case Repo.one(User.local_user_by_name(name)) do
       nil -> {:reply, :error, socket}
       user ->
-        query = from p in Post, where: p.user_id == ^user.id
-        post_count = Repo.aggregate(query, :count, :id)
-        query = from f in Follow, where: f.user_id == ^user.id
-        follow_count = Repo.aggregate(query, :count, :id)
-        query = from f in Follow, where: f.target_user_id == ^user.id
-        followed_count = Repo.aggregate(query, :count, :id)
-        query = from p in Post,
-          where: p.user_id == ^user.id,
-          order_by: [desc: :id],
-          limit: @user_posts_limit
-        posts = Repo.all(Post.preload(query))
-        favs = Fav.get_favs(posts, socket.assigns.user)
-        mysteries_count = Repo.aggregate(Mystery.user_mysteries(user), :count, :id)
-        opened_mysteries_count = Repo.aggregate(Post.opened_mystery_posts(user), :count, :id)
-        res = %{
-          "user" => user,
-          "posts" => posts,
-          "favs" => favs,
-          "postCount" => post_count,
-          "following" => follow_count,
-          "followers" => followed_count,
-          "mysteries" => mysteries_count,
-          "openedMysteries" => opened_mysteries_count
-        }
+        res = UserActions.user_info(user, socket.assigns.user)
         {:reply, {:ok, res}, socket}
+    end
+  end
+
+  def handle_in("remote_user_info", %{"host" => host, "name" => name}, socket) do
+    Share.Remote.Message.create(host, "user_info", %{name: name})
+    |> Share.Remote.RequestServer.request()
+    |> case do
+      {:ok, %{"payload" => %{"info" => info}}} ->
+        info = info
+               |> Map.update!("user", &Map.put(&1, "host", host))
+               |> Map.update!("posts", fn posts ->
+                 Enum.map(posts, &Map.put(&1, "host", host))
+               end)
+        {:reply, {:ok, info}, socket}
+      _ ->
+        {:reply, :error, socket}
     end
   end
 

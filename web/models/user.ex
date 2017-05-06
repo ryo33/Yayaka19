@@ -1,3 +1,9 @@
+defimpl Poison.Encoder, for: Ecto.Association.NotLoaded do
+  def encode(_struct, _options) do
+    "null"
+  end
+end
+
 defmodule Share.User do
   use Share.Web, :model
   defimpl Poison.Encoder, for: Share.User do

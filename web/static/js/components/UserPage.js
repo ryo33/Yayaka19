@@ -18,7 +18,7 @@ const mapStateToProps = state => {
   const user = userSelector(state)
   const userPage = userPageSelector(state)
   return {
-    isMe: userPage.user && userPage.user.id === user.id,
+    isMe: userPage.user && userPage.user.host == null && userPage.user.id === user.id,
     isNotMe: userPage.user && userPage.user.id !== user.id,
     userPage
   }
@@ -31,6 +31,19 @@ const actionCreators = {
   followingPageAction: name => followingPage.action({name}),
   mysteriesPageAction: name => mysteriesPage.action({name}),
   openedMysteriesPageAction: name => openedMysteriesPage.action({name})
+}
+
+const LocalButton = ({ user, ...props }) => {
+  if (user && user.host) {
+    const { onClick, ...newProps } = props
+    return (
+      <Button {...newProps} />
+    )
+  } else {
+    return (
+      <Button {...props} />
+    )
+  }
 }
 
 class UserPage extends Component {
@@ -89,6 +102,7 @@ class UserPage extends Component {
       user, postCount, following, followers, mysteries, openedMysteries,
       posts, isLoadingMorePosts
     } = userPage
+    const remote = user && user.host != null
     if (user != null) {
       return (
         <Segment.Group>
@@ -113,28 +127,43 @@ class UserPage extends Component {
                   </span>
                 </Card.Meta>
                 <Card.Description>
-                  <Button
+                  {remote ? (
+                    <Segment basic>
+                      <Button as='a'
+                        href={user.path ? `https://${user.host}${user.path}` : null}
+                        fluid
+                        primary
+                      >
+                        {`Go to ${user.host}`}
+                      </Button>
+                    </Segment>
+                  ) : null}
+                  <LocalButton
+                    user={user}
                     content='Following'
                     icon='user'
                     label={{as: 'a', basic: true, content: following}}
                     labelPosition='right'
                     onClick={this.handleClickFollowing}
                   />
-                  <Button
+                  <LocalButton
+                    user={user}
                     content='Followers'
                     icon='user'
                     label={{as: 'a', basic: true, content: followers}}
                     labelPosition='right'
                     onClick={this.handleClickFollowers}
                   />
-                  <Button
+                  <LocalButton
+                    user={user}
                     content='Opened Mysteries'
                     icon='bomb'
                     label={{as: 'a', basic: true, content: openedMysteries}}
                     labelPosition='right'
                     onClick={this.handleClickOpenedMysteries}
                   />
-                  <Button
+                  <LocalButton
+                    user={user}
                     content='Mysteries'
                     icon='bomb'
                     label={{as: 'a', basic: true, content: mysteries}}
@@ -166,14 +195,16 @@ class UserPage extends Component {
           <Segment>
             <Header>Recent Posts</Header>
             <PostList posts={posts}>
-              <Segment vertical>
-                <Dimmer active={isLoadingMorePosts} inverted>
-                  <Loader inverted />
-                </Dimmer>
-                <Button primary fluid onClick={this.handleLoadMorePosts}>
-                  Load More
-                </Button>
-              </Segment>
+              {!remote ? (
+                <Segment vertical>
+                  <Dimmer active={isLoadingMorePosts} inverted>
+                    <Loader inverted />
+                  </Dimmer>
+                  <Button primary fluid onClick={this.handleLoadMorePosts}>
+                    Load More
+                  </Button>
+                </Segment>
+              ) : null}
             </PostList>
           </Segment>
         </Segment.Group>

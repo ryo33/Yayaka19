@@ -9,7 +9,7 @@ import {
   editUser, setUser, initializeUser,
   submitPost, updatePostText,
   saveFailedPost, resubmitFailedPost,
-  requestUser, setUserInfo,
+  requestUser, setUserInfo, requestRemoteUser,
   requestMoreUserPosts, addUserPosts,
   requestPost, setPost, requestContexts, setContexts,
   requestFollow, requestUnfollow, follow, unfollow,
@@ -74,6 +74,22 @@ const requestUserMiddleware = createAsyncHook(
   ({ dispatch, action }) => {
     setUserInfo({})
     pushMessage(channel, 'user_info', {name: action.payload})
+      .then(resp => {
+        const { user, posts, favs, postCount, following, followers, mysteries, openedMysteries } = resp
+        dispatch(addFavs(favs))
+        dispatch(setUserInfo({user, posts, postCount, following, followers, mysteries, openedMysteries}))
+      }, ({ error, timeout }) => {
+        dispatch(home.action())
+      })
+  }
+)
+
+const requestRemoteUserMiddleware = createAsyncHook(
+  requestRemoteUser.getType(),
+  ({ dispatch, action }) => {
+    setUserInfo({})
+    const { host, name } = action.payload
+    pushMessage(channel, 'remote_user_info', {host, name})
       .then(resp => {
         const { user, posts, favs, postCount, following, followers, mysteries, openedMysteries } = resp
         dispatch(addFavs(favs))
@@ -278,6 +294,7 @@ export default composeMiddleware(
   ...signedInMiddlewares,
   redirectLoginPageMiddleware,
   requestUserMiddleware,
+  requestRemoteUserMiddleware,
   requestMoreUserPostsMiddleware,
   requestPostMiddleware,
   requestContextsMiddleware,

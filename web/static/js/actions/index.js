@@ -40,6 +40,10 @@ export const requestUnfollow = createAction('request unfollow', (name, host) => 
 export const requestMoreUserPosts = createAction('request more user posts', (user, id) => ({user, id}))
 export const addUserPosts = createAction('add user posts', posts => posts)
 
+// Remote
+export const requestRemoteUser = createAction('request remote user',
+  (host, name) => ({host, name}))
+
 // Mysteries
 export const requestMysteries = createAction('request mysteries', name => name)
 export const setMysteries = createAction('set mysteries', (user, mysteries) => ({user, mysteries}))

@@ -77,6 +77,15 @@ defmodule Share.Remote.Handler do
     end)
   end
 
+  def handle(%{"action" => "user_info"} = message) do
+    %{"payload" => %{"name" => name},
+      "from" => host} = message
+    user = Share.Repo.one!(Share.User.local_user_by_name(name))
+    info = Share.UserActions.remote_user_info(user)
+    Share.Remote.Message.create_reply(message, %{info: info})
+    |> Share.Remote.RequestServer.request()
+  end
+
   def handle(_) do
     :ok
   end
