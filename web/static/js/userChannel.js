@@ -2,6 +2,8 @@ import { userChannel } from './socket.js'
 
 import {
   addNotices, addNewPosts, loadNewPosts,
+  updateRemoteTimeline,
+  updateRemoteTimelineStatus
 } from './actions/index.js'
 import {
   windowFocusedSelector, pageSelector, timelineSelector, userSelector
@@ -21,5 +23,17 @@ export const watchUserChannel = (store) => {
     } else {
       store.dispatch(addNewPosts(posts))
     }
+  })
+  userChannel.on('remote_timeline', ({host, posts}) => {
+    store.dispatch(updateRemoteTimeline(host, posts))
+  })
+  userChannel.on('remote_timeline_timeout', ({host}) => {
+    store.dispatch(updateRemoteTimelineStatus(host, 'timeout'))
+  })
+  userChannel.on('remote_timeline_error', ({host}) => {
+    store.dispatch(updateRemoteTimelineStatus(host, 'error'))
+  })
+  userChannel.on('add_remote_posts', ({posts}) => {
+    store.dispatch(addNewPosts(posts))
   })
 }

@@ -4,15 +4,19 @@ import { connect } from 'react-redux'
 import { Button, Icon, Popup } from 'semantic-ui-react'
 
 import { requestFollow, requestUnfollow } from '../actions/index.js'
-import { userSelector, followingSelector } from '../selectors.js'
+import {
+  userSelector, followingSelector, remoteFollowingSelector
+} from '../selectors.js'
 
 const mapStateToProps = (state, { user }) => {
   const currentUser = userSelector(state)
   const following = followingSelector(state)
+  const remoteFollowing = remoteFollowingSelector(state)
   return {
     currentUser,
     user,
-    following
+    following,
+    remoteFollowing
   }
 }
 
@@ -29,20 +33,31 @@ class FollowButton extends Component {
 
   follow() {
     const { requestFollow, user } = this.props
-    requestFollow(user.id)
+    const host = this.getHost()
+    requestFollow(user.name, host)
   }
 
   unfollow() {
     const { requestUnfollow, user } = this.props
-    requestUnfollow(user.id)
+    const host = this.getHost()
+    requestUnfollow(user.name, host)
+  }
+
+  getHost() {
+    const { user, host: post_host } = this.props
+    return user.host || post_host
   }
 
   render() {
-    const { currentUser, following, user, floated } = this.props
-    if (currentUser == null || currentUser.id == user.id) {
+    const { currentUser, remoteFollowing, following, user, floated } = this.props
+    const host = this.getHost()
+    if (currentUser == null || (host == null && currentUser.id == user.id)) {
       return null
     }
-    if (following.includes(user.id)) {
+    const isFollowing = host == null
+      ? following.includes(user.name)
+      : remoteFollowing.some(([h, n]) => h == host && n == user.name)
+    if (isFollowing) {
       return (
         <Popup
           trigger={<Button size='mini' icon='user' color='blue' floated={floated} />}

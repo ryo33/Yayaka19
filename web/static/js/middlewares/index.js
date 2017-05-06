@@ -125,10 +125,10 @@ const requestContextsMiddleware = createAsyncHook(
 const requestFollowMiddleware = createAsyncHook(
   requestFollow.getType(),
   ({ dispatch, action }) => {
-    const id = action.payload
-    pushMessage(userChannel, 'follow', {id})
+    const { name, host } = action.payload
+    pushMessage(userChannel, 'follow', {name, host})
       .then(resp => {
-        dispatch(follow(id))
+        dispatch(follow(name, host))
       }).catch(() => {
         dispatch(showError('Failed to follow.'))
       })
@@ -138,10 +138,10 @@ const requestFollowMiddleware = createAsyncHook(
 const requestUnfollowMiddleware = createAsyncHook(
   requestUnfollow.getType(),
   ({ dispatch, action }) => {
-    const id = action.payload
-    pushMessage(userChannel, 'unfollow', {id})
+    const { name, host } = action.payload
+    pushMessage(userChannel, 'unfollow', {name, host})
       .then(resp => {
-        dispatch(unfollow(id))
+        dispatch(unfollow(name, host))
       }).catch(() => {
         dispatch(showError('Failed to unfollow.'))
       })
@@ -190,9 +190,9 @@ const requestTimelineMiddleware = createAsyncHook(
   requestTimeline.getType(),
   ({ dispatch, action }) => {
     pushMessage(userChannel, 'timeline', {})
-      .then(({ posts, favs }) => {
+      .then(({ posts, favs, remotes }) => {
         dispatch(addFavs(favs))
-        dispatch(updateTimeline(posts))
+        dispatch(updateTimeline(posts, remotes))
       }).catch(() => {
         dispatch(showError('Failed to fetch the timeline.'))
       })

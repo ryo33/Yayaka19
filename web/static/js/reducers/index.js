@@ -40,9 +40,17 @@ const users = createReducer({
 
 const following = createReducer({
   [setFollowing]: (state, payload) => payload,
-  [follow]: (state, id) => [id, ...state],
-  [unfollow]: (state, unfollowID) => state.filter(id => id !== unfollowID),
+  [follow]: (state, {name, host}) => host == null ? [name, ...state] : state,
+  [unfollow]: (state, {name: unfollowName, host}) => host == null
+    ? state.filter(name => name !== unfollowName) : state,
   [initializeUser]: (state, { following }) => following
+}, [])
+
+const remoteFollowing = createReducer({
+  [follow]: (state, {name, host}) => host == null ? state : [[host, name], ...state],
+  [unfollow]: (state, {name: unfollowName, host: unfollowHost}) => unfollowHost == null
+    ? state : state.filter(([host, name]) => host !== unfollowHost || name !== unfollowName),
+  [initializeUser]: (state, { remoteFollowing }) => remoteFollowing
 }, [])
 
 const followers = createReducer({
@@ -73,6 +81,7 @@ export default combineReducers({
   user,
   users,
   following,
+  remoteFollowing,
   followers,
   favs,
   newPostPage,
