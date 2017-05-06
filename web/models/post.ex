@@ -11,9 +11,12 @@ defmodule Share.Post do
   schema "posts" do
     field :text, :string
     field :user_display, :string
+    field :remote_id, :string
+    field :remote_path, :string
     belongs_to :user, Share.User
     belongs_to :post, Share.Post
     belongs_to :mystery, Share.Mystery
+    belongs_to :server, Share.Server
 
     has_many :post_addresses, Share.PostAddress
 
@@ -29,11 +32,18 @@ defmodule Share.Post do
       %Ecto.Association.NotLoaded{} -> Map.delete(params, :mystery)
       _ -> params
     end
-    Map.from_struct(params)
-    |> Map.take([
-      :id, :text, :user_display, :user, :inserted_at,
-      :post, :post_id, :post_addresses, :mystery, :mystery_id
-    ])
+    map = Map.from_struct(params)
+          |> Map.take([
+            :id, :text, :user_display, :user, :inserted_at,
+            :post, :post_id, :post_addresses, :mystery, :mystery_id
+          ])
+    if not is_nil(params.server_id) do
+      map
+      |> Map.put(:host, params.server.host)
+      |> Map.put(:path, params.remote_path)
+    else
+      map
+    end
   end
 
   def put_path(%__MODULE__{} = post), do: put_path(to_map(post))
@@ -90,15 +100,22 @@ defmodule Share.Post do
     |> Share.Post.preload()
   end
 
+  def timeline(users) do
+    Share.Post
+    |> where([p], p.user_id in ^users)
+    |> order_by([p], [desc: p.id])
+    |> Share.Post.preload()
+  end
+
   @preload [
-    :user, mystery: [:user], post_addresses: :user, post: [
+    :user, :server, mystery: [:user], post_addresses: :user, post: [
       :user, mystery: [:user], post_addresses: :user]]
   @deep_preload [
-    :user, mystery: [:user], post_addresses: :user, post: [
-      :user, mystery: [:user], post_addresses: :user, post: [
-        :user, mystery: [:user], post_addresses: :user, post: [
-          :user, mystery: [:user], post_addresses: :user, post: [
-            :user, :post, mystery: [:user], post_addresses: :user]]]]]
+    :user, :server, mystery: [:user], post_addresses: :user, post: [
+      :user, :server, mystery: [:user], post_addresses: :user, post: [
+        :user, :server, mystery: [:user], post_addresses: :user, post: [
+          :user, :server, mystery: [:user], post_addresses: :user, post: [
+            :user, :server, :post, mystery: [:user], post_addresses: :user]]]]]
 
   def preload_params, do: @preload
   def deep_preload_params, do: @deep_preload

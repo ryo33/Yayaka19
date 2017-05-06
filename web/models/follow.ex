@@ -31,19 +31,45 @@ defmodule Share.Follow do
     Ecto.Query.preload(query, ^@preload_params)
   end
 
-  def get_followers(user) do
+  def get_followers(user_id) do
     from f in Share.Follow,
-      join: u in Share.User, on: u.id == f.target_user_id,
-      where: u.id == ^user.id,
+      where: f.target_user_id == ^user_id,
       order_by: [desc: f.id],
       preload: ^@preload_params
   end
 
-  def get_following(user) do
+  def get_following_ids(user_id) do
     from f in Share.Follow,
-      join: u in Share.User, on: u.id == f.user_id,
-      where: u.id == ^user.id,
+      where: f.user_id == ^user_id,
+      select: f.target_user_id
+  end
+
+  def get_following(user_id) do
+    from f in Share.Follow,
+      where: f.user_id == ^user_id,
       order_by: [desc: f.id],
       preload: ^@preload_params
+  end
+
+  def get_follow(user_id, target_id) do
+    from f in Share.Follow,
+      where: f.user_id == ^user_id,
+      where: f.target_user_id == ^target_id
+  end
+
+  def remote_followers(user_id) do
+    from f in Share.Follow,
+      join: u in Share.User, on: f.user_id == u.id,
+      where: f.target_user_id == ^user_id,
+      where: not is_nil(u.server_id),
+      preload: [user: [:server]]
+  end
+
+  def remote_following(user_id) do
+    from f in Share.Follow,
+      join: u in Share.User, on: f.target_user_id == u.id,
+      where: f.user_id == ^user_id,
+      where: not is_nil(u.server_id),
+      preload: [target_user: [:server]]
   end
 end

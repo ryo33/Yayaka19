@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Segment, Menu, Icon, Label, Header } from 'semantic-ui-react'
 
+import UserButton from './UserButton.js'
 import UserID from './UserID.js'
 import Time from './Time.js'
 import FollowButton from './FollowButton.js'
@@ -34,10 +35,9 @@ const FollowersPage = ({ pageUser, followers, userPageAction }) => (
       followers.map(({ id, user, inserted_at }) => (
         <Segment key={id} vertical>
           <Menu secondary>
-            <Menu.Item href={userPage.path({name: user.name})}
-              onClick={(e) => { e.preventDefault(); userPageAction(user.name) }}>
+            <UserButton component={Menu.Item} user={user}>
               {user.display} <UserID user={user} />
-            </Menu.Item>
+            </UserButton>
             <Menu.Menu position='right'>
               <Menu.Item>
                 <Time time={inserted_at} />

@@ -22,28 +22,48 @@ defmodule Share.Tasks.Post do
     else
       post |> Post.preload()
     end
-    {:broadcast_to_user, [post, post.user]}
-    |> Honeydew.async(:post)
-    {:broadcast_to_followers, [post]}
+    broadcast_to_user(post, post.user)
+    broadcast_to_followers(post, post.user)
+    {:broadcast_to_remote, [post]}
     |> Honeydew.async(:post)
     Share.Handlers.Notice.post(post)
   end
 
-  def broadcast_to_followers(post) do
+  def broadcast_to_user(post, user) do
+    {:do_broadcast_to_user, [post, user]}
+    |> Honeydew.async(:post)
+  end
+
+  def broadcast_to_followers(post, user) do
+    {:do_broadcast_to_followers, [post, user]}
+    |> Honeydew.async(:post)
+  end
+
+  def do_broadcast_to_followers(post, user) do
     query = from f in Follow,
     join: user in User,
     on: user.id == f.user_id,
-    where: f.target_user_id == ^post.user.id,
+    where: f.target_user_id == ^user.id,
     select: user
     Repo.all(query)
     |> Enum.map(fn user ->
-      {:broadcast_to_user, [post, user]}
-      |> Honeydew.async(:post)
+      broadcast_to_user(post, user)
     end)
   end
 
-  def broadcast_to_user(post, user) do
-      topic = "user:" <> user.name
-      Share.Endpoint.broadcast! topic, "add_new_posts", %{posts: [post]}
+  def do_broadcast_to_user(post, user) do
+    topic = "user:" <> user.name
+    Share.Endpoint.broadcast! topic, "add_new_posts", %{posts: [post]}
+  end
+
+  def broadcast_to_remote(post) do
+    post = Share.Post.put_path(post)
+    Share.Follow.remote_followers(post.user.id)
+    |> Repo.all()
+    |> Enum.each(fn follow ->
+      host = follow.user.server.host
+      Share.Remote.Message.create(host, "add_new_posts", %{posts: [post]})
+      |> Share.Remote.RequestServer.request(noreply: true)
+    end)
   end
 end

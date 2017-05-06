@@ -18,7 +18,7 @@ defmodule Share.PageChannel do
   end
 
   def handle_in("user_info", %{"name" => name}, socket) do
-    case Repo.get_by(User, name: name) do
+    case Repo.one(User.local_user_by_name(name)) do
       nil -> {:reply, :error, socket}
       user ->
         query = from p in Post, where: p.user_id == ^user.id
@@ -50,7 +50,7 @@ defmodule Share.PageChannel do
   end
 
   def handle_in("more_user_posts", %{"user" => name, "id" => less_than_id}, socket) do
-    case Repo.get_by(User, name: name) do
+    case Repo.one(User.local_user_by_name(name)) do
       nil -> {:reply, :error, socket}
       user ->
         query = from p in Post,
@@ -95,7 +95,7 @@ defmodule Share.PageChannel do
     servers = if is_nil(user) do
       []
     else
-      Share.ServerFollow.following_servers(user)
+      Share.ServerFollow.following_servers(user.id)
       |> Repo.all()
     end
     task = Task.async(fn ->
@@ -114,7 +114,7 @@ defmodule Share.PageChannel do
       case Task.yield(task, @remote_timeout) || Task.shutdown(task) do
         {:ok, resp} ->
           case resp do
-            %{"payload" => %{"posts" => posts}} ->
+            {:ok, %{"payload" => %{"posts" => posts}}} ->
               posts = Task.async_stream(posts, fn post ->
                 Map.put(post, "host", host)
               end)
@@ -150,25 +150,25 @@ defmodule Share.PageChannel do
   end
 
   def handle_in("followers", %{"name" => name}, socket) do
-    case Repo.get_by(User, name: name) do
+    case Repo.one(User.local_user_by_name(name)) do
       nil -> {:reply, :error, socket}
       user ->
-        followers = Repo.all(Follow.get_followers(user))
+        followers = Repo.all(Follow.get_followers(user.id))
         {:reply, {:ok, %{user: user, followers: followers}}, socket}
     end
   end
 
   def handle_in("following", %{"name" => name}, socket) do
-    case Repo.get_by(User, name: name) do
+    case Repo.one(User.local_user_by_name(name)) do
       nil -> {:reply, :error, socket}
       user ->
-        following = Repo.all(Follow.get_following(user))
+        following = Repo.all(Follow.get_following(user.id))
         {:reply, {:ok, %{user: user, following: following}}, socket}
     end
   end
 
   def handle_in("user_mysteries", %{"name" => name}, socket) do
-    case Repo.get_by(User, name: name) do
+    case Repo.one(User.local_user_by_name(name)) do
       nil -> {:reply, :error, socket}
       user ->
         query = Mystery.user_mysteries(user)
@@ -179,7 +179,7 @@ defmodule Share.PageChannel do
   end
 
   def handle_in("opened_mysteries", %{"name" => name}, socket) do
-    case Repo.get_by(User, name: name) do
+    case Repo.one(User.local_user_by_name(name)) do
       nil -> {:reply, :error, socket}
       user ->
         query = Post.opened_mystery_posts(user)
@@ -190,7 +190,7 @@ defmodule Share.PageChannel do
   end
 
   def handle_in("following_servers", %{"name" => name}, socket) do
-    case Repo.get_by(User, name: name) do
+    case Repo.one(User.local_user_by_name(name)) do
       nil -> {:reply, :error, socket}
       user ->
         query = Server.following(user)

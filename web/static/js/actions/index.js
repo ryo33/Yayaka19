@@ -33,10 +33,10 @@ export const dismissFailedPost = createAction('dismiss failed post')
 // User
 export const requestUser = createAction('request user', name => name)
 export const setUserInfo = createAction('set user info', info => info)
-export const follow = createAction('follow', id => id)
-export const unfollow = createAction('unfollow', id => id)
-export const requestFollow = createAction('request follow', id => id)
-export const requestUnfollow = createAction('request unfollow', id => id)
+export const follow = createAction('follow', (name, host) => ({name, host}))
+export const unfollow = createAction('unfollow', (name, host) => ({name, host}))
+export const requestFollow = createAction('request follow', (name, host) => ({name, host}))
+export const requestUnfollow = createAction('request unfollow', (name, host) => ({name, host}))
 export const requestMoreUserPosts = createAction('request more user posts', (user, id) => ({user, id}))
 export const addUserPosts = createAction('add user posts', posts => posts)
 
@@ -58,7 +58,12 @@ export const updatePublicTimeline = createAction('update public timeline', data 
 
 // Timeline
 export const requestTimeline = createAction('request timeline')
-export const updateTimeline = createAction('update timeline', data => data)
+export const updateTimeline = createAction('update timeline',
+  (posts, remotes) => ({posts, remotes}))
+export const updateRemoteTimeline = createAction('update remote timeline',
+  (host, posts) => ({host, posts}))
+export const updateRemoteTimelineStatus = createAction('update remote timeline status',
+  (host, status) => ({host, status}))
 export const addNewPosts = createAction('add new posts', posts => posts)
 export const loadNewPosts = createAction('load new posts', posts => posts)
 export const requestMoreTimeline = createAction('request more timeline', id => id)
