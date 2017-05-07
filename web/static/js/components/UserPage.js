@@ -111,7 +111,7 @@ class UserPage extends Component {
               <Card.Content>
                 <Card.Header>
                   {user.display} {isNotMe ? (
-                    <FollowButton user={user} />
+                    <FollowButton user={user} large />
                   ) : null} {isMe ? (
                     <Button size='tiny' onClick={this.handleClickEdit}>
                       <Icon name='edit' />
@@ -134,6 +134,7 @@ class UserPage extends Component {
                         fluid
                         primary
                       >
+                        <Icon name='external' />
                         {`Go to ${user.host}`}
                       </Button>
                     </Segment>

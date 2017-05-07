@@ -61,7 +61,7 @@ class FollowButton extends Component {
   }
 
   render() {
-    const { currentUser, remoteFollowing, following, user, floated } = this.props
+    const { currentUser, remoteFollowing, following, user, floated, large } = this.props
     const host = this.getHost()
     if (host == null && currentUser.id == user.id) {
       return null
@@ -72,7 +72,14 @@ class FollowButton extends Component {
     if (isFollowing) {
       return (
         <Popup
-          trigger={<Button size='mini' icon='user' color='blue' floated={floated} />}
+          trigger={large ? (
+            <Button color='blue' floated={floated}>
+              <Icon name='user' />
+              Following
+            </Button>
+          ) : (
+            <Button size='mini' icon='user' color='blue' floated={floated} />
+          )}
           flowing
           hoverable
           on='click'
@@ -109,16 +116,28 @@ class FollowButton extends Component {
         </Popup>
       )
     } else {
-      return (
-        <Button size='mini' icon='add user' onClick={this.follow} floated={floated} />
-      )
+      if (large) {
+        return (
+          <Button onClick={this.follow} floated={floated}>
+            <Icon name='add user' color='blue' />
+            Follow
+          </Button>
+        )
+      } else {
+        return (
+          <Button icon size='mini' onClick={this.follow} floated={floated}>
+            <Icon name='add user' color='blue' />
+          </Button>
+        )
+      }
     }
   }
 }
 
 FollowButton.propTypes = {
   user: React.PropTypes.object.isRequired,
-  floated: React.PropTypes.oneOf(['left', 'right'])
+  floated: React.PropTypes.oneOf(['left', 'right']),
+  large: React.PropTypes.bool
 }
 
 export default connect(mapStateToProps, actionCreators)(FollowButton)
