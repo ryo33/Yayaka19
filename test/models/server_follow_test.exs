@@ -3,7 +3,7 @@ defmodule Share.ServerFollowTest do
 
   alias Share.ServerFollow
 
-  @valid_attrs %{}
+  @valid_attrs %{user_id: 0, server_id: 0}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do

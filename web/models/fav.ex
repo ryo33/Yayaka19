@@ -34,10 +34,10 @@ defmodule Share.Fav do
   end
 
   def preload(%Share.Fav{} = fav) do
-    Share.Repo.preload(fav, [:user, post: [:user, post_addresses: :user]])
+    Share.Repo.preload(fav, [:user, post: [:user]])
   end
 
   def preload(query) do
-    Ecto.Query.preload(query, [:user, post: [:user, post_addresses: :user]])
+    Ecto.Query.preload(query, [:user, post: [:user]])
   end
 end

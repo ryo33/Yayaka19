@@ -7,6 +7,7 @@ import UserID from './UserID.js'
 import Time from './Time.js'
 import { userPage } from '../pages.js'
 import Post from './Post.js'
+import UserButton from './UserButton.js'
 import FollowButton from './FollowButton.js'
 import { compareNotices } from '../utils.js'
 
@@ -38,9 +39,9 @@ const FavNotice = ({ fav: { user, post, inserted_at }, userPageAction }) => (
     </Feed.Label>
     <Feed.Content>
       <Feed.Summary>
-        <Feed.User onClick={() => userPageAction(user.name)}>
+        <UserButton Component={Feed.User} user={user}>
           {user.display}
-        </Feed.User> (<UserID user={user} />) favorited
+        </UserButton> (<UserID user={user} />) favorited
         <Feed.Date>
           <Time time={inserted_at} />
         </Feed.Date>
@@ -64,9 +65,9 @@ const FollowNotice = ({ follow: { user, inserted_at }, userPageAction}) => (
     </Feed.Label>
     <Feed.Content>
       <Feed.Summary>
-        <Feed.User onClick={() => userPageAction(user.name)}>
+        <UserButton Component={Feed.User} user={user}>
           {user.display}
-        </Feed.User> (<UserID user={user} />) followed you <FollowButton user={user} />
+        </UserButton> (<UserID user={user} />) followed you <FollowButton user={user} />
         <Feed.Date>
           <Time time={inserted_at} />
         </Feed.Date>
@@ -82,9 +83,9 @@ const AddressNotice = ({ address, userPageAction }) => (
     </Feed.Label>
     <Feed.Content>
       <Feed.Summary>
-        <Feed.User onClick={() => userPageAction(address.user.name)}>
+        <UserButton Component={Feed.User} user={address.user}>
           {address.user.display}
-        </Feed.User> (<UserID user={address.user} />) addressed you
+        </UserButton> (<UserID user={address.user} />) addressed you
         <Feed.Date>
           <Time time={address.inserted_at} />
         </Feed.Date>
@@ -107,9 +108,9 @@ const ReplyNotice = ({ reply: post, userPageAction }) => (
     </Feed.Label>
     <Feed.Content>
       <Feed.Summary>
-        <Feed.User onClick={() => userPageAction(post.user.name)}>
+        <UserButton Component={Feed.User} user={post.user}>
           {post.user.display}
-        </Feed.User> (<UserID user={post.user} />) replied to you
+        </UserButton> (<UserID user={post.user} />) replied to you
         <Feed.Date>
           <Time time={post.inserted_at} />
         </Feed.Date>

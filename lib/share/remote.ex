@@ -26,7 +26,7 @@ defmodule Share.Remote do
 
   if Mix.env == :dev do
     def port, do: Application.get_env(:share, Share.Endpoint)[:url][:port]
-    def host, do: "#{@host}:#{port}"
+    def host, do: "#{@host}:#{port()}"
   else
     def port, do: @port
     def host, do: @host

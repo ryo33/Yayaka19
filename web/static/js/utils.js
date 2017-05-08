@@ -33,3 +33,7 @@ export function createRemotePath(host, path) {
     return null
   }
 }
+
+export function isRemoteHost(host) {
+  return host != null && host != location.host
+}

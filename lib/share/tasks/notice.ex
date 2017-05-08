@@ -6,17 +6,30 @@ defmodule Share.Tasks.Notice do
   import Ecto.Query
 
   def post(post) do
-    if length(post.post_addresses) >= 1 do
+    address = post.address_user
+    if not is_nil(address) do
       if is_nil(post.post_id) do
-        {:add_address_notice, [post]}
-        |> Honeydew.async(:notice)
+        if is_nil(address.server_id) do
+          {:add_address_notice, [post, address]}
+          |> Honeydew.async(:notice)
+        else
+          post = Post.put_path(post)
+          payload = %{post: post, user: address}
+          host = Repo.preload(address, [:server]).server.host
+          Share.Remote.Message.create(host, "add_address_notice", payload)
+          |> Share.Remote.RequestServer.request(noreply: true)
+        end
       else
-        query = from p in Post, where: p.id == ^post.post_id
-        case Repo.aggregate(query, :count, :id) do
-          1 ->
-            {:add_reply_notice, [post]}
-            |> Honeydew.async(:notice)
-          _ -> ()
+        post = Share.Repo.preload(post, [post: Share.Post.preload_params])
+        if is_nil(address.server_id) do
+          {:add_reply_notice, [post, address]}
+          |> Honeydew.async(:notice)
+        else
+          post = Post.put_path(post)
+          payload = %{post: post, user: address}
+          host = Repo.preload(address, [:server]).server.host
+          Share.Remote.Message.create(host, "add_reply_notice", payload)
+          |> Share.Remote.RequestServer.request(noreply: true)
         end
       end
     end
@@ -44,8 +57,7 @@ defmodule Share.Tasks.Notice do
     Share.Endpoint.broadcast! "user:" <> target_user.name, "add_notices", payload
   end
 
-  def add_address_notice(post) do
-    target_user = hd(post.post_addresses).user
+  def add_address_notice(post, target_user) do
     if target_user.id != post.user_id do
       payload = %{addresses: [post]}
       |> format_notices
@@ -53,13 +65,11 @@ defmodule Share.Tasks.Notice do
     end
   end
 
-  def add_reply_notice(post) do
-    post = Share.Repo.preload(post, [post: Share.Post.preload_params])
-    target_user = post.post.user
-    if target_user.id != post.user_id do
+  def add_reply_notice(post, user) do
+    if user.id != post.user_id do
       payload = %{replies: [post]}
       |> format_notices
-      Share.Endpoint.broadcast! "user:" <> target_user.name, "add_notices", payload
+      Share.Endpoint.broadcast! "user:" <> user.name, "add_notices", payload
     end
   end
 

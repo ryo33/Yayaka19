@@ -22,7 +22,10 @@ const UserButton = ({ Component = Button,
   } else {
     const link = userPage.path({name: user.name})
     return (
-      <Component size='mini' href={link} onClick={() => userPageAction(user.name)}>
+      <Component size='mini' href={link} onClick={event => {
+        event.preventDefault()
+        userPageAction(user.name)
+      }}>
         {children}
       </Component>
     )

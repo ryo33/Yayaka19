@@ -1,9 +1,9 @@
 defmodule Share.UserChannel do
   use Share.Web, :channel
+  alias Share.UserActions
   alias Share.Follow
   alias Share.User
   alias Share.Post
-  alias Share.PostAddress
   alias Share.Fav
   alias Share.Mystery
   alias Share.Server
@@ -18,7 +18,7 @@ defmodule Share.UserChannel do
     user = socket.assigns.user
     true = name == user.name
 
-    user_params = get_user_params(user, socket)
+    user_params = get_user_params(user)
     {:ok, %{"userParams" => user_params}, socket}
   end
 
@@ -29,33 +29,41 @@ defmodule Share.UserChannel do
     case Repo.update(changeset) do
       {:ok, user} ->
         {:reply, {:ok, %{user: user}}, socket}
-      {:error, changeset} ->
+      {:error, _changeset} ->
         {:reply, {:error, %{user: user}}, socket}
-    end
-  end
-
-  def post(user, params, address \\ "") do
-    params = params
-             |> Map.put("user_id", user.id)
-             |> Map.put("user_display", user.display)
-    text = Map.get(params, "text")
-    post_id = Map.get(params, "post_id")
-    mystery_id = Map.get(params, "mystery_id")
-    if is_nil(mystery_id) and is_nil(post_id) and text == "" do
-      :error
-    else
-      changeset = Post.changeset(%Post{}, params)
-      post = Repo.insert!(changeset)
-      Share.Handlers.Post.handle(post, address)
-      :ok
     end
   end
 
   def handle_in("new_post", params, socket) do
     user = socket.assigns.user
     user = Repo.get!(User, user.id)
-    %{"post" => params, "address" => address} = params
-    case post(user, params, address) do
+    %{"text" => text, "post" => post, "address" => address} = params
+    params = %{"text" => text}
+    params = if not is_nil(post) do
+      id = Map.get(post, "id")
+      host = Map.get(post, "host")
+      if not is_nil(host) do
+        Share.Remote.Message.create(host, "post", %{id: id})
+        |> Share.Remote.RequestServer.request()
+        |> case do
+          {:ok, %{"payload" => %{"post" => post}}} ->
+            post = Post.put_host(post, host)
+                   |> Post.from_map()
+            Map.put(params, "post_id", post.id)
+        end
+      else
+        Map.put(params, "post_id", id)
+      end
+    else
+      params
+    end
+    params = if not is_nil(address) do
+      address = User.from_map(address)
+      Map.put(params, "address_user_id", address.id)
+    else
+      params
+    end
+    case UserActions.post(user, params) do
       :ok -> {:reply, :ok, socket}
       :error -> {:reply, :error, socket}
     end
@@ -76,15 +84,13 @@ defmodule Share.UserChannel do
     params = %{"text" => "",
       "mystery_id" => mystery.id,
       "user_id" => user.id}
-    case post(user, params) do
+    case UserActions.post(user, params) do
       :ok -> {:reply, {:ok, res}, socket}
       :error -> {:reply, :error, socket}
     end
   end
 
   def handle_in("open_mystery", %{"id" => id}, socket) do
-    user = socket.assigns.user
-
     user = socket.assigns.user
     query = from m in Mystery,
       where: m.id == ^id
@@ -101,7 +107,7 @@ defmodule Share.UserChannel do
       params = %{"text" => "",
         "mystery_id" => mystery.id,
         "user_id" => user.id}
-      case post(user, params) do
+      case UserActions.post(user, params) do
         :ok -> {:reply, {:ok, res}, socket}
         :error -> {:reply, :error, socket}
       end
@@ -141,33 +147,41 @@ defmodule Share.UserChannel do
     end
   end
 
-  def handle_in("follow", %{"id" => id}, socket) do
+  def handle_in("follow", %{"name" => name} = params, socket) do
     user = socket.assigns.user
-    query = from f in Follow,
-      where: f.user_id == ^user.id,
-      where: f.target_user_id == ^id
-    with true <- user.id != id,
-         0 <- Repo.aggregate(query, :count, :id),
-         params <- %{user_id: user.id, target_user_id: id},
-         changeset <- Follow.changeset(%Follow{}, params),
-         {:ok, follow} <- Repo.insert(changeset) do
-      Share.Handlers.Notice.add_follow_notice(user, follow)
-      {:reply, :ok, socket}
+    host = Map.get(params, "host", nil)
+    if not is_nil(host) or host == Share.Remote.host do
+      case UserActions.remote_follow(user.id, host, name) do
+        :ok -> {:reply, :ok, socket}
+        :error -> {:reply, :error, socket}
+      end
     else
-      _ -> {:reply, :error, socket}
+      target_user = Repo.one!(User.local_user_by_name(name))
+      case UserActions.follow(user.id, target_user.id) do
+        {:ok, follow} ->
+          Share.Handlers.Notice.add_follow_notice(user, follow)
+          {:reply, :ok, socket}
+        :already -> {:reply, :ok, socket}
+        :error ->
+          {:reply, :error, socket}
+      end
     end
   end
 
-  def handle_in("unfollow", %{"id" => id}, socket) do
+  def handle_in("unfollow", %{"name" => name} = params, socket) do
     user = socket.assigns.user
-    query = from f in Follow,
-      where: f.user_id == ^user.id,
-      where: f.target_user_id == ^id
-    case Repo.one(query) do
-      nil -> {:reply, :error, socket}
-      follow -> case Repo.delete(follow) do
-        {:ok, _} -> {:reply, :ok, socket}
-        _ -> {:reply, :error, socket}
+    host = Map.get(params, "host", nil)
+    if not is_nil(host) or host == Share.Remote.host do
+      case UserActions.remote_unfollow(user.id, host, name) do
+        :ok -> {:reply, :ok, socket}
+        :error -> {:reply, :error, socket}
+      end
+    else
+      target_user = Repo.one!(Share.User.local_user_by_name(name))
+      case UserActions.unfollow(user.id, target_user.id) do
+        :ok -> {:reply, :ok, socket}
+        :error -> {:reply, :error, socket}
+        :already -> {:reply, :ok, socket}
       end
     end
   end
@@ -181,7 +195,7 @@ defmodule Share.UserChannel do
     with 0 <- Repo.aggregate(query, :count, :id),
          params <- %{user_id: user.id, server_id: server.id},
          changeset <- ServerFollow.changeset(%ServerFollow{}, params),
-         {:ok, follow} <- Repo.insert(changeset) do
+         {:ok, _follow} <- Repo.insert(changeset) do
       {:reply, {:ok, %{server: server}}, socket}
     else
       _ -> {:reply, :error, socket}
@@ -216,40 +230,48 @@ defmodule Share.UserChannel do
 
   def handle_in("timeline", _params, socket) do
     user = socket.assigns.user
-    timeline = get_timeline(user.id, socket)
+    timeline = get_timeline(user, with_remotes: true)
     {:reply, {:ok, timeline}, socket}
   end
 
   def handle_in("more_timeline", %{"id" => id}, socket) do
     user = socket.assigns.user
-    timeline = get_timeline(user.id, socket, [less_than_id: id])
+    timeline = get_timeline(user, [less_than_id: id])
     {:reply, {:ok, timeline}, socket}
   end
 
-  def get_timeline(user_id, socket, opts \\ []) do
+  def get_timeline(user, opts \\ []) do
     less_than_id = Keyword.get(opts, :less_than_id)
+    with_remotes = Keyword.get(opts, :with_remotes)
     limitation = Keyword.get(opts, :limit, @timeline_limit)
-
-    query = from f in Follow,
-      select: f.target_user_id,
-      where: f.user_id == ^user_id
-    users = [user_id | Repo.all(query)]
-    query = Post
-            |> where([p], p.user_id in ^users)
-            |> order_by([p], [desc: p.id])
+    query = Share.Follow.get_following_ids(user.id)
+    users = [user.id | Repo.all(query)]
+    query = Post.timeline(users)
             |> limit(^limitation)
-            |> Post.preload()
     query = if is_nil(less_than_id) do
       query
     else
       where(query, [p], p.id < ^less_than_id)
     end
     posts = Repo.all(query)
-    favs = Fav.get_favs(posts, socket.assigns.user)
-    %{posts: posts, favs: favs}
+    favs = Fav.get_favs(posts, user)
+    if (with_remotes) do
+      remote_following = Follow.remote_following(user.id) |> Repo.all()
+      get_host = fn follow -> follow.target_user.server.host end
+      hosts = Enum.group_by(remote_following, get_host)
+      remotes = Enum.map(hosts, fn {host, _v} -> host end)
+      Enum.each(remotes, fn host ->
+        Share.Tasks.Remote.fetch_timeline(host, user)
+      end)
+      remotes = Enum.map(remotes, fn host -> {host, nil} end)
+                |> Enum.into(%{})
+      %{posts: posts, favs: favs, remotes: remotes}
+    else
+      %{posts: posts, favs: favs}
+    end
   end
 
-  defp get_user_params(user, socket) do
+  defp get_user_params(user) do
     user = Repo.get!(User, user.id)
 
     query = from u in User,
@@ -258,12 +280,19 @@ defmodule Share.UserChannel do
       where: u.id != ^user.id
     users = Repo.all(query)
 
-    timeline = get_timeline(user.id, socket)
-
     query = from f in Follow,
-      select: f.target_user_id,
+      preload: [target_user: [:server]],
       where: f.user_id == ^user.id
     following = Repo.all(query)
+    map = Enum.group_by(following, fn follow ->
+      user = follow.target_user
+      if user.server_id == nil, do: :following, else: :remote
+    end, fn follow ->
+      user = follow.target_user
+      if user.server_id == nil, do: user.name, else: [user.server.host, user.name]
+    end)
+    following = Map.get(map, :following, [])
+    remote_following = Map.get(map, :remote, [])
 
     query = from fav in Fav,
       join: post in Post,
@@ -288,9 +317,7 @@ defmodule Share.UserChannel do
     followers = Repo.all(query)
 
     query = from post in Post,
-      join: address in PostAddress,
-      on: post.id == address.post_id,
-      where: address.user_id == ^user.id,
+      where: post.address_user_id == ^user.id,
       where: post.user_id != ^user.id,
       where: is_nil(post.post_id),
       order_by: [desc: :id],
@@ -298,20 +325,21 @@ defmodule Share.UserChannel do
     addresses = Repo.all(Post.preload(query))
 
     query = from post in Post,
-      join: address in PostAddress,
-      on: post.id == address.post_id,
-      where: address.user_id == ^user.id,
+      where: post.address_user_id == ^user.id,
       where: post.user_id != ^user.id,
       where: not is_nil(post.post_id),
       order_by: [desc: :id],
       limit: 50
     replies = Repo.all(Post.preload(query))
 
+    timeline = get_timeline(user, with_remotes: true)
+
     %{
       user: user,
       users: users,
       timeline: timeline,
       following: following,
+      remoteFollowing: remote_following,
       followers: followers,
       noticed: user.noticed,
       notices: %{

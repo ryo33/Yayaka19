@@ -1,5 +1,6 @@
 defmodule Share.PageChannel do
   use Share.Web, :channel
+  alias Share.UserActions
   alias Share.Follow
   alias Share.User
   alias Share.Post
@@ -11,46 +12,38 @@ defmodule Share.PageChannel do
 
   require Logger
 
-  @user_posts_limit 10
-
   def join("page", _params, socket) do
     {:ok, socket}
   end
 
   def handle_in("user_info", %{"name" => name}, socket) do
-    case Repo.get_by(User, name: name) do
+    case Repo.one(User.local_user_by_name(name)) do
       nil -> {:reply, :error, socket}
       user ->
-        query = from p in Post, where: p.user_id == ^user.id
-        post_count = Repo.aggregate(query, :count, :id)
-        query = from f in Follow, where: f.user_id == ^user.id
-        follow_count = Repo.aggregate(query, :count, :id)
-        query = from f in Follow, where: f.target_user_id == ^user.id
-        followed_count = Repo.aggregate(query, :count, :id)
-        query = from p in Post,
-          where: p.user_id == ^user.id,
-          order_by: [desc: :id],
-          limit: @user_posts_limit
-        posts = Repo.all(Post.preload(query))
-        favs = Fav.get_favs(posts, socket.assigns.user)
-        mysteries_count = Repo.aggregate(Mystery.user_mysteries(user), :count, :id)
-        opened_mysteries_count = Repo.aggregate(Post.opened_mystery_posts(user), :count, :id)
-        res = %{
-          "user" => user,
-          "posts" => posts,
-          "favs" => favs,
-          "postCount" => post_count,
-          "following" => follow_count,
-          "followers" => followed_count,
-          "mysteries" => mysteries_count,
-          "openedMysteries" => opened_mysteries_count
-        }
+        res = UserActions.user_info(user, socket.assigns.user)
         {:reply, {:ok, res}, socket}
     end
   end
 
+  def handle_in("remote_user_info", %{"host" => host, "name" => name}, socket) do
+    Share.Remote.Message.create(host, "user_info", %{name: name})
+    |> Share.Remote.RequestServer.request()
+    |> case do
+      {:ok, %{"payload" => %{"info" => info}}} ->
+        info = info
+               |> Map.update!("user", &User.put_host(&1, host))
+               |> Map.update!("posts", fn posts ->
+                 Enum.map(posts, &Post.put_host(&1, host))
+               end)
+        {:reply, {:ok, info}, socket}
+      _ ->
+        {:reply, :error, socket}
+    end
+  end
+
+  @user_posts_limit 10
   def handle_in("more_user_posts", %{"user" => name, "id" => less_than_id}, socket) do
-    case Repo.get_by(User, name: name) do
+    case Repo.one(User.local_user_by_name(name)) do
       nil -> {:reply, :error, socket}
       user ->
         query = from p in Post,
@@ -84,7 +77,8 @@ defmodule Share.PageChannel do
     case Repo.get(Post, id) do
       nil -> {:reply, :error, socket}
       post ->
-        timeline = Share.UserChannel.get_timeline(post.user_id, socket, [limit: 10, less_than_id: post.id])
+        post = Repo.preload(post, [:user])
+        timeline = Share.UserChannel.get_timeline(post.user, [limit: 10, less_than_id: post.id])
         {:reply, {:ok, timeline}, socket}
     end
   end
@@ -95,12 +89,12 @@ defmodule Share.PageChannel do
     servers = if is_nil(user) do
       []
     else
-      Share.ServerFollow.following_servers(user)
+      Share.ServerFollow.following_servers(user.id)
       |> Repo.all()
     end
     task = Task.async(fn ->
-      posts = Post.public_timeline()
-              |> Repo.all()
+      Post.public_timeline()
+      |> Repo.all()
     end)
     response = Enum.map(servers, fn %{host: host} ->
       task = Task.async(fn ->
@@ -114,10 +108,8 @@ defmodule Share.PageChannel do
       case Task.yield(task, @remote_timeout) || Task.shutdown(task) do
         {:ok, resp} ->
           case resp do
-            %{"payload" => %{"posts" => posts}} ->
-              posts = Task.async_stream(posts, fn post ->
-                Map.put(post, "host", host)
-              end)
+            {:ok, %{"payload" => %{"posts" => posts}}} ->
+              posts = Task.async_stream(posts, &Post.put_host(&1, host))
               |> Enum.map(fn {:ok, post} -> post end)
               {:ok, host, posts}
             :timeout -> {:timeout, host}
@@ -150,25 +142,25 @@ defmodule Share.PageChannel do
   end
 
   def handle_in("followers", %{"name" => name}, socket) do
-    case Repo.get_by(User, name: name) do
+    case Repo.one(User.local_user_by_name(name)) do
       nil -> {:reply, :error, socket}
       user ->
-        followers = Repo.all(Follow.get_followers(user))
+        followers = Repo.all(Follow.get_followers(user.id))
         {:reply, {:ok, %{user: user, followers: followers}}, socket}
     end
   end
 
   def handle_in("following", %{"name" => name}, socket) do
-    case Repo.get_by(User, name: name) do
+    case Repo.one(User.local_user_by_name(name)) do
       nil -> {:reply, :error, socket}
       user ->
-        following = Repo.all(Follow.get_following(user))
+        following = Repo.all(Follow.get_following(user.id))
         {:reply, {:ok, %{user: user, following: following}}, socket}
     end
   end
 
   def handle_in("user_mysteries", %{"name" => name}, socket) do
-    case Repo.get_by(User, name: name) do
+    case Repo.one(User.local_user_by_name(name)) do
       nil -> {:reply, :error, socket}
       user ->
         query = Mystery.user_mysteries(user)
@@ -179,7 +171,7 @@ defmodule Share.PageChannel do
   end
 
   def handle_in("opened_mysteries", %{"name" => name}, socket) do
-    case Repo.get_by(User, name: name) do
+    case Repo.one(User.local_user_by_name(name)) do
       nil -> {:reply, :error, socket}
       user ->
         query = Post.opened_mystery_posts(user)
@@ -190,7 +182,7 @@ defmodule Share.PageChannel do
   end
 
   def handle_in("following_servers", %{"name" => name}, socket) do
-    case Repo.get_by(User, name: name) do
+    case Repo.one(User.local_user_by_name(name)) do
       nil -> {:reply, :error, socket}
       user ->
         query = Server.following(user)

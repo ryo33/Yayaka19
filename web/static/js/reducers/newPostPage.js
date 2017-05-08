@@ -13,9 +13,9 @@ const text = createReducer({
 
 const address = createReducer({
   [updatePostAddress]: (state, payload) => payload,
-  [submitPost]: () => '',
-  [closeNewPostDialog]: () => ''
-}, '')
+  [submitPost]: () => null,
+  [closeNewPostDialog]: () => null
+}, null)
 
 const postAddresses = createReducer({
   [submitPost]: () => [],
