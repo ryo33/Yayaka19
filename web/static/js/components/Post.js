@@ -105,7 +105,8 @@ class Post extends Component {
     this.handleEmptyQuote = this.handleEmptyQuote.bind(this)
     this.state = {
       openReply: false,
-      openQuote: false
+      openQuote: false,
+      emptyQuoted: false
     }
   }
 
@@ -150,6 +151,9 @@ class Post extends Component {
   handleEmptyQuote() {
     const { post, submitPost } = this.props
     submitPost('', null, post)
+    this.setState({
+      emptyQuoted: true
+    })
   }
 
   renderReplyButton() {
@@ -210,7 +214,7 @@ class Post extends Component {
       list = false, followButton = true, actions = true, postLink = true,
       attributeIcon, prefix, post, userPageAction, postPageAction
     } = this.props
-    const { openReply, openQuote } = this.state
+    const { openReply, openQuote, emptyQuoted } = this.state
     const host = post.host || this.props.host
     const remote = isRemoteHost(host)
     const hasChild = post.post != null || post.post_id != null
@@ -292,7 +296,11 @@ class Post extends Component {
                 {!remote ? this.renderFavButton() : null}
                 {this.renderQuoteButton()}
                 <Comment.Action onClick={this.handleEmptyQuote}>
-                  <Icon name='retweet' size='large' />
+                  {emptyQuoted ? (
+                    <Icon name='retweet' size='large' color='green' rotated='clockwise' />
+                  ) : (
+                    <Icon name='retweet' size='large' />
+                  )}
                 </Comment.Action>
                 <Comment.Action as='a' href={getTweetURL(post)} target='_blank'>
                   <Icon name='twitter' size='large' />
