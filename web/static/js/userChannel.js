@@ -8,7 +8,7 @@ import {
 import {
   windowFocusedSelector, pageSelector, timelineSelector, userSelector
 } from './selectors.js'
-import { isDefaultChannel } from './utils.js'
+import { isDefaultChannel, isRemoteHost } from './utils.js'
 
 export const watchUserChannel = (store) => {
   userChannel.on('add_notices', payload => {
@@ -17,7 +17,8 @@ export const watchUserChannel = (store) => {
   userChannel.on('add_new_posts', ({posts}) => {
     const state = store.getState()
     if (posts.length == 1
-      && userSelector(state).id === posts[0].user.id
+      && userSelector(state).name === posts[0].user.name
+      && !isRemoteHost(posts[0].user.host)
       && timelineSelector(state).newPosts.length == 0) {
       store.dispatch(loadNewPosts(posts))
     } else {
@@ -32,8 +33,5 @@ export const watchUserChannel = (store) => {
   })
   userChannel.on('remote_timeline_error', ({host}) => {
     store.dispatch(updateRemoteTimelineStatus(host, 'error'))
-  })
-  userChannel.on('add_remote_posts', ({posts}) => {
-    store.dispatch(addNewPosts(posts))
   })
 }
