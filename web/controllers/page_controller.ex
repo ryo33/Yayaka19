@@ -31,7 +31,7 @@ defmodule Share.PageController do
   end
 
   def user(conn, %{"name" => name}) do
-    case Share.Repo.get_by(Share.User, name: name) do
+    case Share.Repo.one(Share.User.local_user_by_name(name)) do
       nil -> render_page(conn)
       user ->
         title = Application.get_env(:share, :title)

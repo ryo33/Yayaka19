@@ -13,6 +13,7 @@ import {
   userPage, userFormPage,
   postPage, loginPage, noticesPage,
   newMysteryPage,
+  remoteUserPage,
   termsURL, privacyURL,
   apiURL, logoutURL, newAccountURL, getSwitchUserURL,
   passwordUpdateURL
@@ -55,6 +56,7 @@ const actionCreators = {
   loginPageAction: () => loginPage.action(),
   noticesPageAction: () => noticesPage.action(),
   newMysteryPageAction: () => newMysteryPage.action(),
+  remoteUserPageAction: () => remoteUserPage.action(),
   openNewPostDialog, closeNewPostDialog,
   hideError, doPing,
   resubmitFailedPost, dismissFailedPost
@@ -165,6 +167,7 @@ class App extends Component {
       loginPageAction,
       noticesPageAction,
       newMysteryPageAction,
+      remoteUserPageAction,
       newPostsCount,
       noticesCount,
       newPost,
@@ -226,6 +229,9 @@ class App extends Component {
                 <Menu.Menu>
                   <Menu.Item onClick={newMysteryPageAction}>
                     New Mystery Post
+                  </Menu.Item>
+                  <Menu.Item onClick={remoteUserPageAction}>
+                    Remote User
                   </Menu.Item>
                 </Menu.Menu>
               </Menu.Item>

@@ -10,6 +10,7 @@ import {
 } from '../pages.js'
 import { openNewPostDialog, updatePostAddress, requestMoreUserPosts } from '../actions/index.js'
 import { userSelector, userPageSelector, followingSelector } from '../selectors.js'
+import { isRemoteHost } from '../utils.js'
 import UserID from './UserID.js'
 import FollowButton from './FollowButton.js'
 import PostList from './PostList.js'
@@ -18,7 +19,7 @@ const mapStateToProps = state => {
   const user = userSelector(state)
   const userPage = userPageSelector(state)
   return {
-    isMe: userPage.user && userPage.user.id === user.id,
+    isMe: userPage.user && !isRemoteHost(userPage.user.host) && userPage.user.id === user.id,
     isNotMe: userPage.user && userPage.user.id !== user.id,
     userPage
   }
@@ -31,6 +32,19 @@ const actionCreators = {
   followingPageAction: name => followingPage.action({name}),
   mysteriesPageAction: name => mysteriesPage.action({name}),
   openedMysteriesPageAction: name => openedMysteriesPage.action({name})
+}
+
+const LocalButton = ({ user, ...props }) => {
+  if (user && user.host) {
+    const { onClick, ...newProps } = props
+    return (
+      <Button {...newProps} />
+    )
+  } else {
+    return (
+      <Button {...props} />
+    )
+  }
 }
 
 class UserPage extends Component {
@@ -48,7 +62,7 @@ class UserPage extends Component {
   handleSendTo() {
     const { userPage: { user }, openNewPostDialog, updatePostAddress } = this.props
     openNewPostDialog()
-    updatePostAddress(user.name)
+    updatePostAddress(user)
   }
 
   handleClickEdit() {
@@ -89,6 +103,7 @@ class UserPage extends Component {
       user, postCount, following, followers, mysteries, openedMysteries,
       posts, isLoadingMorePosts
     } = userPage
+    const remote = user && isRemoteHost(user.host)
     if (user != null) {
       return (
         <Segment.Group>
@@ -97,7 +112,7 @@ class UserPage extends Component {
               <Card.Content>
                 <Card.Header>
                   {user.display} {isNotMe ? (
-                    <FollowButton user={user} />
+                    <FollowButton user={user} large />
                   ) : null} {isMe ? (
                     <Button size='tiny' onClick={this.handleClickEdit}>
                       <Icon name='edit' />
@@ -113,28 +128,44 @@ class UserPage extends Component {
                   </span>
                 </Card.Meta>
                 <Card.Description>
-                  <Button
+                  {remote ? (
+                    <Segment basic>
+                      <Button as='a'
+                        href={user.path ? `https://${user.host}${user.path}` : null}
+                        fluid
+                        primary
+                      >
+                        <Icon name='external' />
+                        {`Go to ${user.host}`}
+                      </Button>
+                    </Segment>
+                  ) : null}
+                  <LocalButton
+                    user={user}
                     content='Following'
                     icon='user'
                     label={{as: 'a', basic: true, content: following}}
                     labelPosition='right'
                     onClick={this.handleClickFollowing}
                   />
-                  <Button
+                  <LocalButton
+                    user={user}
                     content='Followers'
                     icon='user'
                     label={{as: 'a', basic: true, content: followers}}
                     labelPosition='right'
                     onClick={this.handleClickFollowers}
                   />
-                  <Button
+                  <LocalButton
+                    user={user}
                     content='Opened Mysteries'
                     icon='bomb'
                     label={{as: 'a', basic: true, content: openedMysteries}}
                     labelPosition='right'
                     onClick={this.handleClickOpenedMysteries}
                   />
-                  <Button
+                  <LocalButton
+                    user={user}
                     content='Mysteries'
                     icon='bomb'
                     label={{as: 'a', basic: true, content: mysteries}}
@@ -166,14 +197,16 @@ class UserPage extends Component {
           <Segment>
             <Header>Recent Posts</Header>
             <PostList posts={posts}>
-              <Segment vertical>
-                <Dimmer active={isLoadingMorePosts} inverted>
-                  <Loader inverted />
-                </Dimmer>
-                <Button primary fluid onClick={this.handleLoadMorePosts}>
-                  Load More
-                </Button>
-              </Segment>
+              {!remote ? (
+                <Segment vertical>
+                  <Dimmer active={isLoadingMorePosts} inverted>
+                    <Loader inverted />
+                  </Dimmer>
+                  <Button primary fluid onClick={this.handleLoadMorePosts}>
+                    Load More
+                  </Button>
+                </Segment>
+              ) : null}
             </PostList>
           </Segment>
         </Segment.Group>

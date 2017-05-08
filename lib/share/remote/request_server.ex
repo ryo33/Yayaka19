@@ -32,7 +32,7 @@ defmodule Share.Remote.RequestServer do
       Share.Remote.Pusher.enqueue(message)
       unless noreply do
         receive do
-          {:message, message} -> message
+          {:message, message} -> {:ok, message}
         after
           @timeout ->
             GenServer.cast(__MODULE__, {:cancel, message.id})

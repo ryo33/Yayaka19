@@ -34,7 +34,7 @@ defmodule Share.AuthController do
     query = from u in User,
       where: u.provider == ^provider and u.provided_id == ^id,
       where: u.num == 0
-    user = case Repo.one(query) do
+    case Repo.one(query) do
       nil ->
         changeset = User.changeset(%User{})
         conn
@@ -143,7 +143,7 @@ defmodule Share.AuthController do
     query = from u in User,
       where: u.provider == ^provider and u.provided_id == ^id,
       where: u.num == 0
-    user = case Repo.one(query) do
+    case Repo.one(query) do
       nil ->
         changeset = User.changeset(%User{})
         conn

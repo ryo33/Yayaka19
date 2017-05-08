@@ -13,10 +13,10 @@ import Mystery from './Mystery.js'
 import { requestFav, requestUnfav, setAddressPost, submitPost } from '../actions/index.js'
 import { userPage, postPage } from '../pages.js'
 import { userSelector, favsSelector } from '../selectors.js'
-import { getTweetURL, createRemotePath } from '../utils.js'
+import { getTweetURL, createRemotePath, isRemoteHost } from '../utils.js'
 
 const getPostPath = ({ id, host, path }) =>
-  host != null ? `https://${host+path}` : postPage.path({id})
+  isRemoteHost(host) ? `https://${host+path}` : postPage.path({id})
 
 const mapStateToProps = (state) => {
   const favs = favsSelector(state)
@@ -32,19 +32,13 @@ const actionCreators = {
   submitPost
 }
 
-const PostAddresses = ({ host, addresses = [] }) => (
-  <div>
-    {
-      addresses.map(({ user }) => (
-        <span key={user.name}>
-          <UserButton host={host} user={user}>
-            <Icon name='send' />
-            {user.display} (<UserID user={user} />)
-          </UserButton>
-        </span>
-      ))
-    }
-  </div>
+const PostAddresses = ({ host, user }) => (
+  <span key={user.name}>
+    <UserButton host={host} user={user}>
+      <Icon name='send' />
+      {user.display} (<UserID user={user} />)
+    </UserButton>
+  </span>
 )
 
 const PostLink = ({ post, host, onClick }) => {
@@ -149,15 +143,13 @@ class Post extends Component {
 
   handleClickTime(e) {
     const { post, postPageAction } = this.props
-    if (post.host == null) {
-      e.preventDefault()
-      postPageAction(post.id)
-    }
+    e.preventDefault()
+    postPageAction(post.id)
   }
 
   handleEmptyQuote() {
     const { post, submitPost } = this.props
-    submitPost('', '', post.id)
+    submitPost('', null, post)
   }
 
   renderReplyButton() {
@@ -220,10 +212,11 @@ class Post extends Component {
     } = this.props
     const { openReply, openQuote } = this.state
     const host = post.host || this.props.host
-    const remote = host != null
+    const remote = isRemoteHost(host)
     const hasChild = post.post != null || post.post_id != null
-    const reply = hasChild && post.post_addresses.length >= 1
-    const quote = hasChild && post.post_addresses.length == 0
+    const address = post.address_user != null
+    const reply = hasChild && address
+    const quote = hasChild && !address
     const quoteMystery = post.mystery_id != null
     const empty = !quoteMystery && (post.text ? post.text.length === 0 : true)
     const size = quote ? null : 'tiny'
@@ -260,16 +253,16 @@ class Post extends Component {
               ) : (
                 <Time time={post.inserted_at} />
               )}
-              {!remote && followButton ? (
-                <FollowButton user={post.user} />
+              {followButton ? (
+                <FollowButton host={host} user={post.user} />
               ) : null}
               {attributeIcon ? (
                 <Icon name={attributeIcon} color='blue' size='large' />
               ) : null}
             </Comment.Metadata>
             <Comment.Text>
-              {!reply ? (
-                <PostAddresses host={host} addresses={post.post_addresses} />
+              {!reply && address ? (
+                <PostAddresses host={host} user={post.address_user} />
               ) : null}
               {post.text ? (
                 <pre>
@@ -293,10 +286,10 @@ class Post extends Component {
                 </Segment>
               ) : null}
             </Comment.Text>
-            {actions && !remote && post.text ? (
+            {actions && post.text ? (
               <Comment.Actions>
                 {this.renderReplyButton()}
-                {this.renderFavButton()}
+                {!remote ? this.renderFavButton() : null}
                 {this.renderQuoteButton()}
                 <Comment.Action onClick={this.handleEmptyQuote}>
                   <Icon name='retweet' size='large' />

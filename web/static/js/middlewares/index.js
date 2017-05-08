@@ -9,7 +9,7 @@ import {
   editUser, setUser, initializeUser,
   submitPost, updatePostText,
   saveFailedPost, resubmitFailedPost,
-  requestUser, setUserInfo,
+  requestUser, setUserInfo, requestRemoteUser,
   requestMoreUserPosts, addUserPosts,
   requestPost, setPost, requestContexts, setContexts,
   requestFollow, requestUnfollow, follow, unfollow,
@@ -48,7 +48,7 @@ const submitPostMiddleware = createAsyncHook(
       dispatch(closeNewPostDialog())
     }
     const { text, address, post } = action.payload
-    const payload = {post: {text, post_id: post}, address}
+    const payload = {text, address, post}
     pushMessage(userChannel, 'new_post', payload)
       .then(() => {})
       .catch(() => {
@@ -74,6 +74,22 @@ const requestUserMiddleware = createAsyncHook(
   ({ dispatch, action }) => {
     setUserInfo({})
     pushMessage(channel, 'user_info', {name: action.payload})
+      .then(resp => {
+        const { user, posts, favs, postCount, following, followers, mysteries, openedMysteries } = resp
+        dispatch(addFavs(favs))
+        dispatch(setUserInfo({user, posts, postCount, following, followers, mysteries, openedMysteries}))
+      }, ({ error, timeout }) => {
+        dispatch(home.action())
+      })
+  }
+)
+
+const requestRemoteUserMiddleware = createAsyncHook(
+  requestRemoteUser.getType(),
+  ({ dispatch, action }) => {
+    setUserInfo({})
+    const { host, name } = action.payload
+    pushMessage(channel, 'remote_user_info', {host, name})
       .then(resp => {
         const { user, posts, favs, postCount, following, followers, mysteries, openedMysteries } = resp
         dispatch(addFavs(favs))
@@ -125,10 +141,10 @@ const requestContextsMiddleware = createAsyncHook(
 const requestFollowMiddleware = createAsyncHook(
   requestFollow.getType(),
   ({ dispatch, action }) => {
-    const id = action.payload
-    pushMessage(userChannel, 'follow', {id})
+    const { name, host } = action.payload
+    pushMessage(userChannel, 'follow', {name, host})
       .then(resp => {
-        dispatch(follow(id))
+        dispatch(follow(name, host))
       }).catch(() => {
         dispatch(showError('Failed to follow.'))
       })
@@ -138,10 +154,10 @@ const requestFollowMiddleware = createAsyncHook(
 const requestUnfollowMiddleware = createAsyncHook(
   requestUnfollow.getType(),
   ({ dispatch, action }) => {
-    const id = action.payload
-    pushMessage(userChannel, 'unfollow', {id})
+    const { name, host } = action.payload
+    pushMessage(userChannel, 'unfollow', {name, host})
       .then(resp => {
-        dispatch(unfollow(id))
+        dispatch(unfollow(name, host))
       }).catch(() => {
         dispatch(showError('Failed to unfollow.'))
       })
@@ -190,9 +206,9 @@ const requestTimelineMiddleware = createAsyncHook(
   requestTimeline.getType(),
   ({ dispatch, action }) => {
     pushMessage(userChannel, 'timeline', {})
-      .then(({ posts, favs }) => {
+      .then(({ posts, favs, remotes }) => {
         dispatch(addFavs(favs))
-        dispatch(updateTimeline(posts))
+        dispatch(updateTimeline(posts, remotes))
       }).catch(() => {
         dispatch(showError('Failed to fetch the timeline.'))
       })
@@ -278,6 +294,7 @@ export default composeMiddleware(
   ...signedInMiddlewares,
   redirectLoginPageMiddleware,
   requestUserMiddleware,
+  requestRemoteUserMiddleware,
   requestMoreUserPostsMiddleware,
   requestPostMiddleware,
   requestContextsMiddleware,

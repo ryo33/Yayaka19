@@ -29,6 +29,7 @@ defmodule Share.Server do
   end
 
   def from_host(host) do
+    true = host != Share.Remote.host
     query = from s in Share.Server, where: s.host == ^host
     case Share.Repo.one(query) do
       nil ->

@@ -37,6 +37,8 @@ export const openedMysteriesPage = p('/users/:name/opened-mysteries', 'openedMys
 export const userFormPage        = p('/users/:name/edit', 'userForm')
 export const followingServersPage =
   p('/users/:name/following-servers', 'followingServers')
+export const remoteUserPage      = p('/remote-user')
+
 export const postPage            = p('/posts/:id', 'post')
 export const noticesPage         = p('/n', 'notices')
 export const loginPage           = p('/login', 'login')

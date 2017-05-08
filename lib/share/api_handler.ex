@@ -3,13 +3,13 @@ defmodule Share.APIHandler do
   alias Share.Repo
 
   def post(user, params) do
-    with {_, %{"text" => text}} <- {:invalid, params},
+    with {_, %{"text" => _}} <- {:invalid, params},
          post_id <- Map.get(params, :post_id),
-         address <- Map.get(params, :address, ""),
+         address <- Map.get(params, :address_user, ""),
          {_, true} <- {:invalid, is_nil(post_id) or String.length(address) == 0},
          changeset <- Post.changeset(%Post{}, Map.put(params, "user_id", user.id)),
          {_, {:ok, post}} <- {:insert, Repo.insert(changeset)} do
-      Share.Handlers.Post.handle(post, address)
+      Share.Handlers.Post.handle(post)
       {:ok, 200, %{post_id: post.id}}
     else
       {:invalid, _} ->

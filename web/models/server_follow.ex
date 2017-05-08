@@ -19,10 +19,10 @@ defmodule Share.ServerFollow do
     |> validate_required(@fields)
   end
 
-  def following_servers(user) do
+  def following_servers(user_id) do
     from s in Share.Server,
       join: f in Share.ServerFollow,
       on: f.server_id == s.id,
-      where: f.user_id == ^user.id
+      where: f.user_id == ^user_id
   end
 end

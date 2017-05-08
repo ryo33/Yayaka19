@@ -56,6 +56,6 @@ defmodule Share.APIController do
   def unauthenticated(conn, _params) do
     conn
     |> put_status(401)
-    |> render "error.json", message: "Authentication required"
+    |> render("error.json", message: "Authentication required")
   end
 end
