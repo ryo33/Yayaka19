@@ -23,7 +23,7 @@ import {
   setWindowFocused
 } from '../actions/index.js'
 import { pageSelector, onlinePostsSelector } from '../selectors.js'
-import { compareInsertedAtDesc, compareNotices } from '../utils.js'
+import { compareInsertedAtDesc, compareNotices, isRemoteHost } from '../utils.js'
 import followersPageMiddleware from './followersPage.js'
 import followingPageMiddleware from './followingPage.js'
 import followingServersPageMiddleware from './followingServersPage.js'
@@ -144,7 +144,11 @@ const requestFollowMiddleware = createAsyncHook(
     const { name, host } = action.payload
     pushMessage(userChannel, 'follow', {name, host})
       .then(resp => {
-        dispatch(follow(name, host))
+        if (isRemoteHost(host)) {
+          dispatch(follow(name, host))
+        } else {
+          dispatch(follow(name))
+        }
       }).catch(() => {
         dispatch(showError('Failed to follow.'))
       })
@@ -157,7 +161,11 @@ const requestUnfollowMiddleware = createAsyncHook(
     const { name, host } = action.payload
     pushMessage(userChannel, 'unfollow', {name, host})
       .then(resp => {
-        dispatch(unfollow(name, host))
+        if (isRemoteHost(host)) {
+          dispatch(unfollow(name, host))
+        } else {
+          dispatch(unfollow(name))
+        }
       }).catch(() => {
         dispatch(showError('Failed to unfollow.'))
       })

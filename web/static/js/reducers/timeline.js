@@ -19,7 +19,7 @@ const posts = createReducer({
   },
   [initializeUser]: (state, { timeline: { posts }}) => posts,
   [addTimeline]: (state, posts) => state.concat(posts),
-  [loadNewPosts]: (posts, newPosts) => newPosts.concat(posts)
+  [loadNewPosts]: (posts, newPosts) => newPosts.concat(posts).sort(compareInsertedAtDesc)
 }, [])
 
 const remotes = createReducer({
@@ -34,8 +34,9 @@ const remotes = createReducer({
 }, [])
 
 const newPosts = createReducer({
-  [addNewPosts]: (state, posts) => posts.concat(state).sort(compareInsertedAtDesc),
-  [loadNewPosts]: () => []
+  [addNewPosts]: (state, posts) => posts.concat(state),
+  [loadNewPosts]: () => [],
+  [updateTimeline]: () => []
 }, [])
 
 const isLoadingTimeline = createReducer({

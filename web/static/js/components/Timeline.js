@@ -6,7 +6,7 @@ import { Segment, Header, Button, Rail, Icon, Dimmer, Loader, Table } from 'sema
 import { loadNewPosts, requestTimeline, requestMoreTimeline } from '../actions/index.js'
 import { timelineSelector, userSelector } from '../selectors.js'
 import { publicTimeline } from '../pages.js'
-
+import { isRemoteHost } from '../utils.js'
 import PostList from './PostList.js'
 
 const mapStateToProps = state => {
@@ -14,7 +14,9 @@ const mapStateToProps = state => {
     posts, remotes, newPosts, isLoadingTimeline, isLoadingMore
   } = timelineSelector(state)
   const user = userSelector(state)
-  const myNewPostsCount = newPosts.filter(posts => posts.user.id == user.id).length
+  const myNewPostsCount = newPosts.filter(posts => {
+    return !isRemoteHost(posts.user.host) && posts.user.name == user.name
+  }).length
   return {
     user, posts, remotes, newPosts, myNewPostsCount,
     isLoadingTimeline, isLoadingMore
@@ -134,10 +136,10 @@ class Timeline extends Component {
                 newPosts.length == 1 ? '' : 's'
               } { myNewPostsCount != 0 ? (
                 `(${myNewPostsCount} of them ${
-              myNewPostsCount == 1 ? 'is' : 'are'
-            } your post${
-              myNewPostsCount == 1 ? '' : 's'
-            })`
+                  myNewPostsCount == 1 ? 'is' : 'are'
+                } your post${
+                  myNewPostsCount == 1 ? '' : 's'
+                })`
               ) : null }
             </Button>
           </Segment>

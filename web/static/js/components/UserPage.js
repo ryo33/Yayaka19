@@ -18,9 +18,10 @@ import PostList from './PostList.js'
 const mapStateToProps = state => {
   const user = userSelector(state)
   const userPage = userPageSelector(state)
+  const isMe = userPage.user && !isRemoteHost(userPage.user.host) && userPage.user.name === user.name
   return {
-    isMe: userPage.user && !isRemoteHost(userPage.user.host) && userPage.user.id === user.id,
-    isNotMe: userPage.user && userPage.user.id !== user.id,
+    isMe,
+    isNotMe: !isMe,
     userPage
   }
 }
