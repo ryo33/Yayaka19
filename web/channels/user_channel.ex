@@ -4,7 +4,6 @@ defmodule Share.UserChannel do
   alias Share.Follow
   alias Share.User
   alias Share.Post
-  alias Share.PostAddress
   alias Share.Fav
   alias Share.Mystery
   alias Share.Server
@@ -19,7 +18,7 @@ defmodule Share.UserChannel do
     user = socket.assigns.user
     true = name == user.name
 
-    user_params = get_user_params(user, socket)
+    user_params = get_user_params(user)
     {:ok, %{"userParams" => user_params}, socket}
   end
 
@@ -30,7 +29,7 @@ defmodule Share.UserChannel do
     case Repo.update(changeset) do
       {:ok, user} ->
         {:reply, {:ok, %{user: user}}, socket}
-      {:error, changeset} ->
+      {:error, _changeset} ->
         {:reply, {:error, %{user: user}}, socket}
     end
   end
@@ -38,8 +37,33 @@ defmodule Share.UserChannel do
   def handle_in("new_post", params, socket) do
     user = socket.assigns.user
     user = Repo.get!(User, user.id)
-    %{"post" => params, "address" => address} = params
-    case UserActions.post(user, params, address) do
+    %{"text" => text, "post" => post, "address" => address} = params
+    params = %{"text" => text}
+    params = if not is_nil(post) do
+      id = Map.get(post, "id")
+      host = Map.get(post, "host")
+      if not is_nil(host) do
+        Share.Remote.Message.create(host, "post", %{id: id})
+        |> Share.Remote.RequestServer.request()
+        |> case do
+          {:ok, %{"payload" => %{"post" => post}}} ->
+            post = Post.put_host(post, host)
+                   |> Post.from_map()
+            Map.put(params, "post_id", post.id)
+        end
+      else
+        Map.put(params, "post_id", id)
+      end
+    else
+      params
+    end
+    params = if not is_nil(address) do
+      address = User.from_map(address)
+      Map.put(params, "address_user_id", address.id)
+    else
+      params
+    end
+    case UserActions.post(user, params) do
       :ok -> {:reply, :ok, socket}
       :error -> {:reply, :error, socket}
     end
@@ -67,8 +91,6 @@ defmodule Share.UserChannel do
   end
 
   def handle_in("open_mystery", %{"id" => id}, socket) do
-    user = socket.assigns.user
-
     user = socket.assigns.user
     query = from m in Mystery,
       where: m.id == ^id
@@ -173,7 +195,7 @@ defmodule Share.UserChannel do
     with 0 <- Repo.aggregate(query, :count, :id),
          params <- %{user_id: user.id, server_id: server.id},
          changeset <- ServerFollow.changeset(%ServerFollow{}, params),
-         {:ok, follow} <- Repo.insert(changeset) do
+         {:ok, _follow} <- Repo.insert(changeset) do
       {:reply, {:ok, %{server: server}}, socket}
     else
       _ -> {:reply, :error, socket}
@@ -208,21 +230,20 @@ defmodule Share.UserChannel do
 
   def handle_in("timeline", _params, socket) do
     user = socket.assigns.user
-    timeline = get_timeline(user.id, socket, with_remotes: true)
+    timeline = get_timeline(user, with_remotes: true)
     {:reply, {:ok, timeline}, socket}
   end
 
   def handle_in("more_timeline", %{"id" => id}, socket) do
     user = socket.assigns.user
-    timeline = get_timeline(user.id, socket, [less_than_id: id])
+    timeline = get_timeline(user, [less_than_id: id])
     {:reply, {:ok, timeline}, socket}
   end
 
-  def get_timeline(user_id, socket, opts \\ []) do
+  def get_timeline(user, opts \\ []) do
     less_than_id = Keyword.get(opts, :less_than_id)
     with_remotes = Keyword.get(opts, :with_remotes)
     limitation = Keyword.get(opts, :limit, @timeline_limit)
-    user = socket.assigns.user
     query = Share.Follow.get_following_ids(user.id)
     users = [user.id | Repo.all(query)]
     query = Post.timeline(users)
@@ -250,7 +271,7 @@ defmodule Share.UserChannel do
     end
   end
 
-  defp get_user_params(user, socket) do
+  defp get_user_params(user) do
     user = Repo.get!(User, user.id)
 
     query = from u in User,
@@ -296,9 +317,7 @@ defmodule Share.UserChannel do
     followers = Repo.all(query)
 
     query = from post in Post,
-      join: address in PostAddress,
-      on: post.id == address.post_id,
-      where: address.user_id == ^user.id,
+      where: post.address_user_id == ^user.id,
       where: post.user_id != ^user.id,
       where: is_nil(post.post_id),
       order_by: [desc: :id],
@@ -306,16 +325,14 @@ defmodule Share.UserChannel do
     addresses = Repo.all(Post.preload(query))
 
     query = from post in Post,
-      join: address in PostAddress,
-      on: post.id == address.post_id,
-      where: address.user_id == ^user.id,
+      where: post.address_user_id == ^user.id,
       where: post.user_id != ^user.id,
       where: not is_nil(post.post_id),
       order_by: [desc: :id],
       limit: 50
     replies = Repo.all(Post.preload(query))
 
-    timeline = get_timeline(user.id, socket, with_remotes: true)
+    timeline = get_timeline(user, with_remotes: true)
 
     %{
       user: user,

@@ -9,6 +9,7 @@ import {
   userSelector, followingSelector, remoteFollowingSelector
 } from '../selectors.js'
 import { remoteUserPage } from '../pages.js'
+import { isRemoteHost } from '../utils.js'
 
 const mapStateToProps = (state, { user }) => {
   const currentUser = userSelector(state)
@@ -63,7 +64,7 @@ class FollowButton extends Component {
   render() {
     const { currentUser, remoteFollowing, following, user, floated, large } = this.props
     const host = this.getHost()
-    if (host == null && currentUser.id == user.id) {
+    if (!isRemoteHost(host) && currentUser.name == user.name) {
       return null
     }
     const isFollowing = host == null

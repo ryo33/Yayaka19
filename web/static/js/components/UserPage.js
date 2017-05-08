@@ -10,6 +10,7 @@ import {
 } from '../pages.js'
 import { openNewPostDialog, updatePostAddress, requestMoreUserPosts } from '../actions/index.js'
 import { userSelector, userPageSelector, followingSelector } from '../selectors.js'
+import { isRemoteHost } from '../utils.js'
 import UserID from './UserID.js'
 import FollowButton from './FollowButton.js'
 import PostList from './PostList.js'
@@ -18,7 +19,7 @@ const mapStateToProps = state => {
   const user = userSelector(state)
   const userPage = userPageSelector(state)
   return {
-    isMe: userPage.user && userPage.user.host == null && userPage.user.id === user.id,
+    isMe: userPage.user && !isRemoteHost(userPage.user.host) && userPage.user.id === user.id,
     isNotMe: userPage.user && userPage.user.id !== user.id,
     userPage
   }
@@ -61,7 +62,7 @@ class UserPage extends Component {
   handleSendTo() {
     const { userPage: { user }, openNewPostDialog, updatePostAddress } = this.props
     openNewPostDialog()
-    updatePostAddress(user.name)
+    updatePostAddress(user)
   }
 
   handleClickEdit() {
@@ -102,7 +103,7 @@ class UserPage extends Component {
       user, postCount, following, followers, mysteries, openedMysteries,
       posts, isLoadingMorePosts
     } = userPage
-    const remote = user && user.host != null
+    const remote = user && isRemoteHost(user.host)
     if (user != null) {
       return (
         <Segment.Group>

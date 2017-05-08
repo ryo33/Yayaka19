@@ -48,7 +48,7 @@ const submitPostMiddleware = createAsyncHook(
       dispatch(closeNewPostDialog())
     }
     const { text, address, post } = action.payload
-    const payload = {post: {text, post_id: post}, address}
+    const payload = {text, address, post}
     pushMessage(userChannel, 'new_post', payload)
       .then(() => {})
       .catch(() => {

@@ -3,7 +3,8 @@ defmodule Share.Post do
 
   defimpl Poison.Encoder, for: Share.Post do
     def encode(params, options) do
-      Share.Post.to_map(params)
+      params
+      |> Share.Post.to_map()
       |> Poison.encode!(options)
     end
   end
@@ -13,12 +14,11 @@ defmodule Share.Post do
     field :user_display, :string
     field :remote_id, :string
     field :remote_path, :string
+    belongs_to :address_user, Share.User
     belongs_to :user, Share.User
     belongs_to :post, Share.Post
     belongs_to :mystery, Share.Mystery
     belongs_to :server, Share.Server
-
-    has_many :post_addresses, Share.PostAddress
 
     timestamps()
   end
@@ -34,10 +34,11 @@ defmodule Share.Post do
     end
     map = Map.from_struct(params)
           |> Map.take([
-            :id, :text, :user_display, :user, :inserted_at,
-            :post, :post_id, :post_addresses, :mystery, :mystery_id
+            :id, :text, :user_display, :user, :address_user, :inserted_at,
+            :post, :post_id, :mystery, :mystery_id, :remote_id
           ])
     if not is_nil(params.server_id) do
+      params = Share.Repo.preload(params, [:server])
       map
       |> Map.put(:host, params.server.host)
       |> Map.put(:path, params.remote_path)
@@ -46,26 +47,42 @@ defmodule Share.Post do
     end
   end
 
-  def put_path(%__MODULE__{} = post), do: put_path(to_map(post))
+  def put_path(%__MODULE__{} = post) do
+    post = Share.Repo.preload(post, Share.Post.preload_params)
+    put_path(to_map(post))
+  end
   def put_path(post) do
     path = Share.Router.Helpers.page_path(Share.Endpoint, :post, post.id)
     Map.put(post, :path, path)
+    |> Map.update!(:user, fn user -> Share.User.put_path(user) end)
     |> Map.update(:post, nil, fn post ->
       if is_nil(post), do: nil, else: put_path(post)
     end)
     |> Map.update(:mystery, nil, fn mystery ->
       if is_nil(mystery), do: nil, else: Share.Mystery.put_path(mystery)
     end)
-    |> Map.update(:user, nil, fn user -> Share.User.put_path(user) end)
-    |> Map.update(:post_addresses, nil, fn addresses ->
-      Enum.map(addresses, fn address ->
-        Share.PostAddress.put_path(address)
-      end)
+    |> Map.update(:address_user, nil, fn user ->
+      if is_nil(user), do: nil, else: Share.User.put_path(user)
     end)
   end
 
+  def put_host(post, host) do
+    post
+    |> Map.update("user", nil, fn user ->
+      if is_nil(user), do: nil, else: Share.User.put_host(user, host)
+    end)
+    |> Map.update("address_user", nil, fn user ->
+      if is_nil(user), do: nil, else: Share.User.put_host(user, host)
+    end)
+    |> Map.update("post", nil, fn post ->
+      if is_nil(post), do: nil, else: put_host(post, host)
+    end)
+    |> Map.put_new("host", host)
+  end
+
   @required_fields ~w(user_id)a
-  @optional_fields ~w(text post_id user_display mystery_id)a
+  @optional_fields ~w(text post_id user_display mystery_id address_user_id
+                      server_id remote_id remote_path inserted_at)a
   @fields @required_fields ++ @optional_fields
 
   @doc """
@@ -108,14 +125,14 @@ defmodule Share.Post do
   end
 
   @preload [
-    :user, :server, mystery: [:user], post_addresses: :user, post: [
-      :user, mystery: [:user], post_addresses: :user]]
+    :user, :server, :address_user, mystery: [:user], post: [
+      :user, :server, :address_user, mystery: [:user]]]
   @deep_preload [
-    :user, :server, mystery: [:user], post_addresses: :user, post: [
-      :user, :server, mystery: [:user], post_addresses: :user, post: [
-        :user, :server, mystery: [:user], post_addresses: :user, post: [
-          :user, :server, mystery: [:user], post_addresses: :user, post: [
-            :user, :server, :post, mystery: [:user], post_addresses: :user]]]]]
+    :user, :server, :address_user, mystery: [:user], post: [
+      :user, :server, :address_user, mystery: [:user], post: [
+        :user, :server, :address_user, mystery: [:user], post: [
+          :user, :server, :address_user, mystery: [:user], post: [
+            :user, :server, :post, :address_user, mystery: [:user]]]]]]
 
   def preload_params, do: @preload
   def deep_preload_params, do: @deep_preload
@@ -136,5 +153,59 @@ defmodule Share.Post do
   def deep_preload(query) do
     query
     |> preload(^@deep_preload)
+  end
+
+  def from_map(post) do
+    post_host = Map.get(post, "host")
+    user = cond do
+      is_nil(post_host) ->
+        id = Map.get(post, "id")
+        Share.Repo.get!(Share.Post, id)
+      post_host == Share.Remote.host ->
+        id = Map.get(post, "remote_id")
+        Share.Repo.get!(Share.Post, id)
+      true ->
+        server = Share.Server.from_host(post_host)
+        from_remote_post(server, post)
+    end
+  end
+
+  def from_remote_post(server, post) do
+    post_id = Map.get(post, "id")
+    remote_id = Map.get(post, "remote_id") || to_string(post_id)
+    query = from u in Share.Post,
+      where: u.server_id == ^server.id,
+      where: u.remote_id == ^remote_id
+    case Share.Repo.one(query) do
+      nil ->
+        user = Share.User.from_map(Map.get(post, "user"))
+        params = %{
+          user_id: user.id,
+          text: Map.get(post, "text"),
+          user_display: Map.get(post, "user_display"),
+          server_id: server.id,
+          remote_id: remote_id,
+          remote_path: Map.get(post, "path"),
+          inserted_at: Map.get(post, "inserted_at")
+        }
+        address_user = Map.get(post, "address_user")
+        params = if not is_nil(address_user) do
+          user = Share.User.from_map(address_user)
+          Map.put(params, :address_user_id, user.id)
+        else
+          params
+        end
+        child_post = Map.get(post, "post")
+        params = if not is_nil(child_post) do
+          child_post = Share.Post.from_map(child_post)
+          Map.put(params, :post_id, child_post.id)
+        else
+          params
+        end
+        changeset = Share.Post.changeset(%__MODULE__{}, params)
+        Share.Repo.insert!(changeset)
+      post -> post
+    end
+    |> preload()
   end
 end

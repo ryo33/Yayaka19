@@ -57,6 +57,14 @@ defmodule Share.Follow do
       where: f.target_user_id == ^target_id
   end
 
+  def local_followers(user_id) do
+    from f in Share.Follow,
+      join: u in Share.User, on: f.user_id == u.id,
+      where: f.target_user_id == ^user_id,
+      where: is_nil(u.server_id),
+      preload: [user: [:server]]
+  end
+
   def remote_followers(user_id) do
     from f in Share.Follow,
       join: u in Share.User, on: f.user_id == u.id,

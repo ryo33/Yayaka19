@@ -18,11 +18,11 @@ defmodule Share.UserController do
     changeset = Ecto.Changeset.change(user, secret: secret)
 
     case Repo.update(changeset) do
-      {:ok, user} ->
+      {:ok, _user} ->
         conn
         |> put_flash(:info, "Secret updated successfully.")
         |> redirect(to: user_path(conn, :api))
-      {:error, changeset} ->
+      {:error, _changeset} ->
         conn
         |> redirect(to: user_path(conn, :api))
     end
@@ -38,7 +38,7 @@ defmodule Share.UserController do
     user = Guardian.Plug.current_resource(conn)
     changeset = User.password_changeset(user, params)
     case Repo.update(changeset) do
-      {:ok, user} ->
+      {:ok, _user} ->
         conn
         |> redirect(to: "/")
       {:error, changeset} ->

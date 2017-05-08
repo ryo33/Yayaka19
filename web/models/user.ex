@@ -8,7 +8,9 @@ defmodule Share.User do
   use Share.Web, :model
   defimpl Poison.Encoder, for: Share.User do
     def encode(params, options) do
-      Share.User.to_map(params)
+      params
+      |> Share.Repo.preload([:server])
+      |> Share.User.to_map()
       |> Poison.encode!(options)
     end
   end
@@ -34,7 +36,6 @@ defmodule Share.User do
     :name, :display, :bio, :id
   ]
   def to_map(params) do
-    params = params |> Share.Repo.preload([:server])
     map = Map.from_struct(params)
           |> Map.take(@map_keys)
     if not is_nil(params.server_id) do
@@ -46,10 +47,18 @@ defmodule Share.User do
     end
   end
 
-  def put_path(%__MODULE__{} = user), do: put_path(to_map(user))
+  def put_path(%__MODULE__{} = user) do
+    user = user |> Share.Repo.preload([:server])
+    put_path(to_map(user))
+  end
   def put_path(user) do
     path = Share.Router.Helpers.page_path(Share.Endpoint, :user, user.name)
-    Map.put(user, :path, path)
+    Map.put_new(user, :path, path)
+  end
+
+  def put_host(user, host) do
+    user
+    |> Map.put_new("host", host)
   end
 
   @required_fields [:name, :display]
@@ -83,6 +92,17 @@ defmodule Share.User do
     |> validate_required([:name, :display, :server_id, :remote_id, :remote_path])
   end
 
+  def from_map(user) do
+    user_host = Map.get(user, "host")
+    user_name = Map.get(user, "name")
+    user = if is_nil(user_host) or user_host == Share.Remote.host do
+      Share.Repo.one!(Share.User.local_user_by_name(user_name))
+    else
+      server = Share.Server.from_host(user_host)
+      from_remote_user(server, user)
+    end
+  end
+
   def from_remote_user(server, user) do
     user_id = Map.get(user, "id")
     query = from u in Share.User,
@@ -95,7 +115,7 @@ defmodule Share.User do
           display: Map.get(user, "display"),
           bio: Map.get(user, "bio"),
           server_id: server.id,
-          remote_id: user_id,
+          remote_id: Map.get(user, "remote_id", user_id),
           remote_path: Map.get(user, "path")
         }
         changeset = Share.User.remote_changeset(%__MODULE__{}, params)

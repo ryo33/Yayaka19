@@ -1,10 +1,4 @@
 defmodule Share.Tasks.Remote do
-  alias Share.Repo
-  alias Share.User
-  alias Share.Post
-  alias Share.PostAddress
-  alias Share.Follow
-  import Ecto.Query
 
   def fetch_timeline(host, user) do
     {:do_fetch_timeline, [host, user]}
@@ -17,7 +11,7 @@ defmodule Share.Tasks.Remote do
     |> Share.Remote.RequestServer.request()
     |> case do
       {:ok, %{"payload" => %{"posts" => posts}, "from" => host}} ->
-        posts = Enum.map(posts, fn post -> Map.put(post, "host", host) end)
+        posts = Enum.map(posts, &Share.Post.put_host(&1, host))
         Share.Endpoint.broadcast! topic, "remote_timeline", %{host: host, posts: posts}
       :timeout ->
         Share.Endpoint.broadcast! topic, "remote_timeline_timeout", %{host: host}

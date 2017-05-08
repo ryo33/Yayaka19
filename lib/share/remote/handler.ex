@@ -1,6 +1,8 @@
 defmodule Share.Remote.Handler do
   import Ecto.Query
 
+  require Logger
+
   def enqueue(%{"action" => "reply"} = message) do
     Share.Remote.RequestServer.handle_reply(message)
   end
@@ -69,7 +71,7 @@ defmodule Share.Remote.Handler do
 
   def handle(%{"action" => "add_new_posts"} = message) do
     %{"payload" => %{"posts" => posts}, "from" => host} = message
-    posts = Enum.map(posts, fn post -> Map.put(post, "host", host) end)
+    posts = Enum.map(posts, &Share.Post.put_host(&1, host))
     Enum.each(posts, fn post ->
       server = Share.Server.from_host(host)
       user = Share.User.from_remote_user(server, Map.get(post, "user"))
@@ -86,7 +88,40 @@ defmodule Share.Remote.Handler do
     |> Share.Remote.RequestServer.request()
   end
 
-  def handle(_) do
+  def handle(%{"action" => "post"} = message) do
+    %{"payload" => %{"id" => id},
+      "from" => host} = message
+    post = Share.Repo.get!(Share.Post, id)
+           |> Share.Post.preload()
+           |> Share.Post.put_path()
+    Share.Remote.Message.create_reply(message, %{post: post})
+    |> Share.Remote.RequestServer.request()
+  end
+
+  def handle(%{"action" => "add_address_notice"} = message) do
+    %{"payload" => %{"post" => post, "user" => user},
+      "from" => host} = message
+    server = Share.Server.from_host(host)
+    post = Share.Post.put_host(post, host)
+    post = Share.Post.from_remote_post(server, post)
+    user = Share.User.local_user_by_name(Map.get(user, "name"))
+           |> Share.Repo.one!()
+    Share.Handlers.Post.add_address_notice(post, user)
+  end
+
+  def handle(%{"action" => "add_reply_notice"} = message) do
+    %{"payload" => %{"post" => post, "user" => user},
+      "from" => host} = message
+    server = Share.Server.from_host(host)
+    post = Share.Post.put_host(post, host)
+    post = Share.Post.from_remote_post(server, post)
+    user = Share.User.local_user_by_name(Map.get(user, "name"))
+           |> Share.Repo.one!()
+    Share.Handlers.Post.add_reply_notice(post, user)
+  end
+
+  def handle(message) do
+    Logger.debug(inspect message)
     :ok
   end
 end

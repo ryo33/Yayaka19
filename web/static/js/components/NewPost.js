@@ -70,14 +70,13 @@ class NewPost extends Component {
 
   submit(e) {
     e.preventDefault()
-    const { top, post, address, reply, plugins, allowEmpty = false, submitPost, onSubmitHandler } = this.props
+    const { top, post=null, address, reply, plugins, allowEmpty = false, submitPost, onSubmitHandler } = this.props
     const { text } = this.state
     if (allowEmpty || text.length >= 1) {
-      const replyAddress = reply ? reply.user.name : ''
+      const replyAddress = reply ? reply.user : null
       const finalAddress = top ? address : replyAddress
-      const postID = post ? post.id : null
       const transformedText = handlers.transform(plugins, text)
-      submitPost(transformedText, finalAddress, postID)
+      submitPost(transformedText, finalAddress, post)
       this.reset()
       if (onSubmitHandler) {
         onSubmitHandler()
@@ -117,9 +116,9 @@ class NewPost extends Component {
         <Segment>
           <Header>New Post</Header>
           <Form onSubmit={this.submit}>
-            {address.length != 0 ? (
+            {address ? (
               <Label>
-                <Icon name='send' /> {address} <Icon name='delete' onClick={this.handleRemoveAddress} />
+                <Icon name='send' /> <UserID user={address} /> <Icon name='delete' onClick={this.handleRemoveAddress} />
               </Label>
             ) : null}
             <EditorPluginsOptions text={text} previousText={previousText}

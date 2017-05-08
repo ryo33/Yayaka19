@@ -12,8 +12,6 @@ defmodule Share.PageChannel do
 
   require Logger
 
-  @user_posts_limit 10
-
   def join("page", _params, socket) do
     {:ok, socket}
   end
@@ -33,9 +31,9 @@ defmodule Share.PageChannel do
     |> case do
       {:ok, %{"payload" => %{"info" => info}}} ->
         info = info
-               |> Map.update!("user", &Map.put(&1, "host", host))
+               |> Map.update!("user", &User.put_host(&1, host))
                |> Map.update!("posts", fn posts ->
-                 Enum.map(posts, &Map.put(&1, "host", host))
+                 Enum.map(posts, &Post.put_host(&1, host))
                end)
         {:reply, {:ok, info}, socket}
       _ ->
@@ -43,6 +41,7 @@ defmodule Share.PageChannel do
     end
   end
 
+  @user_posts_limit 10
   def handle_in("more_user_posts", %{"user" => name, "id" => less_than_id}, socket) do
     case Repo.one(User.local_user_by_name(name)) do
       nil -> {:reply, :error, socket}
@@ -78,7 +77,8 @@ defmodule Share.PageChannel do
     case Repo.get(Post, id) do
       nil -> {:reply, :error, socket}
       post ->
-        timeline = Share.UserChannel.get_timeline(post.user_id, socket, [limit: 10, less_than_id: post.id])
+        post = Repo.preload(post, [:user])
+        timeline = Share.UserChannel.get_timeline(post.user, [limit: 10, less_than_id: post.id])
         {:reply, {:ok, timeline}, socket}
     end
   end
@@ -93,8 +93,8 @@ defmodule Share.PageChannel do
       |> Repo.all()
     end
     task = Task.async(fn ->
-      posts = Post.public_timeline()
-              |> Repo.all()
+      Post.public_timeline()
+      |> Repo.all()
     end)
     response = Enum.map(servers, fn %{host: host} ->
       task = Task.async(fn ->
@@ -109,9 +109,7 @@ defmodule Share.PageChannel do
         {:ok, resp} ->
           case resp do
             {:ok, %{"payload" => %{"posts" => posts}}} ->
-              posts = Task.async_stream(posts, fn post ->
-                Map.put(post, "host", host)
-              end)
+              posts = Task.async_stream(posts, &Post.put_host(&1, host))
               |> Enum.map(fn {:ok, post} -> post end)
               {:ok, host, posts}
             :timeout -> {:timeout, host}

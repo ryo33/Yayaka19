@@ -8,7 +8,7 @@ defmodule Share.UserActions do
   alias Share.Fav
   alias Share.Mystery
 
-  def post(user, params, address \\ "") do
+  def post(user, params) do
     params = params
              |> Map.put("user_id", user.id)
              |> Map.put("user_display", user.display)
@@ -20,7 +20,7 @@ defmodule Share.UserActions do
     else
       changeset = Post.changeset(%Post{}, params)
       post = Repo.insert!(changeset)
-      Share.Handlers.Post.handle(post, address)
+      Share.Handlers.Post.handle(post)
       :ok
     end
   end
@@ -89,6 +89,7 @@ defmodule Share.UserActions do
     |> Map.update!("posts", fn posts -> Enum.map(posts, &Post.put_path(&1)) end)
   end
 
+  @user_posts_limit 10
   def user_info(user, request_user \\ nil) do
     query = from p in Post, where: p.user_id == ^user.id
     post_count = Repo.aggregate(query, :count, :id)
@@ -104,7 +105,7 @@ defmodule Share.UserActions do
     favs = Fav.get_favs(posts, request_user)
     mysteries_count = Repo.aggregate(Mystery.user_mysteries(user), :count, :id)
     opened_mysteries_count = Repo.aggregate(Post.opened_mystery_posts(user), :count, :id)
-    res = %{
+    %{
       "user" => user,
       "posts" => posts,
       "favs" => favs,
