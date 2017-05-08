@@ -150,7 +150,7 @@ defmodule Share.UserChannel do
   def handle_in("follow", %{"name" => name} = params, socket) do
     user = socket.assigns.user
     host = Map.get(params, "host", nil)
-    if not is_nil(host) or host == Share.Remote.host do
+    if not is_nil(host) and host != Share.Remote.host do
       case UserActions.remote_follow(user.id, host, name) do
         :ok -> {:reply, :ok, socket}
         :error -> {:reply, :error, socket}
@@ -171,7 +171,7 @@ defmodule Share.UserChannel do
   def handle_in("unfollow", %{"name" => name} = params, socket) do
     user = socket.assigns.user
     host = Map.get(params, "host", nil)
-    if not is_nil(host) or host == Share.Remote.host do
+    if not is_nil(host) and host != Share.Remote.host do
       case UserActions.remote_unfollow(user.id, host, name) do
         :ok -> {:reply, :ok, socket}
         :error -> {:reply, :error, socket}

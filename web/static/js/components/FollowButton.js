@@ -67,9 +67,9 @@ class FollowButton extends Component {
     if (!isRemoteHost(host) && currentUser.name == user.name) {
       return null
     }
-    const isFollowing = host == null
-      ? following.includes(user.name)
-      : remoteFollowing.some(([h, n]) => h == host && n == user.name)
+    const isFollowing = isRemoteHost(host)
+      ? remoteFollowing.some(([h, n]) => h == host && n == user.name)
+      : following.includes(user.name)
     if (isFollowing) {
       return (
         <Popup
