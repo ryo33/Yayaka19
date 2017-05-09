@@ -2,8 +2,8 @@ import React from 'react'
 
 import { isRemoteHost } from '../utils.js'
 
-export default ({ host: post_host, user }) => {
-  const host = user.host || post_host
+export default ({ user }) => {
+  const host = user.host
   if (isRemoteHost(host)) {
     return <span>{host}@{user.name}</span>
   } else {

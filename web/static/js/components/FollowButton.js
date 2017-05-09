@@ -40,13 +40,13 @@ class FollowButton extends Component {
 
   follow() {
     const { requestFollow, user } = this.props
-    const host = this.getHost()
+    const host = user.host
     requestFollow(user.name, host)
   }
 
   unfollow() {
     const { requestUnfollow, user } = this.props
-    const host = this.getHost()
+    const host = user.host
     requestUnfollow(user.name, host)
   }
 
@@ -56,14 +56,9 @@ class FollowButton extends Component {
     })
   }
 
-  getHost() {
-    const { user, host: post_host } = this.props
-    return user.host || post_host
-  }
-
   render() {
     const { currentUser, remoteFollowing, following, user, floated, large } = this.props
-    const host = this.getHost()
+    const host = user.host
     if (!isRemoteHost(host) && currentUser.name == user.name) {
       return null
     }

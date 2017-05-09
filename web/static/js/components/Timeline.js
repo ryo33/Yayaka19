@@ -1,9 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { Segment, Header, Button, Rail, Icon, Dimmer, Loader, Table } from 'semantic-ui-react'
+import {
+  Segment, Header, Button, Rail, Icon, Dimmer, Loader, Table, Label
+} from 'semantic-ui-react'
 
-import { loadNewPosts, requestTimeline, requestMoreTimeline } from '../actions/index.js'
+import {
+  loadNewPosts, requestTimeline, requestMoreTimeline, requestRemoteTimeline
+} from '../actions/index.js'
 import { timelineSelector, userSelector } from '../selectors.js'
 import { publicTimeline } from '../pages.js'
 import { isRemoteHost } from '../utils.js'
@@ -27,7 +31,106 @@ const actionCreators = {
   publicTimelineAction: () => publicTimeline.action(),
   loadNewPosts,
   requestTimeline,
-  requestMoreTimeline
+  requestMoreTimeline,
+  requestRemoteTimeline
+}
+
+const remoteStatusColors = {
+  ok: 'green',
+  error: 'red',
+  timeout: 'yellow'
+}
+
+class RemotesInfo extends Component {
+  constructor(props) {
+    super(props)
+    this.open = this.open.bind(this)
+    this.close = this.close.bind(this)
+    this.state = {
+      open: false
+    }
+  }
+
+  open() {
+    this.setState({open: true})
+  }
+
+  close() {
+    this.setState({open: false})
+  }
+
+  render() {
+    const {
+      remotes, request, ok, error, timeout, loading
+    } = this.props
+    const labels = (
+      <span>
+        {ok && (error || timeout || loading) ? (
+          <Label circular color={remoteStatusColors["ok"]} content={ok} />
+        ) : null}
+        {error ? (
+          <Label circular color={remoteStatusColors["error"]} content={error} />
+        ) : null}
+        {timeout ? (
+          <Label circular color={remoteStatusColors["timeout"]} content={timeout} />
+        ) : null}
+        {loading ? (
+          <Label circular color='grey' content={loading} />
+        ) : null}
+      </span>
+    )
+    if (this.state.open) {
+      return (
+        <div>
+          <Button onClick={this.close}>
+            Close
+          </Button>
+          {labels}
+          <Table celled collapsing>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>Server</Table.HeaderCell>
+                <Table.HeaderCell>Status</Table.HeaderCell>
+                <Table.HeaderCell>Retry</Table.HeaderCell>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
+              {
+                Object.keys(remotes).sort().map(host => {
+                  const remote = remotes[host]
+                  const color = remoteStatusColors[remote]
+                  return (
+                    <Table.Row key={host}>
+                      <Table.Cell>{host}</Table.Cell>
+                      <Table.Cell>
+                        <Label color={color} content={remote || 'loading'} />
+                      </Table.Cell>
+                      <Table.Cell>
+                        {remote != 'ok' ? (
+                          <Button onClick={() => request(host)}>
+                            Retry
+                          </Button>
+                        ) : null}
+                      </Table.Cell>
+                    </Table.Row>
+                  )
+                })
+              }
+            </Table.Body>
+          </Table>
+        </div>
+      )
+    } else {
+      return (
+        <span>
+          <Button onClick={this.open}>
+            Servers
+          </Button>
+          {labels}
+        </span>
+      )
+    }
+  }
 }
 
 class Timeline extends Component {
@@ -79,7 +182,7 @@ class Timeline extends Component {
   render() {
     const {
       user, posts, remotes, newPosts, myNewPostsCount,
-      isLoadingTimeline, isLoadingMore
+      isLoadingTimeline, isLoadingMore, requestRemoteTimeline
     } = this.props
     const list = [0, 0, 0, 0]
     Object.keys(remotes).forEach(host => {
@@ -102,32 +205,12 @@ class Timeline extends Component {
         </Dimmer>
         <Segment vertical>
           <Header>{user.display}'s Timeline</Header>
-          {loading != 0 ? (
-            <Table>
-              <Table.Body>
-                <Table.Row>
-                  <Table.Cell>Loaded</Table.Cell>
-                  <Table.Cell>{ok}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>Error</Table.Cell>
-                  <Table.Cell>{error}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>Timeout</Table.Cell>
-                  <Table.Cell>{timeout}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>Loading</Table.Cell>
-                  <Table.Cell>{loading}</Table.Cell>
-                </Table.Row>
-              </Table.Body>
-            </Table>
-          ) : null}
           <Rail internal position='right'>
             <Button floated='right' icon='refresh' onClick={this.handleRefresh}>
             </Button>
           </Rail>
+          <RemotesInfo remotes={remotes} request={requestRemoteTimeline}
+            ok={ok} error={error} timeout={timeout} loading={loading} />
         </Segment>
         {newPosts.length != 0 ? (
           <Segment vertical>

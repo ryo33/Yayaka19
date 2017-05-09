@@ -32,17 +32,17 @@ const actionCreators = {
   submitPost
 }
 
-const PostAddresses = ({ host, user }) => (
+const PostAddresses = ({ user }) => (
   <span key={user.name}>
-    <UserButton host={host} user={user}>
+    <UserButton user={user}>
       <Icon name='send' />
       {user.display} (<UserID user={user} />)
     </UserButton>
   </span>
 )
 
-const PostLink = ({ post, host, onClick }) => {
-  const { path, inserted_at, id } = post
+const PostLink = ({ post, onClick }) => {
+  const { path, inserted_at, id, host } = post
   if (host) {
     return (
       <a href={createRemotePath(host, path)}>
@@ -59,10 +59,11 @@ const PostLink = ({ post, host, onClick }) => {
   }
 }
 
-const ChildPost = ({ postPageAction, post, host, actions, size }) => {
+const ChildPost = ({ postPageAction, post, actions, size }) => {
   const notLoaded = post.post_id != null && post.post == null
+  const host = post.host
   if (notLoaded) {
-    if (host) {
+    if (isRemoteHost(host)) {
       return (
         <Segment size={size}>
           <Button as='a' href={createRemotePath(host, post.path)}>
@@ -82,7 +83,6 @@ const ChildPost = ({ postPageAction, post, host, actions, size }) => {
     return (
       <Segment size={size}>
         <ConnectedPost
-          host={host}
           actions={actions}
           post={post.post}
         />
@@ -233,7 +233,6 @@ class Post extends Component {
               <ChildPost
                 post={post}
                 postPageAction={postPageAction}
-                host={host}
                 address={quote}
                 size={size}
               />
@@ -243,22 +242,21 @@ class Post extends Component {
               <Icon name={empty ? 'retweet' : 'quote right'}
                 size='large' color='blue' />
             ) : null}
-            <UserButton Component={Comment.Author} host={host} user={post.user}>
+            <UserButton Component={Comment.Author} user={post.user}>
               {userDisplay}
             </UserButton>
             <Comment.Metadata>
-              <UserID host={host} user={post.user} />
+              <UserID user={post.user} />
               {postLink ? (
                 <PostLink
                   post={post}
-                  host={host}
                   onClick={this.handleClickTime}
                 />
               ) : (
                 <Time time={post.inserted_at} />
               )}
               {followButton ? (
-                <FollowButton host={host} user={post.user} />
+                <FollowButton user={post.user} />
               ) : null}
               {attributeIcon ? (
                 <Icon name={attributeIcon} color='blue' size='large' />
@@ -266,7 +264,7 @@ class Post extends Component {
             </Comment.Metadata>
             <Comment.Text>
               {!reply && address ? (
-                <PostAddresses host={host} user={post.address_user} />
+                <PostAddresses user={post.address_user} />
               ) : null}
               {post.text ? (
                 <pre>
@@ -279,7 +277,6 @@ class Post extends Component {
                 <ChildPost
                   post={post}
                   postPageAction={postPageAction}
-                  host={host}
                   address={quote}
                   size={size}
                 />

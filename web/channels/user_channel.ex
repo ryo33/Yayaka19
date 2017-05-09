@@ -234,6 +234,12 @@ defmodule Share.UserChannel do
     {:reply, {:ok, timeline}, socket}
   end
 
+  def handle_in("remote_timeline", %{"host" => host}, socket) do
+    user = socket.assigns.user
+    Share.Tasks.Remote.fetch_timeline(host, user)
+    {:reply, :ok, socket}
+  end
+
   def handle_in("more_timeline", %{"id" => id}, socket) do
     user = socket.assigns.user
     timeline = get_timeline(user, [less_than_id: id])
@@ -263,7 +269,7 @@ defmodule Share.UserChannel do
       Enum.each(remotes, fn host ->
         Share.Tasks.Remote.fetch_timeline(host, user)
       end)
-      remotes = Enum.map(remotes, fn host -> {host, nil} end)
+      remotes = Enum.map(remotes, fn host -> {host, "loading"} end)
                 |> Enum.into(%{})
       %{posts: posts, favs: favs, remotes: remotes}
     else
