@@ -12,22 +12,9 @@ config :share, Share.Repo,
   ssl: true,
   url: System.get_env("DATABASE_URL")
 
-config :ueberauth, Ueberauth.Strategy.Google.OAuth,
-  client_id: System.get_env("GOOGLE_ID"),
-  client_secret: System.get_env("GOOGLE_SECRET"),
-  redirect_uri: "https://yayaka.net/auth/google/callback"
-
-config :ueberauth, Ueberauth.Strategy.Facebook.OAuth,
-  client_id: System.get_env("FACEBOOK_ID"),
-  client_secret: System.get_env("FACEBOOK_SECRET")
-
 config :ueberauth, Ueberauth.Strategy.Github.OAuth,
   client_id: System.get_env("GITHUB_ID"),
   client_secret: System.get_env("GITHUB_SECRET")
-
-config :ueberauth, Ueberauth.Strategy.Twitter.OAuth,
-  consumer_key: System.get_env("TWITTER_ID"),
-  consumer_secret: System.get_env("TWITTER_SECRET")
 
 config :guardian, Guardian,
   secret_key: System.get_env("GUARDIAN_SECRET")

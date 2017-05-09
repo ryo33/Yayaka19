@@ -27,11 +27,11 @@ config :share, Share.Remote,
   pusher_workers: 10
 
 config :share,
-  providers: [:google, :github, :facebook, :twitter],
-  title: "Yayaka19",
+  providers: [:github],
+  title: "Yayaka20",
   description: "What's in your head?",
-  url: "https://yayaka.net",
-  hashtag: "Yayaka19",
+  url: "https://yayaka20.herokuapp.com",
+  hashtag: "Yayaka20",
   admin: [name: "Ryo33",
            url: "https://twitter.com/ryo33music"],
   source: [url: "https://github.com/ryo33/Yayaka19",
@@ -42,10 +42,7 @@ config :share,
 # Authentication
 config :ueberauth, Ueberauth,
   providers: [
-    google: {Ueberauth.Strategy.Google, [default_scope: "email"]},
-    facebook: {Ueberauth.Strategy.Facebook, [default_scope: ""]},
     github: {Ueberauth.Strategy.Github, [default_scope: ""]},
-    twitter: {Ueberauth.Strategy.Twitter, []}
   ]
 
 config :guardian, Guardian,
