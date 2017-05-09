@@ -61,6 +61,7 @@ export const setContexts = createAction('set contexts', contexts => contexts)
 // Public timeline
 export const requestPublicTimeline = createAction('request public timeline')
 export const updatePublicTimeline = createAction('update public timeline', data => data)
+export const requestRemoteTimeline = createAction('request remote timeline', host => host)
 
 // Timeline
 export const requestTimeline = createAction('request timeline')

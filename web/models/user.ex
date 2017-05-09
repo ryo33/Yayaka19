@@ -25,7 +25,6 @@ defmodule Share.User do
     field :noticed, :naive_datetime
     field :secret, :string
     field :password, :string
-    field :remote_id, :string
     field :remote_path, :string
     belongs_to :server, Share.Server
 
@@ -86,10 +85,9 @@ defmodule Share.User do
   end
 
   def remote_changeset(struct, params \\ %{}) do
-    params = Map.update!(params, :remote_id, fn id -> to_string(id) end)
     struct
-    |> cast(params, [:name, :display, :bio, :server_id, :remote_id, :remote_path])
-    |> validate_required([:name, :display, :server_id, :remote_id, :remote_path])
+    |> cast(params, [:name, :display, :bio, :server_id, :remote_path])
+    |> validate_required([:name, :display, :server_id, :remote_path])
   end
 
   def from_map(user) do
@@ -104,18 +102,17 @@ defmodule Share.User do
   end
 
   def from_remote_user(server, user) do
-    user_id = Map.get(user, "id")
+    user_name = Map.get(user, "name")
     query = from u in Share.User,
       where: u.server_id == ^server.id,
-      where: u.remote_id == ^to_string(user_id)
+      where: u.name == ^user_name
     case Share.Repo.one(query) do
       nil ->
         params = %{
-          name: Map.get(user, "name"),
+          name: user_name,
           display: Map.get(user, "display"),
           bio: Map.get(user, "bio"),
           server_id: server.id,
-          remote_id: Map.get(user, "remote_id", user_id),
           remote_path: Map.get(user, "path")
         }
         changeset = Share.User.remote_changeset(%__MODULE__{}, params)
@@ -128,7 +125,6 @@ defmodule Share.User do
     from u in Share.User,
       where: u.name == ^name,
       where: is_nil(u.server_id),
-      where: is_nil(u.remote_id),
       where: is_nil(u.remote_path)
   end
 

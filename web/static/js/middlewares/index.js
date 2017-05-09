@@ -15,7 +15,8 @@ import {
   requestFollow, requestUnfollow, follow, unfollow,
   requestFav, requestUnfav, fav, unfav,
   requestPublicTimeline, updatePublicTimeline,
-  requestTimeline, updateTimeline, addFavs,
+  requestTimeline, requestRemoteTimeline,
+  updateTimeline, addFavs,
   requestMoreTimeline, addTimeline,
   openNoticesPage, updateNoticed,
   showError, hideError, doPing,
@@ -223,6 +224,17 @@ const requestTimelineMiddleware = createAsyncHook(
   }
 )
 
+const requestRemoteTimelineMiddleware = createAsyncHook(
+  requestRemoteTimeline.getType(),
+  ({ dispatch, action }) => {
+    const host = action.payload
+    pushMessage(userChannel, 'remote_timeline', {host})
+      .then(() => {
+      }).catch(() => {
+      })
+  }
+)
+
 const requestMoreTimelineMiddleware = createAsyncHook(
   requestMoreTimeline.getType(),
   ({ dispatch, action }) => {
@@ -286,6 +298,7 @@ if (signedIn) {
     requestFavMiddleware,
     requestUnfavMiddleware,
     requestTimelineMiddleware,
+    requestRemoteTimelineMiddleware,
     requestMoreTimelineMiddleware,
     openNoticesPageMiddleware,
     editUserMiddleware

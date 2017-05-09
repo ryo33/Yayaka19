@@ -10,9 +10,8 @@ const actionCreators = {
   userPageAction: name => userPage.action({name})
 }
 
-const UserButton = ({ Component = Button,
-  host: post_host, user, children, userPageAction }) => {
-  const host = user.host || post_host
+const UserButton = ({ Component = Button, user, children, userPageAction }) => {
+  const host = user.host
   if (host) {
     return (
       <Component size='mini' as='a' href={createRemotePath(host, user.path)}>
