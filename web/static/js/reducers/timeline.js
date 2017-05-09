@@ -16,9 +16,9 @@ const posts = createReducer({
   [requestTimeline]: () => [],
   [updateTimeline]: (state, { posts }) => posts,
   [updateRemoteTimeline]: (state, { posts, host: requestedHost }) => {
-    return posts
+    return state
       .filter(({ host }) => host != requestedHost)
-      .concat(state).sort(compareInsertedAtDesc)
+      .concat(posts).sort(compareInsertedAtDesc)
   },
   [initializeUser]: (state, { timeline: { posts }}) => posts,
   [addTimeline]: (state, posts) => state.concat(posts),

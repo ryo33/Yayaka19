@@ -7,6 +7,7 @@ defmodule Share.Tasks.Remote do
 
   def do_fetch_timeline(host, user) do
     topic = "user:" <> user.name
+    user = Share.User.put_path(user)
     Share.Remote.Message.create(host, "timeline", %{user: user})
     |> Share.Remote.RequestServer.request()
     |> case do
