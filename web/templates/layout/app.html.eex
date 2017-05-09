@@ -53,6 +53,7 @@ new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
       url: "<%= Application.get_env(:share, :admin)[:url] %>"
     }
     window.hashtag = "<%= Application.get_env(:share, :hashtag) %>"
+    window.providers = <%= raw Application.get_env(:share, :providers) |> Poison.encode!() %>
   </script>
   <body>
  <!-- Google Tag Manager (noscript) -->

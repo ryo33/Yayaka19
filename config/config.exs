@@ -27,6 +27,7 @@ config :share, Share.Remote,
   pusher_workers: 10
 
 config :share,
+  providers: [:google, :github, :facebook, :twitter],
   title: "Yayaka19",
   description: "What's in your head?",
   url: "https://yayaka.net",
@@ -37,11 +38,6 @@ config :share,
            title: "https://github.com/ryo33/Yayaka19"],
   api: [url: "https://gist.github.com/ryo33/145e5ef24bad6f11abbb902edc6979d6",
         title: "https://gist.github.com/ryo33/145e5ef24bad6f11abbb902edc6979d6"]
-
-# Configures Elixir's Logger
-config :logger, :console,
-  format: "$time $metadata[$level] $message\n",
-  metadata: [:request_id]
 
 # Authentication
 config :ueberauth, Ueberauth,
@@ -60,6 +56,11 @@ config :guardian, Guardian,
   verify_issuer: true, # optional
   secret_key: System.get_env("GUARDIAN_SECRET_KEY") || "abcdef",
   serializer: Share.UserSerializer
+
+# Configures Elixir's Logger
+config :logger, :console,
+  format: "$time $metadata[$level] $message\n",
+  metadata: [:request_id]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
