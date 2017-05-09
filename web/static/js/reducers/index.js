@@ -9,7 +9,8 @@ import {
   follow, unfollow,
   addFavs, fav, unfav,
   showError, hideError,
-  setWindowFocused
+  setWindowFocused,
+  saveRedirectedPage, clearRedirectedPage
 } from '../actions/index.js'
 
 import notices from './notices.js'
@@ -28,6 +29,11 @@ import mysteryPage from './mysteryPage.js'
 import editorPlugins from './editorPlugins.js'
 
 const page = createPagesReducer(errorPage.name, {})
+
+const redirectedPage = createReducer({
+  [saveRedirectedPage]: (state, payload) => payload,
+  [clearRedirectedPage]: () => null
+}, null)
 
 const user = createReducer({
   [setUser]: (state, payload) => payload,
@@ -78,6 +84,7 @@ export default combineReducers({
   error,
   notices,
   page,
+  redirectedPage,
   user,
   users,
   following,

@@ -1,6 +1,7 @@
 export const infoSelector = ({ info }) => info
 
 export const pageSelector = ({ page }) => page
+export const redirectedPageSelector = ({ redirectedPage }) => redirectedPage
 export const userSelector = ({ user }) => user
 export const usersSelector = ({ users }) => users
 export const followingSelector = ({ following }) => following
