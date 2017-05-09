@@ -1,5 +1,7 @@
 import { createPages, CHANGE_PAGE } from 'redux-pages'
-import { createReplacer, createAsyncHook, composeMiddleware } from 'redux-middlewares'
+import {
+  createMiddleware, createReplacer, createAsyncHook, composeMiddleware
+} from 'redux-middlewares'
 
 import { signedIn } from './global.js'
 import {
@@ -13,7 +15,8 @@ import {
   openMystery,
   requestMysteries,
   requestOpenedMysteries,
-  requestFollowingServers
+  requestFollowingServers,
+  saveRedirectedPage
 } from './actions/index.js'
 import { requestFollowers } from './actions/followersPage.js'
 import { requestFollowing } from './actions/followingPage.js'
@@ -55,7 +58,7 @@ export const logoutURL = '/logout'
 export const newAccountURL = '/new'
 export const getSwitchUserURL = name => `/switch/${name}`
 
-const onlySignedInMiddleware = createReplacer(
+const onlySignedInMiddleware = createMiddleware(
   ({ action }) => signedIn === false && action.type === CHANGE_PAGE,
   ({ action }) => {
     return timeline.check(action)
@@ -64,7 +67,10 @@ const onlySignedInMiddleware = createReplacer(
       || mysteryPage.check(action)
       || newMysteryPage.check(action)
   },
-  () => loginPage.action()
+  ({ dispatch, nextDispatch, action }) => {
+    dispatch(saveRedirectedPage(action))
+    dispatch(loginPage.action())
+  }
 )
 
 const errorPageHook = createReplacer(

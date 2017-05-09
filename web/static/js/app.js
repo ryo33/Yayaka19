@@ -12,13 +12,14 @@ import { signedIn, userID } from './global.js'
 import App from './components/App.js'
 import { pages, pagesMiddleware } from './pages.js'
 import reducer from './reducers/index.js'
-import { pageSelector } from './selectors.js'
+import { pageSelector, redirectedPageSelector } from './selectors.js'
 import middleware from './middlewares/index.js'
 import {
   initializeUser,
   addFavs, updateTimeline, setUser,
   setFollowing, setFollowers, updateNoticed, updateNotices,
-  showError, hideError, doPing, setWindowFocused
+  showError, hideError, doPing, setWindowFocused,
+  clearRedirectedPage
 } from './actions/index.js'
 import { joinChannel, joinUserChannel } from './socket.js'
 import { watchUserChannel } from './userChannel.js'
@@ -43,7 +44,13 @@ const store = createStore(
     autoRehydrate()
   )
 )
-persistStore(store, {whitelist: ['editorPlugins', 'failedPost']})
+persistStore(store, {whitelist: ['editorPlugins', 'failedPost', 'redirectedPage']}, () => {
+  const redirectedPage = redirectedPageSelector(store.getState())
+  if (redirectedPage != null) {
+    store.dispatch(clearRedirectedPage())
+    store.dispatch(redirectedPage)
+  }
+})
 
 // Socket
 const userChannelCallback = ({ userParams }) => {

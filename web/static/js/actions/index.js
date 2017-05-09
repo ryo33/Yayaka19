@@ -7,6 +7,8 @@ export const setFollowers = createAction('set followers', followers => followers
 export const addFavs = createAction('add favs', favs => favs)
 export const initializeUser = createAction('initialize user', params => params)
 export const setWindowFocused = createAction('set window focused', focused => focused)
+export const saveRedirectedPage = createAction('save redirected page', action => action)
+export const clearRedirectedPage = createAction('restore redirected page')
 
 // Error
 export const showError = createAction('show error', message => message)
