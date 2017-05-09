@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import {
-  Segment, Header, Button, Rail, Icon, Dimmer, Loader, Table, Label
+  Segment, Header, Button, Icon, Dimmer, Loader, Table, Label
 } from 'semantic-ui-react'
 
 import {
@@ -205,10 +205,8 @@ class Timeline extends Component {
         </Dimmer>
         <Segment vertical>
           <Header>{user.display}'s Timeline</Header>
-          <Rail internal position='right'>
-            <Button floated='right' icon='refresh' onClick={this.handleRefresh}>
-            </Button>
-          </Rail>
+          <Button floated='right' icon='refresh' onClick={this.handleRefresh}>
+          </Button>
           <RemotesInfo remotes={remotes} request={requestRemoteTimeline}
             ok={ok} error={error} timeout={timeout} loading={loading} />
         </Segment>
