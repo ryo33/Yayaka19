@@ -39,6 +39,7 @@
       url: "<%= Application.get_env(:share, :admin)[:url] %>"
     }
     window.hashtag = "<%= Application.get_env(:share, :hashtag) %>"
+    window.providers = <%= raw Application.get_env(:share, :providers) |> Poison.encode!() %>
   </script>
   <body>
     <%= render @view_module, @view_template, assigns %>

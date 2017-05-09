@@ -9,7 +9,7 @@ defmodule Share.AuthController do
     :new, :switch
   ]
 
-  @providers [:google, :github, :facebook, :twitter]
+  @providers Application.get_env(:share, :providers)
 
   def request(conn, _params) do
     render(conn, "request.html", callback_url: Helpers.callback_url(conn))
