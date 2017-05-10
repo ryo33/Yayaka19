@@ -86,7 +86,7 @@ class RemotesInfo extends Component {
             Close
           </Button>
           {labels}
-          <Table celled collapsing>
+          <Table celled fixed unstackable singleLine>
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell>Server</Table.HeaderCell>
