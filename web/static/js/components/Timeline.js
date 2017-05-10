@@ -21,9 +21,10 @@ const mapStateToProps = state => {
   const myNewPostsCount = newPosts.filter(posts => {
     return !isRemoteHost(posts.user.host) && posts.user.name == user.name
   }).length
+  const oldestPost = posts.filter(({ host }) => !isRemoteHost(host)).slice(-1).pop()
   return {
     user, posts, remotes, newPosts, myNewPostsCount,
-    isLoadingTimeline, isLoadingMore
+    isLoadingTimeline, isLoadingMore, oldestPost
   }
 }
 
@@ -147,9 +148,10 @@ class Timeline extends Component {
   }
 
   handleLoadMore() {
-    const { posts, requestMoreTimeline } = this.props
-    const oldestPost = posts[posts.length - 1]
-    requestMoreTimeline(oldestPost.id)
+    const { oldestPost, requestMoreTimeline } = this.props
+    if (oldestPost != null) {
+      requestMoreTimeline(oldestPost.id)
+    }
   }
 
   handleLoadPosts() {
