@@ -45,10 +45,12 @@ const store = createStore(
   )
 )
 persistStore(store, {whitelist: ['editorPlugins', 'failedPost', 'redirectedPage']}, () => {
-  const redirectedPage = redirectedPageSelector(store.getState())
-  if (redirectedPage != null) {
-    store.dispatch(clearRedirectedPage())
-    store.dispatch(redirectedPage)
+  if (signedIn) {
+    const redirectedPage = redirectedPageSelector(store.getState())
+    if (redirectedPage != null) {
+      store.dispatch(clearRedirectedPage())
+      store.dispatch(redirectedPage)
+    }
   }
 })
 
