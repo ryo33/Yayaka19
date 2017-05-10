@@ -1,31 +1,38 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { Comment, Segment } from 'semantic-ui-react'
+import { Segment } from 'semantic-ui-react'
 
 import { userSelector } from '../selectors.js'
+import { getPostKey } from '../utils.js'
 import Post from './Post.js'
 
-function get_id(post) {
-  if (post.host) {
-    return `${post.host}/${post.id}`
-  } else {
-    return post.id
-  }
-}
-
-const PostList = ({ followButton = true, posts, children }) => (
+const PostList = ({ followButton = true, posts, footers = {}, children }) => (
   <div>
     {
-      posts.map(post => (
-        <Segment key={get_id(post)} vertical>
-          <Post
-            list
-            followButton={followButton}
-            post={post}
-          />
-        </Segment>
-      ))
+      posts.map(post => {
+        const key = getPostKey(post)
+        const element = (
+          <Segment key={key} vertical>
+            <Post
+              list
+              followButton={followButton}
+              post={post}
+            />
+          </Segment>
+        )
+        const footer = footers[key]
+        if (footer != null) {
+          return [
+            element,
+            <Segment key={key + '-footer'} vertical>
+              {footer}
+            </Segment>
+          ]
+        } else {
+          return element
+        }
+      })
     }
     {children}
   </div>

@@ -110,10 +110,10 @@ defmodule Share.Post do
       order_by: [desc: :id]
   end
 
-  def public_timeline do
+  def public_timeline(posts_limit \\ 50) do
     Share.Post
     |> order_by([p], [desc: p.id])
-    |> limit(50)
+    |> limit(^posts_limit)
     |> Share.Post.preload()
   end
 

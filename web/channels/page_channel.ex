@@ -84,6 +84,7 @@ defmodule Share.PageChannel do
   end
 
   @remote_timeout 4000
+  @public_timeline_limit 50
   def handle_in("public_timeline", _params, socket) do
     user = socket.assigns.user
     servers = if is_nil(user) do
@@ -93,7 +94,7 @@ defmodule Share.PageChannel do
       |> Repo.all()
     end
     task = Task.async(fn ->
-      Post.public_timeline()
+      Post.public_timeline(@public_timeline_limit)
       |> Repo.all()
     end)
     response = Enum.map(servers, fn %{host: host} ->
