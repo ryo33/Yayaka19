@@ -1,3 +1,7 @@
+import React from 'react'
+
+import { Segment, Icon } from 'semantic-ui-react'
+
 import { postPage } from './pages.js'
 import { hashtag } from './global.js'
 
@@ -36,4 +40,38 @@ export function createRemotePath(host, path) {
 
 export function isRemoteHost(host) {
   return host != null && host != location.host
+}
+
+export function getPostKey(post) {
+  if (post.host) {
+    return `${post.host}/${post.id}`
+  } else {
+    return post.id
+  }
+}
+
+export function getPostsFooters(posts, localFooter = null) {
+  const endOfHosts = {}
+  let endOfLocal = null
+  posts.forEach(post => {
+    const { host } = post
+    if (isRemoteHost(host)) {
+      endOfHosts[host] = post
+    } else {
+      endOfLocal = post
+    }
+  })
+  const footers = {}
+  Object.keys(endOfHosts).forEach(host => {
+    footers[getPostKey(endOfHosts[host])] = (
+      <Segment basic secondary>
+        <Icon size='large' name='anchor' />
+        The end of posts from <Icon name='external' /> <a href={`https://${host}`}>{host}</a>
+      </Segment>
+    )
+  })
+  if (endOfLocal != null) {
+    footers[getPostKey(endOfLocal)] = localFooter
+  }
+  return footers
 }

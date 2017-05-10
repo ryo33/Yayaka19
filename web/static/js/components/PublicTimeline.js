@@ -6,6 +6,7 @@ import { Segment, Message, Header, Button, Label, Dimmer, Loader } from 'semanti
 import { signedIn } from '../global.js'
 import { userSelector, publicTimelineSelector } from '../selectors.js'
 import { requestPublicTimeline } from '../actions/index.js'
+import { getPostsFooters } from '../utils.js'
 import UserID from './UserID.js'
 import PostList from './PostList.js'
 
@@ -38,6 +39,7 @@ class PublicTimeline extends Component {
     const {
       posts, requestPublicTimeline, user, isLoadingPublicTimeline
     } = this.props
+    const footers = getPostsFooters(posts)
     return (
       <Dimmer.Dimmable>
         <Dimmer active={isLoadingPublicTimeline} inverted>
@@ -61,6 +63,7 @@ class PublicTimeline extends Component {
         </Segment>
         <PostList
           posts={posts}
+          footers={footers}
         />
         <Segment vertical>
           <Button onClick={requestPublicTimeline}>Reload</Button>

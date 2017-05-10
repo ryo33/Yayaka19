@@ -10,7 +10,7 @@ import {
 } from '../actions/index.js'
 import { timelineSelector, userSelector } from '../selectors.js'
 import { publicTimeline } from '../pages.js'
-import { isRemoteHost } from '../utils.js'
+import { isRemoteHost, getPostsFooters } from '../utils.js'
 import PostList from './PostList.js'
 
 const mapStateToProps = state => {
@@ -162,28 +162,21 @@ class Timeline extends Component {
     publicTimelineAction()
   }
 
-  renderLoadMore() {
-    const { isLoadingMore } = this.props
-    if (isLoadingMore) {
-      return (
-        <Dimmer active>
-          <Loader />
-        </Dimmer>
-      )
-    } else {
-      return (
-        <Button primary fluid onClick={this.handleLoadMore}>
-          Load More
-        </Button>
-      )
-    }
-  }
-
   render() {
     const {
       user, posts, remotes, newPosts, myNewPostsCount,
       isLoadingTimeline, isLoadingMore, requestRemoteTimeline
     } = this.props
+    const footers = getPostsFooters(posts, (
+      <div>
+        <Dimmer active={isLoadingMore} inverted>
+          <Loader inverted />
+        </Dimmer>
+        <Button primary fluid onClick={this.handleLoadMore}>
+          Load More
+        </Button>
+      </div>
+    ))
     const list = [0, 0, 0, 0]
     Object.keys(remotes).forEach(host => {
       const status = remotes[host]
@@ -235,16 +228,8 @@ class Timeline extends Component {
         <PostList
           followButton={false}
           posts={posts}
-        >
-          <Segment vertical>
-            <Dimmer active={isLoadingMore} inverted>
-              <Loader inverted />
-            </Dimmer>
-            <Button primary fluid onClick={this.handleLoadMore}>
-              Load More
-            </Button>
-          </Segment>
-        </PostList>
+          footers={footers}
+        />
       </Dimmer.Dimmable>
     )
   }
