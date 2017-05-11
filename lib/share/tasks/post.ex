@@ -37,10 +37,9 @@ defmodule Share.Tasks.Post do
 
   def broadcast_to_remote(post) do
     post = Share.Post.put_path(post)
-    Share.Follow.remote_followers(post.user.id)
+    Share.Follow.followers_hosts(post.user.id)
     |> Repo.all()
-    |> Enum.each(fn follow ->
-      host = follow.user.server.host
+    |> Enum.each(fn host ->
       Share.Remote.Message.create(host, "add_new_posts", %{posts: [post]})
       |> Share.Remote.RequestServer.request(noreply: true)
     end)
