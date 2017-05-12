@@ -21,9 +21,9 @@ defmodule Share.Server do
     |> validate_required(@fields)
   end
 
-  def following(user) do
+  def trusted_servers(user) do
     from s in Share.Server,
-      join: f in Share.ServerFollow,
+      join: f in Share.ServerTrust,
       on: f.server_id == s.id,
       where: f.user_id == ^user.id
   end

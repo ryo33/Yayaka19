@@ -7,7 +7,7 @@ defmodule Share.UserChannel do
   alias Share.Fav
   alias Share.Mystery
   alias Share.Server
-  alias Share.ServerFollow
+  alias Share.ServerTrust
   alias Share.Repo
 
   require Logger
@@ -95,25 +95,40 @@ defmodule Share.UserChannel do
     query = from m in Mystery,
       where: m.id == ^id
     mystery = Repo.one(Mystery.preload(query))
-    query = from p in Post,
-      where: p.user_id == ^user.id,
-      where: p.mystery_id == ^mystery.id
     res = %{
       mystery: mystery,
       text: mystery.text
     }
-    if user.id != mystery.user_id and Repo.aggregate(query, :count, :id) == 0 do
-      # Quote and open
-      params = %{"text" => "",
-        "mystery_id" => mystery.id,
-        "user_id" => user.id}
-      case UserActions.post(user, params) do
-        :ok -> {:reply, {:ok, res}, socket}
-        :error -> {:reply, :error, socket}
-      end
-    else
-      # Open
-      {:reply, {:ok, res}, socket}
+    case UserActions.open_mystery(user, mystery) do
+      :ok -> {:reply, {:ok, res}, socket}
+      :error -> {:reply, :error, socket}
+    end
+  end
+
+  def handle_in("open_remote_mystery", %{"host" => host, "id" => id}, socket) do
+    user = socket.assigns.user
+    Share.Remote.Message.create(host, "open_mystery", %{id: id})
+    |> Share.Remote.RequestServer.request()
+    |> case do
+      {:ok, %{"payload" => %{"mystery" => mystery, "text" => text}}} ->
+        mystery = Mystery.put_host(mystery, host)
+               |> Mystery.from_map()
+        res = %{
+          mystery: mystery,
+          text: text
+        }
+        case UserActions.open_mystery(user, mystery) do
+          :ok -> {:reply, {:ok, res}, socket}
+          :error -> {:reply, :error, socket}
+        end
+      {:ok, %{"payload" => %{"mystery" => mystery}}} ->
+        mystery = Mystery.put_host(mystery, host)
+                  |> Mystery.from_map()
+        res = %{
+          mystery: mystery
+        }
+        {:reply, {:ok, res}, socket}
+      _ -> {:reply, :error, socket}
     end
   end
 
@@ -186,15 +201,15 @@ defmodule Share.UserChannel do
     end
   end
 
-  def handle_in("follow_server", %{"host" => host}, socket) do
+  def handle_in("trust_server", %{"host" => host}, socket) do
     user = socket.assigns.user
     server = Server.from_host(host)
-    query = from f in ServerFollow,
+    query = from f in ServerTrust,
       where: f.user_id == ^user.id,
       where: f.server_id == ^server.id
     with 0 <- Repo.aggregate(query, :count, :id),
          params <- %{user_id: user.id, server_id: server.id},
-         changeset <- ServerFollow.changeset(%ServerFollow{}, params),
+         changeset <- ServerTrust.changeset(%ServerTrust{}, params),
          {:ok, _follow} <- Repo.insert(changeset) do
       {:reply, {:ok, %{server: server}}, socket}
     else
@@ -202,9 +217,9 @@ defmodule Share.UserChannel do
     end
   end
 
-  def handle_in("unfollow_server", %{"id" => id}, socket) do
+  def handle_in("untrust_server", %{"id" => id}, socket) do
     user = socket.assigns.user
-    query = from f in ServerFollow,
+    query = from f in ServerTrust,
       where: f.user_id == ^user.id,
       where: f.server_id == ^id
     case Repo.one(query) do

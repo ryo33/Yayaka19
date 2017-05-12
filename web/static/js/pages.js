@@ -15,7 +15,7 @@ import {
   openMystery,
   requestMysteries,
   requestOpenedMysteries,
-  requestFollowingServers,
+  requestTrustedServers,
   saveRedirectedPage
 } from './actions/index.js'
 import { requestFollowers } from './actions/followersPage.js'
@@ -38,9 +38,9 @@ export const followingPage       = p('/users/:name/following', 'following')
 export const mysteriesPage       = p('/users/:name/mysteries', 'userMysteries')
 export const openedMysteriesPage = p('/users/:name/opened-mysteries', 'openedMysteries')
 export const userFormPage        = p('/users/:name/edit', 'userForm')
-export const followingServersPage =
-  p('/users/:name/following-servers', 'followingServers')
+export const trustedServersPage  = p('/users/:name/trusted', 'trusted')
 export const remoteUserPage      = p('/remote-user')
+export const remoteMysteryPage      = p('/remote-mystery')
 
 export const postPage            = p('/posts/:id', 'post')
 export const noticesPage         = p('/n', 'notices')
@@ -171,11 +171,11 @@ const mysteryPageHook = createAsyncHook(
   }
 )
 
-const followingServersPageHook = createAsyncHook(
-  ({ action }) => followingServersPage.check(action),
+const trustedServersPageHook = createAsyncHook(
+  ({ action }) => trustedServersPage.check(action),
   ({ dispatch, action }) => {
     const name = action.payload.params.name
-    dispatch(requestFollowingServers(name))
+    dispatch(requestTrustedServers(name))
   }
 )
 
@@ -193,5 +193,5 @@ export const pagesMiddleware = composeMiddleware(
   postPageHook,
   noticesPageHook,
   mysteryPageHook,
-  followingServersPageHook
+  trustedServersPageHook
 )

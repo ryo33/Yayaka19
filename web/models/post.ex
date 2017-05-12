@@ -77,6 +77,9 @@ defmodule Share.Post do
     |> Map.update("post", nil, fn post ->
       if is_nil(post), do: nil, else: put_host(post, host)
     end)
+    |> Map.update("mystery", nil, fn mystery ->
+      if is_nil(mystery), do: nil, else: Share.Mystery.put_host(mystery, host)
+    end)
     |> Map.put_new("host", host)
   end
 
@@ -159,7 +162,7 @@ defmodule Share.Post do
     post_host = Map.get(post, "host")
     user = cond do
       is_nil(post_host) ->
-        id = Map.get(post, "id")
+        id = Map.get(post, "remote_id", Map.get(post, "id"))
         Share.Repo.get!(Share.Post, id)
       post_host == Share.Remote.host ->
         id = Map.get(post, "remote_id")
@@ -179,12 +182,19 @@ defmodule Share.Post do
     case Share.Repo.one(query) do
       nil ->
         user = Share.User.from_map(Map.get(post, "user"))
+        mystery_id = case Map.get(post, "mystery") do
+          mystery when not is_nil(mystery) ->
+            mystery = Share.Mystery.from_map(mystery)
+            mystery.id
+          nil -> nil
+        end
         params = %{
           user_id: user.id,
           text: Map.get(post, "text"),
           user_display: Map.get(post, "user_display"),
           server_id: server.id,
           remote_id: remote_id,
+          mystery_id: mystery_id,
           remote_path: Map.get(post, "path"),
           inserted_at: Map.get(post, "inserted_at")
         }

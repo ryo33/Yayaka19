@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Linkify from 'react-linkify'
+import queryString from 'query-string'
 
 import { Comment, Icon, Header, Label } from 'semantic-ui-react'
 
@@ -8,20 +9,23 @@ import UserID from './UserID.js'
 import Time from './Time.js'
 import FollowButton from './FollowButton.js'
 import UserButton from './UserButton.js'
-import { userPage, mysteryPage } from '../pages.js'
-import { createRemotePath } from '../utils.js'
+import { userPage, mysteryPage, remoteMysteryPage } from '../pages.js'
+import { createRemoteMysteryPath, isRemoteHost } from '../utils.js'
 
 const actionCreators = {
   userPageAction: name => userPage.action({name}),
   mysteryPageAction: id => mysteryPage.action({id})
 }
 
-const MysteryLink = ({ mystery, host: post_host, onClick, children }) => {
-  const { id } = mystery
-  const host = mystery.host || post_host
-  if (host) {
+const MysteryLink = ({ mystery, onClick, children }) => {
+  const id = mystery.id
+  const host = mystery.host
+  if (isRemoteHost(host)) {
+    const path = remoteMysteryPage.path()
+    const query = queryString.stringify({host: host, id})
+    const url = `${path}?${query}`
     return (
-      <a href={createRemotePath(host, mystery.path)}>
+      <a href={url}>
         {children}
       </a>
     )
@@ -74,7 +78,7 @@ class Mystery extends Component {
           <Header as='h2'>
             <MysteryLink host={host} mystery={mystery}
               onClick={this.handleClickTime}>
-              <Icon name={host ? 'military' : 'bomb'} color='black' />
+              <Icon name={isRemoteHost(host) ? 'military' : 'bomb'} color='black' />
               {title}
             </MysteryLink>
           </Header>

@@ -3,7 +3,7 @@ defmodule Share.MysteryTest do
 
   alias Share.Mystery
 
-  @valid_attrs %{text: "some content", title: "some content"}
+  @valid_attrs %{text: "some content", title: "some content", user_id: 3}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do
