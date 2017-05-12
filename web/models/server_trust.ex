@@ -1,7 +1,7 @@
-defmodule Share.ServerFollow do
+defmodule Share.ServerTrust do
   use Share.Web, :model
 
-  schema "server_follow" do
+  schema "server_trust" do
     belongs_to :user, Share.User
     belongs_to :server, Share.Server
 
@@ -19,10 +19,10 @@ defmodule Share.ServerFollow do
     |> validate_required(@fields)
   end
 
-  def following_servers(user_id) do
+  def trusted_servers(user_id) do
     from s in Share.Server,
-      join: f in Share.ServerFollow,
-      on: f.server_id == s.id,
-      where: f.user_id == ^user_id
+      join: t in Share.ServerTrust,
+      on: t.server_id == s.id,
+      where: t.user_id == ^user_id
   end
 end

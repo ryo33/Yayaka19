@@ -86,7 +86,7 @@ class FollowButton extends Component {
       )
     } else if (currentUser == null || currentUser.name == null) {
       const path = remoteUserPage.path()
-      const query = queryString.stringify({host: location.host, name: user.name})
+      const query = queryString.stringify({host: user.host || location.host, name: user.name})
       const url = `https://${this.state.host}${path}?${query}`
       return (
         <Popup

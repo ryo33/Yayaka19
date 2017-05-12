@@ -12,17 +12,6 @@ defmodule Share.Remote.Handler do
     |> Honeydew.async(:request_handler)
   end
 
-  def handle(%{"action" => "public_timeline"} = message) do
-    posts = Share.Post.public_timeline()
-            |> Share.Repo.all()
-            |> Enum.map(&Share.Post.put_path(&1))
-    payload = %{
-      posts: posts
-    }
-    Share.Remote.Message.create_reply(message, payload)
-    |> Share.Remote.RequestServer.request()
-  end
-
   def handle(%{"action" => "remote_follow"} = message) do
     %{"payload" => %{"user" => user, "name" => name},
       "from" => host} = message
@@ -118,6 +107,27 @@ defmodule Share.Remote.Handler do
     user = Share.User.local_user_by_name(Map.get(user, "name"))
            |> Share.Repo.one!()
     Share.Handlers.Post.add_reply_notice(post, user)
+  end
+
+  def handle(%{"action" => "open_mystery"} = message) do
+    %{"payload" => %{"id" => id},
+      "from" => host} = message
+    mystery = Share.Mystery.local_mystery_by_id(id)
+              |> Share.Mystery.preload()
+              |> Share.Repo.one!()
+    server = Share.Server.from_host(host)
+    trust = Share.Repo.get_by(Share.ServerTrust,
+                              user_id: mystery.user_id,
+                              server_id: server.id)
+    if is_nil(trust) do
+      Share.Remote.Message.create_reply(message, %{mystery: mystery})
+      |> Share.Remote.RequestServer.request()
+    else
+      text = mystery.text
+      mystery = Share.Mystery.put_path(mystery)
+      Share.Remote.Message.create_reply(message, %{mystery: mystery, text: text})
+      |> Share.Remote.RequestServer.request()
+    end
   end
 
   def handle(message) do

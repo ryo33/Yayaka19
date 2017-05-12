@@ -27,7 +27,7 @@ import { pageSelector, onlinePostsSelector } from '../selectors.js'
 import { compareInsertedAtDesc, compareNotices, isRemoteHost } from '../utils.js'
 import followersPageMiddleware from './followersPage.js'
 import followingPageMiddleware from './followingPage.js'
-import followingServersPageMiddleware from './followingServersPage.js'
+import trustedServersPageMiddleware from './trustedServersPage.js'
 import mysteriesPageMiddleware from './mysteriesPage.js'
 import openedMysteriesPageMiddleware from './openedMysteriesPage.js'
 import mysteryPageMiddleware from './mysteryPage.js'
@@ -308,7 +308,7 @@ if (signedIn) {
 export default composeMiddleware(
   followersPageMiddleware,
   followingPageMiddleware,
-  followingServersPageMiddleware,
+  trustedServersPageMiddleware,
   mysteriesPageMiddleware,
   openedMysteriesPageMiddleware,
   mysteryPageMiddleware,

@@ -283,7 +283,7 @@ class Post extends Component {
               ) : null}
               {post.mystery ? (
                 <Segment>
-                  <Mystery host={host} mystery={post.mystery} />
+                  <Mystery mystery={post.mystery} />
                 </Segment>
               ) : null}
             </Comment.Text>

@@ -4,10 +4,10 @@ import {
   publicTimeline, timeline,
   userPage, followersPage, followingPage,
   mysteriesPage, openedMysteriesPage,
-  userFormPage, followingServersPage,
+  userFormPage, trustedServersPage,
   postPage, noticesPage,
   mysteryPage, newMysteryPage, loginPage,
-  remoteUserPage
+  remoteUserPage, remoteMysteryPage
 } from '../pages.js'
 import PublicTimeline from './PublicTimeline.js'
 import Timeline from './Timeline.js'
@@ -18,10 +18,11 @@ import FollowingPage from './FollowingPage.js'
 import MysteriesPage from './MysteriesPage.js'
 import OpenedMysteriesPage from './OpenedMysteriesPage.js'
 import UserForm from './UserForm.js'
-import FollowingServersPage from './FollowingServersPage.js'
+import TrustedServersPage from './TrustedServersPage.js'
 import PostPage from './PostPage.js'
 import NoticesPage from './NoticesPage.js'
 import MysteryPage from './MysteryPage.js'
+import RemoteMysteryPage from './RemoteMysteryPage.js'
 import NewMystery from './NewMystery.js'
 import LoginPage from './LoginPage.js'
 import ErrorPage from './ErrorPage.js'
@@ -46,14 +47,16 @@ export default ({ name, params }) => {
       return <OpenedMysteriesPage />
     case userFormPage.name:
       return <UserForm params={params} />
-    case followingServersPage.name:
-      return <FollowingServersPage params={params} />
+    case trustedServersPage.name:
+      return <TrustedServersPage params={params} />
     case postPage.name:
       return <PostPage params={params} />
     case noticesPage.name:
       return <NoticesPage />
     case mysteryPage.name:
       return <MysteryPage />
+    case remoteMysteryPage.name:
+      return <RemoteMysteryPage />
     case newMysteryPage.name:
       return <NewMystery />
     case loginPage.name:

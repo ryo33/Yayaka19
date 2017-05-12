@@ -2,20 +2,20 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import queryString from 'query-string'
 
-import { requestRemoteUser } from '../actions/index.js'
+import { requestRemoteMystery } from '../actions/index.js'
 import RemoteContentForm from './RemoteContentForm.js'
-import UserPage from './UserPage.js'
+import MysteryPage from './MysteryPage.js'
 
 const actionCreators = {
-  requestRemoteUser
+  requestRemoteMystery
 }
 
-class RemoteUserPage extends Component {
+class RemoteMysteryPage extends Component {
   constructor(props) {
     super(props)
     this.state = {
       host: '',
-      name: ''
+      id: ''
     }
   }
 
@@ -23,19 +23,19 @@ class RemoteUserPage extends Component {
     const parsed = queryString.parse(location.search)
     this.setState({
       host: parsed.host || '',
-      name: parsed.name || ''
+      id: parsed.id || ''
     })
   }
 
   render() {
-    const { host, name, opened } = this.state
+    const { host, id } = this.state
     return (
-      <RemoteContentForm host={host} id={name} placeholder='name'
-        onRequest={this.props.requestRemoteUser}>
-        <UserPage params={{name}} />
+      <RemoteContentForm host={host} id={id} placeholder='ID'
+        onRequest={this.props.requestRemoteMystery}>
+        <MysteryPage params={{id}} />
       </RemoteContentForm>
     )
   }
 }
 
-export default connect(null, actionCreators)(RemoteUserPage)
+export default connect(null, actionCreators)(RemoteMysteryPage)
