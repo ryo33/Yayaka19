@@ -4,16 +4,19 @@ import { Segment, Menu, Form, Input, Button, Icon, Header } from 'semantic-ui-re
 
 import UserID from './UserID.js'
 import { userPage } from '../pages.js'
-import { userSelector, trustedServersPageSelector } from '../selectors.js'
+import {
+  userSelector, trustedServersPageSelector, followingServersSelector
+} from '../selectors.js'
 import { requestTrustServer, requestUntrustServer } from '../actions/index.js'
 
 const mapStateToProps = state => {
   const user = userSelector(state)
   const { user: pageUser, trustedServers } = trustedServersPageSelector(state)
+  const hosts = trustedServers.map(({ host }) => host)
+  const following = followingServersSelector(state).filter(host => !hosts.includes(host))
   return {
     isMe: user && pageUser && user.id === pageUser.id,
-    hosts: trustedServers.map(({ host }) => host),
-    pageUser, trustedServers
+    hosts, following, pageUser, trustedServers
   }
 }
 
@@ -42,6 +45,9 @@ class TrustServerForm extends Component {
   trust(event) {
     event.preventDefault()
     this.props.trust(this.state.host)
+    this.setState({
+      host: ''
+    })
   }
 
   render() {
@@ -52,7 +58,7 @@ class TrustServerForm extends Component {
           <Form.Group inline>
             <Form.Input placeholder='Host' name='host'
               value={host} onChange={this.handleChange} />
-            <Form.Button content='Trust' />
+            <Form.Button primary content='Trust' />
           </Form.Group>
         </Form>
       </Segment>
@@ -78,7 +84,7 @@ class TrustedServersPage extends Component {
   }
 
   render() {
-    const { isMe, pageUser, trustedServers, userPageAction } = this.props
+    const { isMe, following, pageUser, trustedServers, userPageAction } = this.props
     return (
       <div>
         <Segment vertical>
@@ -93,6 +99,20 @@ class TrustedServersPage extends Component {
             <TrustServerForm trust={this.trustServer} />
           ) : null}
         </Segment>
+        {following.length >= 1 ? (
+        <Segment vertical>
+          <Header>Your Following Servers</Header>
+          {
+            following.map(host => {
+              return (
+                <Button primary key={host} onClick={() => this.props.requestTrustServer(host)}>
+                  Trust {host}
+                </Button>
+              )
+            })
+          }
+        </Segment>
+        ) : null}
         {
           trustedServers.map(({ id, host }) => (
             <Segment key={id} vertical>
