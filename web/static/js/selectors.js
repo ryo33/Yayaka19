@@ -39,6 +39,7 @@ export const publicTimelineSelector = ({ publicTimeline }) => publicTimeline
 
 // Timeline
 export const timelineSelector = ({ timeline }) => timeline
+export const followingServersSelector = ({ timeline: { remotes }}) => Object.keys(remotes)
 
 // Notices
 export const noticesCountSelctor = ({ notices: { noticed, favs, follows, addresses, replies }}) => {
