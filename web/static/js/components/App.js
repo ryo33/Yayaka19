@@ -14,6 +14,7 @@ import {
   postPage, loginPage, noticesPage,
   newMysteryPage,
   remoteUserPage,
+  trustedServersPage,
   termsURL, privacyURL,
   apiURL, logoutURL, newAccountURL, getSwitchUserURL,
   passwordUpdateURL
@@ -57,6 +58,7 @@ const actionCreators = {
   noticesPageAction: () => noticesPage.action(),
   newMysteryPageAction: () => newMysteryPage.action(),
   remoteUserPageAction: () => remoteUserPage.action(),
+  trustedServersPageAction: name => trustedServersPage.action({name}),
   openNewPostDialog, closeNewPostDialog,
   hideError, doPing,
   resubmitFailedPost, dismissFailedPost
@@ -168,6 +170,7 @@ class App extends Component {
       noticesPageAction,
       newMysteryPageAction,
       remoteUserPageAction,
+      trustedServersPageAction,
       newPostsCount,
       noticesCount,
       newPost,
@@ -232,6 +235,9 @@ class App extends Component {
                   </Menu.Item>
                   <Menu.Item onClick={remoteUserPageAction}>
                     Remote User
+                  </Menu.Item>
+                  <Menu.Item onClick={() => trustedServersPageAction(user.name)}>
+                    Manage Trusted Servers
                   </Menu.Item>
                 </Menu.Menu>
               </Menu.Item>

@@ -18,7 +18,7 @@ export const compareInsertedAtDesc = (a, b) => {
 export const compareNotices = compareInsertedAtDesc
 
 export const getTweetURL = post => {
-  const url = encodeURIComponent(window.location.origin + postPage.path({id: post.id}))
+  const url = encodeURIComponent(`https://${post.host || location.host}${postPage.path({id: post.id})}`)
   const text = encodeURIComponent(`“${post.text}” - ${post.user.display} (${post.user.name})`)
   const hashtags = encodeURIComponent(hashtag)
   return `https://twitter.com/intent/tweet?url=${url}&text=${text}&hashtags=${hashtags}`

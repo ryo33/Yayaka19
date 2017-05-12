@@ -1,18 +1,18 @@
-defmodule Share.ServerFollowTest do
+defmodule Share.ServerTrustTest do
   use Share.ModelCase
 
-  alias Share.ServerFollow
+  alias Share.ServerTrust
 
   @valid_attrs %{user_id: 0, server_id: 0}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do
-    changeset = ServerFollow.changeset(%ServerFollow{}, @valid_attrs)
+    changeset = ServerTrust.changeset(%ServerTrust{}, @valid_attrs)
     assert changeset.valid?
   end
 
   test "changeset with invalid attributes" do
-    changeset = ServerFollow.changeset(%ServerFollow{}, @invalid_attrs)
+    changeset = ServerTrust.changeset(%ServerTrust{}, @invalid_attrs)
     refute changeset.valid?
   end
 end

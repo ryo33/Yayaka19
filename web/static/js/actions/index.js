@@ -45,6 +45,8 @@ export const addUserPosts = createAction('add user posts', posts => posts)
 // Remote
 export const requestRemoteUser = createAction('request remote user',
   (host, name) => ({host, name}))
+export const requestRemoteMystery = createAction('request remote mystery',
+  (host, id) => ({host, id}))
 
 // Mysteries
 export const requestMysteries = createAction('request mysteries', name => name)
@@ -88,10 +90,10 @@ export const setMysteryInfo = createAction('set mystery', mystery => mystery)
 export const submitMystery = createAction('submit mystery', mystery => mystery)
 
 // Following Servers
-export const requestFollowingServers = createAction('request following servers', name => name)
-export const setFollowingServers = createAction('set following servers',
-  (user, followingServers) => ({user, followingServers}))
-export const requestFollowServer = createAction('request follow server', host => host)
-export const requestUnfollowServer = createAction('request unfollow server', host => host)
-export const followServer = createAction('follow server', server => server)
-export const unfollowServer = createAction('unfollow server', id => id)
+export const requestTrustedServers = createAction('request trusted servers', name => name)
+export const setTrustedServers = createAction('set trusted servers',
+  (user, trustedServers) => ({user, trustedServers}))
+export const requestTrustServer = createAction('request trust server', host => host)
+export const requestUntrustServer = createAction('request untrust server', host => host)
+export const trustServer = createAction('trust server', server => server)
+export const untrustServer = createAction('untrust server', id => id)

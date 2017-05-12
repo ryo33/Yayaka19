@@ -116,4 +116,18 @@ defmodule Share.UserActions do
       "openedMysteries" => opened_mysteries_count
     }
   end
+
+  def open_mystery(user, mystery) do
+    query = from p in Post,
+      where: p.user_id == ^user.id,
+      where: p.mystery_id == ^mystery.id
+    if user.id != mystery.user_id and Repo.aggregate(query, :count, :id) == 0 do
+      params = %{"text" => "",
+        "mystery_id" => mystery.id,
+        "user_id" => user.id}
+      post(user, params)
+    else
+      :ok
+    end
+  end
 end
