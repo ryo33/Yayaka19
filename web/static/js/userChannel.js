@@ -26,7 +26,13 @@ export const watchUserChannel = (store) => {
     }
   })
   userChannel.on('remote_timeline', ({host, posts}) => {
-    store.dispatch(updateRemoteTimeline(host, posts))
+    const { newPosts } = timelineSelector(store.getState())
+    const filteredPosts = posts.filter(({ id, host }) => {
+      return !newPosts.some(({ id: newPostID, host: newPostHost }) => {
+        return newPostID == id && newPostHost == host
+      })
+    })
+    store.dispatch(updateRemoteTimeline(host, filteredPosts))
   })
   userChannel.on('remote_timeline_timeout', ({host}) => {
     store.dispatch(updateRemoteTimelineStatus(host, 'timeout'))

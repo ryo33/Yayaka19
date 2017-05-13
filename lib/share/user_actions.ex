@@ -7,6 +7,7 @@ defmodule Share.UserActions do
   alias Share.Post
   alias Share.Fav
   alias Share.Mystery
+  alias Share.ServerTrust
 
   def post(user, params) do
     params = params
@@ -60,7 +61,9 @@ defmodule Share.UserActions do
       {:ok, %{"payload" => %{"user" => user}}} ->
         target_user = User.from_remote_user(server, user)
         case follow(user_id, target_user.id) do
-          {:ok, _} -> :ok
+          {:ok, _} ->
+            trust_server(user_id, target_user.server.id)
+            :ok
           :already -> :ok
           :error ->
             :error
@@ -128,6 +131,20 @@ defmodule Share.UserActions do
       post(user, params)
     else
       :ok
+    end
+  end
+
+  def trust_server(user_id, server_id) do
+    query = from f in ServerTrust,
+      where: f.user_id == ^user_id,
+      where: f.server_id == ^server_id
+    with 0 <- Repo.aggregate(query, :count, :id),
+         params <- %{user_id: user_id, server_id: server_id},
+         changeset <- ServerTrust.changeset(%ServerTrust{}, params),
+         {:ok, _trust} <- Repo.insert(changeset) do
+      :ok
+    else
+      _ -> :error
     end
   end
 end
