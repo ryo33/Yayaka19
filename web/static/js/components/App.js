@@ -7,7 +7,7 @@ import {
   Confirm, Button, Header, Message
 } from 'semantic-ui-react'
 
-import { title, signedIn, source, admin } from '../global.js'
+import { title, signedIn, source, admin, slogan } from '../global.js'
 import {
   home, publicTimeline, timeline,
   userPage, userFormPage,
@@ -307,6 +307,18 @@ class App extends Component {
           </Sidebar>
           <Sidebar.Pusher dimmed={sidebar} onClick={this.closeSidebar}>
             <Container>
+              {slogan.header != null && name == publicTimeline.name ? (
+                <Message size='massive'>
+                  <Message.Header>
+                    {slogan.header}
+                  </Message.Header>
+                  {slogan.text != null ? (
+                    <p>
+                      {slogan.text}
+                    </p>
+                  ) : null}
+                </Message>
+              ) : null}
               {error ? (
                 <Message
                   negative
