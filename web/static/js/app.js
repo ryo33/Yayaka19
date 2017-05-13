@@ -12,7 +12,9 @@ import { signedIn, userID } from './global.js'
 import App from './components/App.js'
 import { pages, pagesMiddleware } from './pages.js'
 import reducer from './reducers/index.js'
-import { pageSelector, redirectedPageSelector } from './selectors.js'
+import {
+  pageSelector, redirectedPageSelector, timelineSelector
+} from './selectors.js'
 import middleware from './middlewares/index.js'
 import {
   initializeUser,
@@ -55,8 +57,17 @@ persistStore(store, {whitelist: ['editorPlugins', 'failedPost', 'redirectedPage'
 })
 
 // Socket
-const userChannelCallback = ({ userParams }) => {
-  store.dispatch(initializeUser(userParams))
+const userChannelCallback = ({ userParams: { timeline, ...params }}) => {
+  const { newPosts } = timelineSelector(store.getState())
+  const { posts } = timeline
+  const filteredPosts = posts.filter(({ id }) => {
+    return !newPosts.some(({ id: newPostID }) => {
+      return newPostID == id
+    })
+  })
+  timeline.posts = filteredPosts
+  Object.assign(params, {timeline})
+  store.dispatch(initializeUser(params))
 }
 if (signedIn) {
   joinUserChannel(userChannelCallback)
