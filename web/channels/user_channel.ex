@@ -204,16 +204,9 @@ defmodule Share.UserChannel do
   def handle_in("trust_server", %{"host" => host}, socket) do
     user = socket.assigns.user
     server = Server.from_host(host)
-    query = from f in ServerTrust,
-      where: f.user_id == ^user.id,
-      where: f.server_id == ^server.id
-    with 0 <- Repo.aggregate(query, :count, :id),
-         params <- %{user_id: user.id, server_id: server.id},
-         changeset <- ServerTrust.changeset(%ServerTrust{}, params),
-         {:ok, _follow} <- Repo.insert(changeset) do
-      {:reply, {:ok, %{server: server}}, socket}
-    else
-      _ -> {:reply, :error, socket}
+    case UserActions.trust_server(user.id, server.id) do
+      :ok -> {:reply, {:ok, %{server: server}}, socket}
+      :error -> {:reply, :error, socket}
     end
   end
 

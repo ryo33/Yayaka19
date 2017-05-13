@@ -119,6 +119,7 @@ defmodule Share.User do
         Share.Repo.insert!(changeset)
       user -> user
     end
+    |> Share.Repo.preload([:server])
   end
 
   def local_user_by_name(name) do
