@@ -1,15 +1,9 @@
-# This file is responsible for configuring your application
-# and its dependencies with the aid of the Mix.Config module.
-#
-# This configuration file is loaded before any dependency and
-# is restricted to this project.
 use Mix.Config
 
 # General application configuration
 config :share,
   ecto_repos: [Share.Repo]
 
-# Configures the endpoint
 config :share, Share.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "W1UEn6jzIfLiCen2i7CUTKUSjnpDgWufagT+D2O6mBOzQO/EytaoysBe+mcWxIiP",
@@ -17,6 +11,7 @@ config :share, Share.Endpoint,
   pubsub: [name: Share.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
+# Configures the number of job workers
 config :share, Share.Tasks,
   post_workers: 10,
   notice_workers: 10,
@@ -26,14 +21,17 @@ config :share, Share.Tasks,
 config :share, Share.Remote,
   pusher_workers: 10
 
+# Configures the infomations
 config :share,
   providers: [:google, :github, :facebook, :twitter],
   title: "Yayaka19",
   description: "What's in your head?",
   url: "https://yayaka.net",
   hashtag: "Yayaka19",
+  # slogan: [header: "Watch Flip Flappers.",
+  #          text: "Yayaka loves Cocona but ..."],
   admin: [name: "Ryo33",
-           url: "https://twitter.com/ryo33music"],
+          url: "https://twitter.com/ryo33music"],
   source: [url: "https://github.com/ryo33/Yayaka19",
            title: "https://github.com/ryo33/Yayaka19"],
   api: [url: "https://gist.github.com/ryo33/145e5ef24bad6f11abbb902edc6979d6",
