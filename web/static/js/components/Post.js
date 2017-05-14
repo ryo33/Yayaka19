@@ -13,10 +13,7 @@ import Mystery from './Mystery.js'
 import { requestFav, requestUnfav, setAddressPost, submitPost } from '../actions/index.js'
 import { userPage, postPage } from '../pages.js'
 import { userSelector, favsSelector } from '../selectors.js'
-import { getTweetURL, createRemotePath, isRemoteHost } from '../utils.js'
-
-const getPostPath = ({ id, host, path }) =>
-  isRemoteHost(host) ? `https://${host+path}` : postPage.path({id})
+import { getTweetURL, createRemotePath, isRemoteHost, getLocalID } from '../utils.js'
 
 const mapStateToProps = (state) => {
   const favs = favsSelector(state)
@@ -42,8 +39,8 @@ const PostAddresses = ({ user }) => (
 )
 
 const PostLink = ({ post, onClick }) => {
-  const { path, inserted_at, id, host } = post
-  if (host) {
+  const { path, inserted_at, host } = post
+  if (isRemoteHost(host)) {
     return (
       <a href={createRemotePath(host, path)}>
         <Icon name='external' />
@@ -51,6 +48,7 @@ const PostLink = ({ post, onClick }) => {
       </a>
     )
   } else {
+    const id = getLocalID(post)
     return (
       <a href={postPage.path({id})} onClick={onClick}>
         <Time time={post.inserted_at} />
@@ -75,7 +73,7 @@ const ChildPost = ({ postPageAction, post, actions, size }) => {
     } else {
       return (
         <Segment size={size}>
-          <Button onClick={() => postPageAction(post.id)}>Load More</Button>
+          <Button onClick={() => postPageAction(getLocalID(post))}>Load More</Button>
         </Segment>
       )
     }
@@ -112,12 +110,12 @@ class Post extends Component {
 
   fav() {
     const { requestFav, post } = this.props
-    requestFav(post.id)
+    requestFav(getLocalID(post))
   }
 
   unfav() {
     const { requestUnfav, post } = this.props
-    requestUnfav(post.id)
+    requestUnfav(getLocalID(post))
   }
 
   openReply() {
@@ -145,7 +143,7 @@ class Post extends Component {
   handleClickTime(e) {
     const { post, postPageAction } = this.props
     e.preventDefault()
-    postPageAction(post.id)
+    postPageAction(getLocalID(post))
   }
 
   handleEmptyQuote() {
@@ -176,7 +174,7 @@ class Post extends Component {
 
   renderFavButton() {
     const { favs, post } = this.props
-    if (favs.includes(post.id)) {
+    if (favs.includes(getLocalID(post))) {
       return (
         <Comment.Action onClick={this.unfav}>
           <Icon name='star' color='yellow' size='large' />

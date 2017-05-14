@@ -10,7 +10,7 @@ import Time from './Time.js'
 import FollowButton from './FollowButton.js'
 import UserButton from './UserButton.js'
 import { userPage, mysteryPage, remoteMysteryPage } from '../pages.js'
-import { createRemoteMysteryPath, isRemoteHost } from '../utils.js'
+import { createRemoteMysteryPath, isRemoteHost, getLocalID } from '../utils.js'
 
 const actionCreators = {
   userPageAction: name => userPage.action({name}),
@@ -18,7 +18,7 @@ const actionCreators = {
 }
 
 const MysteryLink = ({ mystery, onClick, children }) => {
-  const id = mystery.id
+  const id = getLocalID(mystery)
   const host = mystery.host
   if (isRemoteHost(host)) {
     const path = remoteMysteryPage.path()
@@ -54,13 +54,13 @@ class Mystery extends Component {
   handleClickTime(e) {
     e.preventDefault()
     const { mystery, mysteryPageAction } = this.props
-    mysteryPageAction(mystery.id)
+    mysteryPageAction(getLocalID(mystery))
   }
 
   handleClickTitle(e) {
     e.preventDefault()
     const { mystery, mysteryPageAction } = this.props
-    mysteryPageAction(mystery.id)
+    mysteryPageAction(getLocalID(mystery))
   }
 
   render() {
@@ -69,7 +69,7 @@ class Mystery extends Component {
       mystery,
       mysteryLink = true
     } = this.props
-    const { id, user, title, text, inserted_at } = mystery
+    const { user, title, text, inserted_at } = mystery
     const onlyTitle = text == null || text == ''
     const host = mystery.host || post_host
     if (onlyTitle) {
