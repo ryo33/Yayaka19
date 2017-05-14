@@ -42,11 +42,15 @@ export function isRemoteHost(host) {
   return host != null && host != location.host
 }
 
+export function getLocalID(post) {
+  return post.remote_id || post.id
+}
+
 export function getPostKey(post) {
-  if (post.host) {
+  if (isRemoteHost(post.host)) {
     return `${post.host}/${post.id}`
   } else {
-    return post.id
+    return post.remote_id || post.id
   }
 }
 

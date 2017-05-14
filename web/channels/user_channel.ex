@@ -43,6 +43,7 @@ defmodule Share.UserChannel do
       id = Map.get(post, "id")
       host = Map.get(post, "host")
       if not is_nil(host) do
+        id = Map.get(post, "remote_id") || id
         Share.Remote.Message.create(host, "post", %{id: id})
         |> Share.Remote.RequestServer.request()
         |> case do
