@@ -20,3 +20,14 @@ pre {
   font-size: 16px;
   font-family: "ＭＳ Ｐゴシック", "MS PGothic", Mona, sans-serif;
 }
+img.mystery {
+  object-fit: cover;
+  width: 192px;
+  height: 192px;
+}
+@media (min-width: 640px) {
+  img.mystery {
+    width: 512px;
+    height: 512px;
+  }
+}
