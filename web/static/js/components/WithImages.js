@@ -28,7 +28,7 @@ class WithImages extends Component {
   }
 
   render() {
-    const { text } = this.props
+    const { text, size = 'medium', showAlways = false } = this.props
     if (text == null) return null
     const images = (linkify.match(text) || []).map(({ url }, idx) => {
       if (imageRegExp.test(url)
@@ -38,7 +38,7 @@ class WithImages extends Component {
           <Image
             key={`${url}@@${idx}`}
             src={url}
-            as='a' size='medium'
+            as='a' size={size}
             href={url}
             target='_blank'
           />
@@ -47,7 +47,7 @@ class WithImages extends Component {
         return null
       }
     }).filter(child => child != null)
-    if (images.length >= 1 && !this.state.show) {
+    if (images.length >= 1 && !this.state.show && !showAlways) {
       return (
         <div>
           <Linkify properties={{target: '_blank'}}>
