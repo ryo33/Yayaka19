@@ -66,6 +66,7 @@ const onlySignedInMiddleware = createMiddleware(
       || userFormPage.check(action)
       || mysteryPage.check(action)
       || newMysteryPage.check(action)
+      || remoteMysteryPage.check(action)
   },
   ({ dispatch, nextDispatch, action }) => {
     dispatch(saveRedirectedPage(action))

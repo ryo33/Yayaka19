@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import Linkify from 'react-linkify'
 import queryString from 'query-string'
 
 import { Comment, Icon, Header, Label } from 'semantic-ui-react'
@@ -9,6 +8,7 @@ import UserID from './UserID.js'
 import Time from './Time.js'
 import FollowButton from './FollowButton.js'
 import UserButton from './UserButton.js'
+import WithImages from './WithImages.js'
 import { userPage, mysteryPage, remoteMysteryPage } from '../pages.js'
 import { createRemoteMysteryPath, isRemoteHost, getLocalID } from '../utils.js'
 
@@ -63,24 +63,6 @@ class Mystery extends Component {
     mysteryPageAction(getLocalID(mystery))
   }
 
-  images (text) {
-    var html = '';
-    var rows = text.split ("\n");
-    for (var i = 0; i < rows.length; i++) {
-      var row = rows [i];
-      if (/^http:\/\/mdii\.tk\/\w+\.(svg|png|jpeg)$/.test (row))
-      {
-        html +=
-          '<a href="' + row + '" target="_blank">' +
-          '<img ' +
-          'src="' + row + '" ' +
-          'class="mystery" />' +
-          '</a> ';
-      }
-    }
-    return {__html: html};
-  }
-
   render() {
     const {
       host: post_host,
@@ -132,12 +114,9 @@ class Mystery extends Component {
                 <Header as='h2'>{title}</Header>
                 {text ? (
                   <pre>
-                    <Linkify properties={{target: '_blank'}}>
-                      {text}
-                    </Linkify>
+                    <WithImages text={text} />
                   </pre>
                 ) : null}
-                <div dangerouslySetInnerHTML={this.images(text)} />
               </Comment.Text>
             </Comment.Content>
           </Comment>

@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import Linkify from 'react-linkify'
 
 import { Comment, Icon, Segment, Button } from 'semantic-ui-react'
 
@@ -10,6 +9,7 @@ import FollowButton from './FollowButton.js'
 import UserButton from './UserButton.js'
 import NewPost from './NewPost.js'
 import Mystery from './Mystery.js'
+import WithImages from './WithImages.js'
 import { requestFav, requestUnfav, setAddressPost, submitPost } from '../actions/index.js'
 import { userPage, postPage } from '../pages.js'
 import { userSelector, favsSelector } from '../selectors.js'
@@ -266,9 +266,7 @@ class Post extends Component {
               ) : null}
               {post.text ? (
                 <pre>
-                  <Linkify properties={{target: '_blank'}}>
-                    {post.text}
-                  </Linkify>
+                  <WithImages text={post.text} />
                 </pre>
               ) : null}
               {quote ? (

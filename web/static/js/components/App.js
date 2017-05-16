@@ -309,13 +309,9 @@ class App extends Component {
             <Container>
               {slogan.header != null && name == publicTimeline.name ? (
                 <Message size='massive'>
-                  <Message.Header>
-                    {slogan.header}
-                  </Message.Header>
+                  <Message.Header dangerouslySetInnerHTML={{__html: slogan.header}} />
                   {slogan.text != null ? (
-                    <p>
-                      {slogan.text}
-                    </p>
+                    <p dangerouslySetInnerHTML={{__html: slogan.text}} />
                   ) : null}
                 </Message>
               ) : null}
