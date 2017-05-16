@@ -31,8 +31,9 @@ class WithImages extends Component {
     const { text, size = 'medium', showAlways = false } = this.props
     if (text == null) return null
     const images = (linkify.match(text) || []).map(({ url }, idx) => {
-      if (imageRegExp.test(url)
-        && trustedHosts.includes(new URL(url).host)
+      const urlObj = new URL(url)
+      if (imageRegExp.test(urlObj.pathname)
+        && trustedHosts.includes(urlObj.host)
       ) {
         return (
           <Image
