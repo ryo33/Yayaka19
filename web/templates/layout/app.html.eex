@@ -41,6 +41,7 @@
     window.hashtag = "<%= Application.get_env(:share, :hashtag) %>"
     window.providers = <%= raw Application.get_env(:share, :providers) |> Poison.encode!() %>
     window.slogan = <%= raw Application.get_env(:share, :slogan, []) |> Enum.into(%{}) |> Poison.encode!() %>
+    window.trustedHosts = <%= raw Application.get_env(:share, :trusted_hosts_for_images, []) |> Poison.encode!() %>
   </script>
   <body>
     <%= render @view_module, @view_template, assigns %>
