@@ -63,6 +63,24 @@ class Mystery extends Component {
     mysteryPageAction(getLocalID(mystery))
   }
 
+  images (text) {
+    var html = '';
+    var rows = text.split ("\n");
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows [i];
+      if (/^http:\/\/mdii\.tk\/\w+\.(svg|png|jpeg)$/.test (row))
+      {
+        html +=
+          '<a href="' + row + '" target="_blank">' +
+          '<img ' +
+          'src="' + row + '" ' +
+          'class="mystery" />' +
+          '</a> ';
+      }
+    }
+    return {__html: html};
+  }
+
   render() {
     const {
       host: post_host,
@@ -119,6 +137,7 @@ class Mystery extends Component {
                     </Linkify>
                   </pre>
                 ) : null}
+                <div dangerouslySetInnerHTML={this.images(text)} />
               </Comment.Text>
             </Comment.Content>
           </Comment>
