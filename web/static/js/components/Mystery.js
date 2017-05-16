@@ -114,7 +114,7 @@ class Mystery extends Component {
                 <Header as='h2'>{title}</Header>
                 {text ? (
                   <pre>
-                    <WithImages text={text} />
+                    <WithImages text={text} size='big' showAlways={true} />
                   </pre>
                 ) : null}
               </Comment.Text>
