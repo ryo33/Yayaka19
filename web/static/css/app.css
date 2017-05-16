@@ -24,6 +24,9 @@ img.mystery {
   object-fit: cover;
   width: 192px;
   height: 192px;
+  border-color: gray;
+  border-width: thin;
+  border-style: solid;
 }
 @media (min-width: 640px) {
   img.mystery {
