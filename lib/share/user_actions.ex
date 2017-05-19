@@ -77,6 +77,7 @@ defmodule Share.UserActions do
     with user when not is_nil(user) <- Repo.one(query),
          user <- Share.User.put_path(user),
          x when x in [:ok, :already] <- unfollow(user_id, user.id),
+         user <- Repo.get!(User, user_id) |> Share.User.put_path(),
          message <- Share.Remote.Message.create(host, "remote_unfollow",
                                                 %{user: user, name: name}),
          {:ok, %{"payload" => true}} <- Share.Remote.RequestServer.request(message) do
