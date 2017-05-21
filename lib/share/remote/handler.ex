@@ -18,6 +18,7 @@ defmodule Share.Remote.Handler do
     server = Share.Server.from_host(host)
     user = Share.User.from_remote_user(server, user)
     target = Share.Repo.one!(Share.User.local_user_by_name(name))
+             |> Share.User.put_path()
     case Share.UserActions.follow(user.id, target.id) do
       {:ok, follow} ->
         Share.Handlers.Notice.add_follow_notice(user, follow)
