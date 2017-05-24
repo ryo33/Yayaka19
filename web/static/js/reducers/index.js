@@ -4,6 +4,7 @@ import { createPagesReducer } from 'redux-pages'
 
 import { errorPage } from '../pages.js'
 import {
+  setLoaded,
   initializeUser,
   setUser, setFollowing, setFollowers,
   follow, unfollow,
@@ -80,6 +81,10 @@ const windowFocused = createReducer({
   [setWindowFocused]: (state, payload) => payload
 }, true)
 
+const isLoaded = createReducer({
+  [setLoaded]: (state, payload) => payload
+}, false)
+
 export default combineReducers({
   error,
   notices,
@@ -104,5 +109,6 @@ export default combineReducers({
   timeline,
   mysteryPage,
   windowFocused,
+  isLoaded,
   editorPlugins
 })

@@ -17,6 +17,7 @@ import {
 } from './selectors.js'
 import middleware from './middlewares/index.js'
 import {
+  setLoaded,
   initializeUser,
   addFavs, updateTimeline, setUser,
   setFollowing, setFollowers, updateNoticed, updateNotices,
@@ -68,6 +69,7 @@ const userChannelCallback = ({ userParams: { timeline, ...params }}) => {
   timeline.posts = filteredPosts
   Object.assign(params, {timeline})
   store.dispatch(initializeUser(params))
+  store.dispatch(setLoaded(true))
 }
 if (signedIn) {
   joinUserChannel(userChannelCallback)
@@ -83,6 +85,9 @@ const respCallback = () => {
   pingTimer = setInterval(() => {
     store.dispatch(doPing())
   }, 30000)
+  if (!signedIn) {
+    store.dispatch(setLoaded(true))
+  }
 }
 const errorCallback = () => {
   store.dispatch(showError('Failed to connect to the server.'))

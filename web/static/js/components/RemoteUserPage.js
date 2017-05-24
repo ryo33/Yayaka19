@@ -2,9 +2,17 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import queryString from 'query-string'
 
+import { isLoadedSelector } from '../selectors.js'
 import { requestRemoteUser } from '../actions/index.js'
 import RemoteContentForm from './RemoteContentForm.js'
 import UserPage from './UserPage.js'
+
+const mapStateToProps = (state) => {
+  const isLoaded = isLoadedSelector(state)
+  return {
+    isLoaded
+  }
+}
 
 const actionCreators = {
   requestRemoteUser
@@ -28,9 +36,10 @@ class RemoteUserPage extends Component {
   }
 
   render() {
+    const { isLoaded } = this.props
     const { host, name, opened } = this.state
     return (
-      <RemoteContentForm host={host} id={name} placeholder='name'
+      <RemoteContentForm isLoaded={isLoaded} host={host} id={name} placeholder='Name'
         onRequest={this.props.requestRemoteUser}>
         <UserPage params={{name}} />
       </RemoteContentForm>
@@ -38,4 +47,4 @@ class RemoteUserPage extends Component {
   }
 }
 
-export default connect(null, actionCreators)(RemoteUserPage)
+export default connect(mapStateToProps, actionCreators)(RemoteUserPage)

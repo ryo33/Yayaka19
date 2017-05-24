@@ -1,5 +1,6 @@
 export const infoSelector = ({ info }) => info
 
+export const isLoadedSelector = ({ isLoaded }) => isLoaded
 export const pageSelector = ({ page }) => page
 export const redirectedPageSelector = ({ redirectedPage }) => redirectedPage
 export const userSelector = ({ user }) => user
