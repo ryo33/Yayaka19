@@ -6,6 +6,7 @@ import {
 import { persistStore, autoRehydrate } from 'redux-persist'
 import { Provider } from 'react-redux'
 import createLogger from 'redux-logger'
+import { createAsyncHook } from 'redux-middlewares'
 import createHistory from 'history/createBrowserHistory'
 
 import { signedIn, userID } from './global.js'
@@ -17,6 +18,7 @@ import {
 } from './selectors.js'
 import middleware from './middlewares/index.js'
 import {
+  push,
   setLoaded,
   initializeUser,
   addFavs, updateTimeline, setUser,
@@ -34,6 +36,11 @@ const pushPath = (path) => history.push(path)
 const reduxPagesMiddleware = pages
   .middleware(pageSelector, getCurrentPath, pushPath)
 
+const pushPathMiddleware = createAsyncHook(
+  push.getType(),
+  ({ action }) => pushPath(action.payload)
+)
+
 // Create the store
 const middlewares = [middleware]
 if (process.env.NODE_ENV !== 'production') {
@@ -43,7 +50,11 @@ if (process.env.NODE_ENV !== 'production') {
 const store = createStore(
   reducer,
   compose(
-    applyMiddleware(reduxPagesMiddleware, pagesMiddleware, ...middlewares),
+    applyMiddleware(
+      reduxPagesMiddleware,
+      pushPathMiddleware,
+      pagesMiddleware,
+      ...middlewares),
     autoRehydrate()
   )
 )
