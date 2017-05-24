@@ -8,8 +8,14 @@ import {
   userFormPage, followersPage, followingPage,
   mysteriesPage, openedMysteriesPage
 } from '../pages.js'
-import { openNewPostDialog, updatePostAddress, requestMoreUserPosts } from '../actions/index.js'
-import { userSelector, userPageSelector, followingSelector } from '../selectors.js'
+import {
+  openNewPostDialog, updatePostAddress, requestMoreUserPosts,
+  showUserImageAlways, hideUserImageAlways
+} from '../actions/index.js'
+import {
+  userSelector, userPageSelector, followingSelector,
+  isTrustedImageUserFunctionSelector
+} from '../selectors.js'
 import { isRemoteHost } from '../utils.js'
 import UserID from './UserID.js'
 import FollowButton from './FollowButton.js'
@@ -19,15 +25,18 @@ const mapStateToProps = state => {
   const user = userSelector(state)
   const userPage = userPageSelector(state)
   const isMe = userPage.user && !isRemoteHost(userPage.user.host) && userPage.user.name === user.name
+  const isTrustedImageUser = isTrustedImageUserFunctionSelector(state)
   return {
     isMe,
     isNotMe: !isMe,
-    userPage
+    userPage,
+    isTrustedImageUser: isTrustedImageUser(userPage.user)
   }
 }
 
 const actionCreators = {
   openNewPostDialog, updatePostAddress, requestMoreUserPosts,
+  showUserImageAlways, hideUserImageAlways,
   userFormPageAction: name => userFormPage.action({name}),
   followersPageAction: name => followersPage.action({name}),
   followingPageAction: name => followingPage.action({name}),
@@ -36,7 +45,7 @@ const actionCreators = {
 }
 
 const LocalButton = ({ user, ...props }) => {
-  if (user && user.host) {
+  if (user && isRemoteHost(user.host)) {
     const { onClick, ...newProps } = props
     return (
       <Button {...newProps} />
@@ -58,6 +67,8 @@ class UserPage extends Component {
     this.handleClickFollowing = this.handleClickFollowing.bind(this)
     this.handleClickMysteries = this.handleClickMysteries.bind(this)
     this.handleClickOpenedMysteries = this.handleClickOpenedMysteries.bind(this)
+    this.handleClickShowAlways = this.handleClickShowAlways.bind(this)
+    this.handleClickHideAlways = this.handleClickHideAlways.bind(this)
   }
 
   handleSendTo() {
@@ -98,8 +109,18 @@ class UserPage extends Component {
     openedMysteriesPageAction(user.name)
   }
 
+  handleClickShowAlways() {
+    const { showUserImageAlways, userPage: { user }} = this.props
+    showUserImageAlways(user)
+  }
+
+  handleClickHideAlways() {
+    const { hideUserImageAlways, userPage: { user }} = this.props
+    hideUserImageAlways(user)
+  }
+
   render() {
-    const { isMe, isNotMe, userPage } = this.props
+    const { isMe, isNotMe, userPage, isTrustedImageUser } = this.props
     const {
       user, postCount, following, followers, mysteries, openedMysteries,
       posts, isLoadingMorePosts
@@ -181,6 +202,15 @@ class UserPage extends Component {
                     <Icon name='send' />
                     Send to
                   </Button>
+                  {isTrustedImageUser ? (
+                    <Button onClick={this.handleClickHideAlways}>
+                      Don't always show images from <UserID user={user} />
+                    </Button>
+                  ) : (
+                    <Button onClick={this.handleClickShowAlways}>
+                      Show images from <UserID user={user} /> always
+                    </Button>
+                  )}
                 </Card.Content>
               ) : null}
             </Card>

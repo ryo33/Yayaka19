@@ -67,9 +67,11 @@ class WithImages extends Component {
           <Linkify properties={{target: '_blank'}}>
             {text}
           </Linkify>
-          <div>
-            {images}
-          </div>
+          {images.length >= 1 ? (
+            <div>
+              {images}
+            </div>
+          ) : null}
         </div>
       )
     }

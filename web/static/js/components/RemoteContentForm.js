@@ -5,7 +5,7 @@ import { Segment, Button, Form } from 'semantic-ui-react'
 class RemoteContentForm extends Component {
   constructor(props) {
     super(props)
-    this.open = this.open.bind(this)
+    this.handleClickOpen = this.handleClickOpen.bind(this)
     this.changeHost = this.changeHost.bind(this)
     this.changeID = this.changeID.bind(this)
     this.state = {
@@ -22,8 +22,12 @@ class RemoteContentForm extends Component {
     })
   }
 
-  open(event) {
+  handleClickOpen(event) {
     event.preventDefault()
+    this.open()
+  }
+
+  open() {
     const { host, id } = this.state
     if (host.length > 0 && id.length > 0) {
       this.props.onRequest(host, id)
@@ -47,13 +51,25 @@ class RemoteContentForm extends Component {
     })
   }
 
+  componentWillReceiveProps(newProps) {
+    if (!this.props.isLoaded && newProps.isLoaded) {
+      this.open()
+    }
+  }
+
+  componentDidMount() {
+    if (this.props.isLoaded) {
+      this.open()
+    }
+  }
+
   render() {
-    const { placeholder, children } = this.props
+    const { placeholder = 'ID', children } = this.props
     const { host, id, opened } = this.state
     return (
       <Segment>
         <Segment vertical>
-          <Form onSubmit={this.open}>
+          <Form onSubmit={this.handleClickOpen}>
             <Form.Group>
               <Form.Input placeholder='Host' name='host'
                 value={host} onChange={this.changeHost} />
