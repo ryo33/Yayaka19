@@ -42,6 +42,8 @@ export const requestFollow = createAction('request follow', (name, host) => ({na
 export const requestUnfollow = createAction('request unfollow', (name, host) => ({name, host}))
 export const requestMoreUserPosts = createAction('request more user posts', (user, id) => ({user, id}))
 export const addUserPosts = createAction('add user posts', posts => posts)
+export const showUserImageAlways = createAction('show user images always', user => user)
+export const hideUserImageAlways = createAction('hide user images always', user => user)
 
 // Remote
 export const requestRemoteUser = createAction('request remote user',

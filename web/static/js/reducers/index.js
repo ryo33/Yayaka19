@@ -9,10 +9,12 @@ import {
   setUser, setFollowing, setFollowers,
   follow, unfollow,
   addFavs, fav, unfav,
+  showUserImageAlways, hideUserImageAlways,
   showError, hideError,
   setWindowFocused,
   saveRedirectedPage, clearRedirectedPage
 } from '../actions/index.js'
+import { isSameUser } from '../utils.js'
 
 import notices from './notices.js'
 import newPostPage from './newPostPage.js'
@@ -72,6 +74,18 @@ const favs = createReducer({
   [initializeUser]: (state, { timeline: { favs }}) => favs
 }, [])
 
+const trustedImageUsers = createReducer({
+  [showUserImageAlways]: (state, user) => {
+    return state
+      .filter(user1 => !isSameUser(user1, user))
+      .concat(user)
+  },
+  [hideUserImageAlways]: (state, user) => {
+    return state
+      .filter(user1 => !isSameUser(user1, user))
+  }
+}, [])
+
 const error = createReducer({
   [showError]: (state, payload) => payload,
   [hideError]: () => null
@@ -96,6 +110,7 @@ export default combineReducers({
   remoteFollowing,
   followers,
   favs,
+  trustedImageUsers,
   newPostPage,
   failedPost,
   userPage,

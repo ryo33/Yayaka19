@@ -47,7 +47,9 @@ const store = createStore(
     autoRehydrate()
   )
 )
-persistStore(store, {whitelist: ['editorPlugins', 'failedPost', 'redirectedPage']}, () => {
+persistStore(store, {whitelist: [
+  'editorPlugins', 'failedPost', 'redirectedPage', 'trustedImageUsers'
+]}, () => {
   if (signedIn) {
     const redirectedPage = redirectedPageSelector(store.getState())
     if (redirectedPage != null) {

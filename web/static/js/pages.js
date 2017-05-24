@@ -2,6 +2,7 @@ import { createPages, CHANGE_PAGE } from 'redux-pages'
 import {
   createMiddleware, createReplacer, createAsyncHook, composeMiddleware
 } from 'redux-middlewares'
+import queryString from 'query-string'
 
 import { signedIn } from './global.js'
 import {
@@ -57,6 +58,9 @@ export const apiURL = '/profile/api'
 export const logoutURL = '/logout'
 export const newAccountURL = '/new'
 export const getSwitchUserURL = name => `/switch/${name}`
+export const getRemoteUserPageQuery = (host, name) => {
+  return queryString.stringify({host, name})
+}
 
 const onlySignedInMiddleware = createMiddleware(
   ({ action }) => signedIn === false && action.type === CHANGE_PAGE,
