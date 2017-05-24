@@ -75,7 +75,7 @@ class RemoteContentForm extends Component {
                 value={host} onChange={this.changeHost} />
               <Form.Input placeholder={placeholder} name='id'
                 value={id} onChange={this.changeID} />
-              <Form.Button content='Request' />
+              <Form.Button content='Request' disabled={opened} />
             </Form.Group>
           </Form>
         </Segment>
