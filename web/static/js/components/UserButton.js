@@ -3,8 +3,8 @@ import { connect } from 'react-redux'
 
 import { Button, Icon } from 'semantic-ui-react'
 
-import { userPage } from '../pages.js'
-import { createRemotePath } from '../utils.js'
+import { userPage, remoteUserPage, getRemoteUserPageQuery } from '../pages.js'
+import { isRemoteHost } from '../utils.js'
 
 const actionCreators = {
   userPageAction: name => userPage.action({name})
@@ -12,9 +12,12 @@ const actionCreators = {
 
 const UserButton = ({ Component = Button, user, children, userPageAction }) => {
   const host = user.host
-  if (host) {
+  if (isRemoteHost(host)) {
+    const path = remoteUserPage.path()
+    const query = getRemoteUserPageQuery(host, user.name)
+    const href = `${path}?${query}`
     return (
-      <Component size='mini' as='a' href={createRemotePath(host, user.path)}>
+      <Component size='mini' as='a' href={href}>
         {children}
       </Component>
     )

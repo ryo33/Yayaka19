@@ -10,15 +10,23 @@ import UserButton from './UserButton.js'
 import NewPost from './NewPost.js'
 import Mystery from './Mystery.js'
 import WithImages from './WithImages.js'
-import { requestFav, requestUnfav, setAddressPost, submitPost } from '../actions/index.js'
+import {
+  requestFav, requestUnfav, setAddressPost, submitPost
+} from '../actions/index.js'
 import { userPage, postPage } from '../pages.js'
-import { userSelector, favsSelector } from '../selectors.js'
-import { getTweetURL, createRemotePath, isRemoteHost, getLocalID } from '../utils.js'
+import {
+  userSelector, favsSelector, isTrustedImageUserFunctionSelector
+} from '../selectors.js'
+import {
+  getTweetURL, createRemotePath, isRemoteHost, getLocalID, isSameUser
+} from '../utils.js'
 
 const mapStateToProps = (state) => {
+  const user = userSelector(state)
   const favs = favsSelector(state)
+  const isTrustedImageUser = isTrustedImageUserFunctionSelector(state)
   return {
-    favs
+    user, favs, isTrustedImageUser
   }
 }
 
@@ -210,7 +218,8 @@ class Post extends Component {
   render() {
     const {
       list = false, followButton = true, actions = true, postLink = true,
-      attributeIcon, prefix, post, userPageAction, postPageAction
+      attributeIcon, prefix, post, userPageAction, postPageAction,
+      user, isTrustedImageUser
     } = this.props
     const { openReply, openQuote, emptyQuoted } = this.state
     const host = post.host || this.props.host
@@ -266,7 +275,13 @@ class Post extends Component {
               ) : null}
               {post.text ? (
                 <pre>
-                  <WithImages text={post.text} />
+                  <WithImages
+                    text={post.text}
+                    showAlways={
+                      isSameUser(user, post.user)
+                      || isTrustedImageUser(post.user)
+                    }
+                  />
                 </pre>
               ) : null}
               {quote ? (

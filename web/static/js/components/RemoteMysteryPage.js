@@ -2,9 +2,17 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import queryString from 'query-string'
 
+import { isLoadedSelector } from '../selectors.js'
 import { requestRemoteMystery } from '../actions/index.js'
 import RemoteContentForm from './RemoteContentForm.js'
 import MysteryPage from './MysteryPage.js'
+
+const mapStateToProps = (state) => {
+  const isLoaded = isLoadedSelector(state)
+  return {
+    isLoaded
+  }
+}
 
 const actionCreators = {
   requestRemoteMystery
@@ -28,9 +36,10 @@ class RemoteMysteryPage extends Component {
   }
 
   render() {
+    const { isLoaded } = this.props
     const { host, id } = this.state
     return (
-      <RemoteContentForm host={host} id={id} placeholder='ID'
+      <RemoteContentForm isLoaded={isLoaded} host={host} id={id} placeholder='ID'
         onRequest={this.props.requestRemoteMystery}>
         <MysteryPage params={{id}} />
       </RemoteContentForm>
@@ -38,4 +47,4 @@ class RemoteMysteryPage extends Component {
   }
 }
 
-export default connect(null, actionCreators)(RemoteMysteryPage)
+export default connect(mapStateToProps, actionCreators)(RemoteMysteryPage)

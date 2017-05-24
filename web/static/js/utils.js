@@ -79,3 +79,17 @@ export function getPostsFooters(posts, localFooter = null) {
   }
   return footers
 }
+
+export function isSameUser(user1, user2) {
+  if (user1 == null || user2 == null) return false
+  const { host: host1, name: name1 } = user1
+  const { host: host2, name: name2 } = user2
+  const isSameRemoteUser = isRemoteHost(host1)
+    && isRemoteHost(host2)
+    && host1 == host2
+    && name1 == name2
+  const isSameLocalUser = !isRemoteHost(host1)
+    && !isRemoteHost(host2)
+    && name1 == name2
+  return isSameRemoteUser || isSameLocalUser
+}

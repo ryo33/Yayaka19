@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import queryString from 'query-string'
 
 import { Button, Icon, Popup, Input } from 'semantic-ui-react'
 
@@ -8,7 +7,7 @@ import { requestFollow, requestUnfollow } from '../actions/index.js'
 import {
   userSelector, followingSelector, remoteFollowingSelector
 } from '../selectors.js'
-import { remoteUserPage } from '../pages.js'
+import { remoteUserPage, getRemoteUserPageQuery } from '../pages.js'
 import { isRemoteHost } from '../utils.js'
 
 const mapStateToProps = (state, { user }) => {
@@ -86,7 +85,7 @@ class FollowButton extends Component {
       )
     } else if (currentUser == null || currentUser.name == null) {
       const path = remoteUserPage.path()
-      const query = queryString.stringify({host: user.host || location.host, name: user.name})
+      const query = getRemoteUserPageQuery(user.host || location.host, user.name)
       const url = `https://${this.state.host}${path}?${query}`
       return (
         <Popup

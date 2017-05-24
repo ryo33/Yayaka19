@@ -1,5 +1,8 @@
+import { isSameUser } from './utils.js'
+
 export const infoSelector = ({ info }) => info
 
+export const isLoadedSelector = ({ isLoaded }) => isLoaded
 export const pageSelector = ({ page }) => page
 export const redirectedPageSelector = ({ redirectedPage }) => redirectedPage
 export const userSelector = ({ user }) => user
@@ -10,6 +13,10 @@ export const followersSelector = ({ followers }) => followers
 export const favsSelector = ({ favs }) => favs
 export const errorSelector = ({ error }) => error
 export const windowFocusedSelector = ({ windowFocused }) => windowFocused
+export const isTrustedImageUserFunctionSelector =
+  ({ trustedImageUsers: users }) => user1 => users.some(
+    user2 => isSameUser(user1, user2)
+  )
 
 // New post
 export const newPostPageSelector = ({ newPostPage }) => newPostPage
