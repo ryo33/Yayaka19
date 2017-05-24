@@ -1,5 +1,6 @@
 import { createAction } from 'redux-act'
 
+export const push = createAction('push path', path => path)
 export const setLoaded = createAction('set loaded', loaded => loaded)
 export const setUser = createAction('set user', user => user)
 export const editUser = createAction('edit user', user => user)

@@ -9,6 +9,7 @@ import Time from './Time.js'
 import FollowButton from './FollowButton.js'
 import UserButton from './UserButton.js'
 import WithImages from './WithImages.js'
+import Link from './Link.js'
 import { userPage, mysteryPage, remoteMysteryPage } from '../pages.js'
 import { createRemoteMysteryPath, isRemoteHost, getLocalID } from '../utils.js'
 
@@ -25,9 +26,9 @@ const MysteryLink = ({ mystery, onClick, children }) => {
     const query = queryString.stringify({host: host, id})
     const url = `${path}?${query}`
     return (
-      <a href={url}>
+      <Link href={url}>
         {children}
-      </a>
+      </Link>
     )
   } else {
     return (
