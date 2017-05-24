@@ -48,7 +48,7 @@ const LocalButton = ({ user, ...props }) => {
   if (user && isRemoteHost(user.host)) {
     const { onClick, ...newProps } = props
     return (
-      <Button {...newProps} />
+      <Button {...newProps} disabled />
     )
   } else {
     return (

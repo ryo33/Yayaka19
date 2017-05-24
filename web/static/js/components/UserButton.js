@@ -5,6 +5,7 @@ import { Button, Icon } from 'semantic-ui-react'
 
 import { userPage, remoteUserPage, getRemoteUserPageQuery } from '../pages.js'
 import { isRemoteHost } from '../utils.js'
+import Link from './Link.js'
 
 const actionCreators = {
   userPageAction: name => userPage.action({name})
@@ -17,9 +18,9 @@ const UserButton = ({ Component = Button, user, children, userPageAction }) => {
     const query = getRemoteUserPageQuery(host, user.name)
     const href = `${path}?${query}`
     return (
-      <Component size='mini' as='a' href={href}>
+      <Link href={href} as={Component} size='mini'>
         {children}
-      </Component>
+      </Link>
     )
   } else {
     const link = userPage.path({name: user.name})
